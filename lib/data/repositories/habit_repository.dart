@@ -7,6 +7,7 @@ abstract class IHabitRepository{
   Future<void> addHabit(HabitModel habit);
   Future<void> updateHabit(HabitModel habit);
   Future<void> deleteHabit(String id);
+  Future<void> clearAllData();
 
   List<ConcludedHabitsModel> getHistory(String habitId);
   Future<void> markAsDone(ConcludedHabitsModel conclusion);
@@ -46,6 +47,13 @@ class HabitRepository implements IHabitRepository {
   @override
   Future<void> deleteHabit(String id) async {
     await _habitBox.delete(id);
+
+  }
+
+  @override
+  Future<void> clearAllData() async{
+    await _habitBox.clear();
+    await _conclusionBox.clear();
 
   }
 

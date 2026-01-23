@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive_ce/hive.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
@@ -24,7 +23,6 @@ void main() async {
   // Iniciar as Box do Hive
   await Hive.openBox<HabitModel>('habits');
   await Hive.openBox<ConcludedHabitsModel>('conclusions');
-
 
   runApp(const MainApp());
   
