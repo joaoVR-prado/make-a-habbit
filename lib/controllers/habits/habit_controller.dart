@@ -44,11 +44,9 @@ class HabitController extends Notifier<List<HabitModel>> {
 
   }
 
-  final habitControllerProvider = NotifierProvider<HabitController, List<HabitModel>>((){
-    return HabitController();
-    
-  });
-
-  
-
 }
+
+final habitControllerProvider = NotifierProvider<HabitController, List<HabitModel>>((){
+  return HabitController();
+  
+});
