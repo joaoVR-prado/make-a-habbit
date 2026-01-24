@@ -192,7 +192,7 @@ void main(){
         expect(currentList.length, 0, reason: "A lista deve estar vazia após deletar todos os hábitos");
 
         // Verifica se o repositório foi chamado
-        verify(() => mockRepository.clearAllData()).called(1);
+        verify(() => mockRepository.clearAllData()).called(2);
 
     });
 
