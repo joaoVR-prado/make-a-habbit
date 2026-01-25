@@ -194,6 +194,8 @@ void main(){
         // Verifica se o repositório foi chamado
         verify(() => mockRepository.clearAllData()).called(2);
 
+        ///
+
     });
 
 
