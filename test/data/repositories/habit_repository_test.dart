@@ -42,7 +42,7 @@ void main(){
             goalQuantity: 2, 
             frequency: HabitFrequency(
                 type: HabitFrequencyType.daily,
-                daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
+                selectedDays: [1, 2, 3, 4, 5, 6, 7]
             ), 
             startDate: DateTime(2026, 01, 24)
         );
@@ -56,6 +56,9 @@ void main(){
         final currentList = providerContainer.read(habitControllerProvider);
         expect(currentList.length, 1, reason: 'A lista de hábitos agora deve conter 1 tem (novo hábito)');
         expect(currentList.first.name, newHabit.name, reason: 'O nome do hábito que acabou de ser salvo deve estar correto');
+        expect(currentList.first.conclusionType, newHabit.conclusionType, reason: 'O tipo de conclusao do hábito que acabou de ser salvo deve estar correto');
+        expect(currentList.first.goalQuantity, newHabit.goalQuantity, reason: 'A meta de conclusão do hábito que acabou de ser salvo deve estar correto');
+        expect(currentList.first.frequency.type, newHabit.frequency.type, reason: 'O nome do hábito que acabou de ser salvo deve estar correto');
 
         // Verifica se o repositório foi chamado
         verify(() => mockRepository.addHabit(newHabit)).called(1);
@@ -71,7 +74,7 @@ void main(){
             goalQuantity: 2, 
             frequency: HabitFrequency(
                 type: HabitFrequencyType.daily,
-                daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
+                selectedDays: [1, 2, 3, 4, 5, 6, 7]
             ), 
             startDate: DateTime(2026, 01, 24)
         );
@@ -104,7 +107,7 @@ void main(){
             goalQuantity: 2, 
             frequency: HabitFrequency(
                 type: HabitFrequencyType.daily,
-                daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
+                selectedDays: [1, 2, 3, 4, 5, 6, 7]
             ), 
             startDate: DateTime(2026, 01, 24)
         );
@@ -120,7 +123,7 @@ void main(){
             goalQuantity: 4, 
             frequency: HabitFrequency(
                 type: HabitFrequencyType.weekly,
-                daysOfWeek: [0, 1, 2, 3, 4]
+                selectedDays: [1, 2, 3, 4, 5]
             ), 
             startDate: DateTime(2026, 01, 24)
         );
@@ -143,8 +146,8 @@ void main(){
         expect(habitInCurrentList.name, equals('Diminuir o café para 4 xícaras ao dia, todos os dias exceto final de semana'));
         expect(habitInCurrentList.conclusionType, HabitConclusionType.goalQuantity, reason: 'O método de conclusão do hábito não foi alterado, então deve ser o mesmo');
         expect(habitInCurrentList.goalQuantity, 4, reason: 'Quantidade para concluir o hábito foi alterado');
-        expect(habitInCurrentList.frequency.type, HabitFrequencyType.daily, reason: 'O tipo de frequência permanece o mesmo');
-        expect(habitInCurrentList.frequency.daysOfWeek, equals([0, 1, 2, 3, 4]), reason: 'Os dias do hábito foram alterados');
+        expect(habitInCurrentList.frequency.type, HabitFrequencyType.weekly, reason: 'O tipo de frequência permanece o mesmo');
+        expect(habitInCurrentList.frequency.selectedDays, equals([0, 1, 2, 3, 4]), reason: 'Os dias do hábito foram alterados');
         expect(habitInCurrentList.startDate, equals(DateTime(2026, 01, 24)));
 
         // Verifica se o repositório foi chamado
@@ -161,7 +164,7 @@ void main(){
             goalQuantity: 2, 
             frequency: HabitFrequency(
                 type: HabitFrequencyType.daily,
-                daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
+                selectedDays: [1, 2, 3, 4, 5, 6, 7]
             ), 
             startDate: DateTime(2026, 01, 24)
         );
@@ -173,7 +176,7 @@ void main(){
             conclusionType: HabitConclusionType.yesNo,
             frequency: HabitFrequency(
                 type: HabitFrequencyType.daily,
-                daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
+                selectedDays: [1, 2, 3, 4, 5, 6, 7]
             ), 
             startDate: DateTime(2026, 01, 23)
         );
@@ -194,6 +197,29 @@ void main(){
         // Verifica se o repositório foi chamado
         verify(() => mockRepository.clearAllData()).called(1);
 
+
+    });
+
+    test('Hábitos não devem aparecer no dia atual se a data de inicio ainda não chegou', () async {
+        final today = DateTime(2026, 01, 2025);
+        final tomorrow = today.add(const Duration(days: 1));
+
+        final newHabit = HabitModel(
+            id: '1', 
+            iconCode: 0, 
+            name: 'Diminuir o café para 2 xícaras ao dia, todos os dias', 
+            conclusionType: HabitConclusionType.goalQuantity,
+            goalQuantity: 2, 
+            frequency: HabitFrequency(
+                type: HabitFrequencyType.daily,
+                selectedDays: [1, 2, 3, 4, 5, 6, 7]
+            ), 
+            startDate: tomorrow
+        );
+
+        final isActive = newHabit.isHabitActiveOn(today);
+        
+        expect(isActive, isFalse, reason: 'Hábitos que ainda não começaram não devem aparecer na lista');
 
     });
 

@@ -9,19 +9,19 @@ class HabitFrequency {
   final HabitFrequencyType type;
 
   @HiveField(1)
-  final List<int>? daysOfWeek;
+  final List<int>? selectedDays;
 
-  @HiveField(2)
-  final int? daysInterval;
+  // @HiveField(2)
+  // final int? daysInterval;
 
-  @HiveField(3)
-  final List<int>? daysOfMonth;
+  // @HiveField(3)
+  // final List<int>? daysOfMonth;
 
   HabitFrequency({
     required this.type,
-    this.daysOfWeek,
-    this.daysInterval,
-    this.daysOfMonth
+    this.selectedDays,
+    //this.daysInterval,
+    //this.daysOfMonth
 
   });
 

@@ -18,24 +18,18 @@ class HabitFrequencyAdapter extends TypeAdapter<HabitFrequency> {
     };
     return HabitFrequency(
       type: fields[0] as HabitFrequencyType,
-      daysOfWeek: (fields[1] as List?)?.cast<int>(),
-      daysInterval: (fields[2] as num?)?.toInt(),
-      daysOfMonth: (fields[3] as List?)?.cast<int>(),
+      selectedDays: (fields[1] as List?)?.cast<int>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, HabitFrequency obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(2)
       ..writeByte(0)
       ..write(obj.type)
       ..writeByte(1)
-      ..write(obj.daysOfWeek)
-      ..writeByte(2)
-      ..write(obj.daysInterval)
-      ..writeByte(3)
-      ..write(obj.daysOfMonth);
+      ..write(obj.selectedDays);
   }
 
   @override
