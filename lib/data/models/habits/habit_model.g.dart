@@ -23,8 +23,8 @@ class HabitModelAdapter extends TypeAdapter<HabitModel> {
       conclusionType: fields[3] as HabitConclusionType,
       goalQuantity: (fields[4] as num?)?.toInt(),
       frequency: fields[5] as HabitFrequency,
-      startData: fields[6] as DateTime,
-      endData: fields[7] as DateTime?,
+      startDate: fields[6] as DateTime,
+      endDate: fields[7] as DateTime?,
       description: fields[8] as String?,
       notificationId: (fields[9] as num?)?.toInt(),
       notificationTime: fields[10] as DateTime?,
@@ -48,9 +48,9 @@ class HabitModelAdapter extends TypeAdapter<HabitModel> {
       ..writeByte(5)
       ..write(obj.frequency)
       ..writeByte(6)
-      ..write(obj.startData)
+      ..write(obj.startDate)
       ..writeByte(7)
-      ..write(obj.endData)
+      ..write(obj.endDate)
       ..writeByte(8)
       ..write(obj.description)
       ..writeByte(9)

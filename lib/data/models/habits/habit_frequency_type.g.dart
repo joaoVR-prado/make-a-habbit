@@ -19,8 +19,6 @@ class HabitFrequencyTypeAdapter extends TypeAdapter<HabitFrequencyType> {
         return HabitFrequencyType.weekly;
       case 2:
         return HabitFrequencyType.monthly;
-      case 3:
-        return HabitFrequencyType.daysInterval;
       default:
         return HabitFrequencyType.daily;
     }
@@ -35,8 +33,6 @@ class HabitFrequencyTypeAdapter extends TypeAdapter<HabitFrequencyType> {
         writer.writeByte(1);
       case HabitFrequencyType.monthly:
         writer.writeByte(2);
-      case HabitFrequencyType.daysInterval:
-        writer.writeByte(3);
     }
   }
 

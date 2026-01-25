@@ -42,9 +42,9 @@ void main(){
             goalQuantity: 2, 
             frequency: HabitFrequency(
                 type: HabitFrequencyType.daily,
-                daysOfWeek: [1, 2, 3, 4, 5, 6, 7]
+                daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
             ), 
-            startData: DateTime(2026, 01, 24)
+            startDate: DateTime(2026, 01, 24)
         );
 
         when(() => mockRepository.addHabit(newHabit)).thenAnswer((_) async{});
@@ -71,9 +71,9 @@ void main(){
             goalQuantity: 2, 
             frequency: HabitFrequency(
                 type: HabitFrequencyType.daily,
-                daysOfWeek: [1, 2, 3, 4, 5, 6, 7]
+                daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
             ), 
-            startData: DateTime(2026, 01, 24)
+            startDate: DateTime(2026, 01, 24)
         );
 
         when(() => mockRepository.getAllHabits()).thenReturn([newHabit]);
@@ -104,9 +104,9 @@ void main(){
             goalQuantity: 2, 
             frequency: HabitFrequency(
                 type: HabitFrequencyType.daily,
-                daysOfWeek: [1, 2, 3, 4, 5, 6, 7]
+                daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
             ), 
-            startData: DateTime(2026, 01, 24)
+            startDate: DateTime(2026, 01, 24)
         );
 
         when(() => mockRepository.getAllHabits()).thenReturn([newHabit]);
@@ -119,10 +119,10 @@ void main(){
             conclusionType: HabitConclusionType.goalQuantity,
             goalQuantity: 4, 
             frequency: HabitFrequency(
-                type: HabitFrequencyType.daily,
-                daysOfWeek: [1, 2, 3, 4, 5]
+                type: HabitFrequencyType.weekly,
+                daysOfWeek: [0, 1, 2, 3, 4]
             ), 
-            startData: DateTime(2026, 01, 24)
+            startDate: DateTime(2026, 01, 24)
         );
 
         when(() => mockRepository.updateHabit(editedNewHabit)).thenAnswer((_) async {});
@@ -144,8 +144,8 @@ void main(){
         expect(habitInCurrentList.conclusionType, HabitConclusionType.goalQuantity, reason: 'O método de conclusão do hábito não foi alterado, então deve ser o mesmo');
         expect(habitInCurrentList.goalQuantity, 4, reason: 'Quantidade para concluir o hábito foi alterado');
         expect(habitInCurrentList.frequency.type, HabitFrequencyType.daily, reason: 'O tipo de frequência permanece o mesmo');
-        expect(habitInCurrentList.frequency.daysOfWeek, equals([1, 2, 3, 4, 5]), reason: 'Os dias do hábito foram alterados');
-        expect(habitInCurrentList.startData, equals(DateTime(2026, 01, 24)));
+        expect(habitInCurrentList.frequency.daysOfWeek, equals([0, 1, 2, 3, 4]), reason: 'Os dias do hábito foram alterados');
+        expect(habitInCurrentList.startDate, equals(DateTime(2026, 01, 24)));
 
         // Verifica se o repositório foi chamado
         verify(() => mockRepository.updateHabit(editedNewHabit)).called(1);
@@ -161,9 +161,9 @@ void main(){
             goalQuantity: 2, 
             frequency: HabitFrequency(
                 type: HabitFrequencyType.daily,
-                daysOfWeek: [1, 2, 3, 4, 5, 6, 7]
+                daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
             ), 
-            startData: DateTime(2026, 01, 24)
+            startDate: DateTime(2026, 01, 24)
         );
 
         final newHabit2 = HabitModel(
@@ -173,9 +173,9 @@ void main(){
             conclusionType: HabitConclusionType.yesNo,
             frequency: HabitFrequency(
                 type: HabitFrequencyType.daily,
-                daysOfWeek: [1, 2, 3, 4, 5, 6, 7]
+                daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
             ), 
-            startData: DateTime(2026, 01, 23)
+            startDate: DateTime(2026, 01, 23)
         );
 
         when(() => mockRepository.getAllHabits()).thenReturn([newHabit1, newHabit2]);
@@ -192,9 +192,8 @@ void main(){
         expect(currentList.length, 0, reason: "A lista deve estar vazia após deletar todos os hábitos");
 
         // Verifica se o repositório foi chamado
-        verify(() => mockRepository.clearAllData()).called(2);
+        verify(() => mockRepository.clearAllData()).called(1);
 
-        ///
 
     });
 

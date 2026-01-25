@@ -27,10 +27,10 @@ class HabitModel extends HiveObject {
   final HabitFrequency frequency;
 
   @HiveField(6)
-  final DateTime startData;
+  final DateTime startDate;
 
   @HiveField(7)
-  final DateTime? endData;
+  final DateTime? endDate;
 
   @HiveField(8)
   final String? description;
@@ -48,8 +48,8 @@ class HabitModel extends HiveObject {
     required this.conclusionType,
     this.goalQuantity,
     required this.frequency,
-    required this.startData,
-    this.endData,
+    required this.startDate,
+    this.endDate,
     this.description,
     this.notificationId,
     this.notificationTime

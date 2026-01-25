@@ -4,6 +4,7 @@ import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 
 abstract class IHabitRepository{
   List<HabitModel> getAllHabits();
+  HabitModel? getOneHabit(String id);
   Future<void> addHabit(HabitModel habit);
   Future<void> updateHabit(HabitModel habit);
   Future<void> deleteHabit(String id);
@@ -29,6 +30,12 @@ class HabitRepository implements IHabitRepository {
   @override
   List<HabitModel> getAllHabits(){
     return _habitBox.values.toList();
+
+  }
+
+  @override
+  HabitModel? getOneHabit(String id){
+    return _habitBox.get(id);
 
   }
 
