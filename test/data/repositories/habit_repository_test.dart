@@ -271,8 +271,61 @@ void main(){
             expect(isActive, isTrue, reason: 'Hábitos criados hoje com a data de inicio para hoje devem aparecer na lista');
 
         });
+
+        test('Verificamos quais dias o hábito semanal deve aparecer nas datas fornecidas', () async {
+            final startDate = DateTime(2026, 01, 25);
+            final today = DateTime(2026, 02, 15);
+            final tuesday = DateTime(2026, 02, 17);
+
+            final newHabit = HabitModel(
+                id: '1', 
+                iconCode: 0, 
+                name: 'Ler um livro nos dias de descanso', 
+                conclusionType: HabitConclusionType.goalQuantity,
+                goalQuantity: 2, 
+                frequency: HabitFrequency(
+                    type: HabitFrequencyType.weekly,
+                    selectedDays: [1, 4, 6, 7]
+                ), 
+                startDate: startDate,
+            );
+
+            final isActiveToday = newHabit.isHabitActiveOn(today);
+            final isActiveTuesday = newHabit.isHabitActiveOn(tuesday);
+            
+            expect(isActiveToday, isTrue, reason: 'O usuário criou um hábito que deve aparecer na segunda, quinta, sabado e domingo. Como a data fornecida é domingo, o hábito deve aparecer hoje');
+            expect(isActiveTuesday, isFalse, reason: 'O usuário criou um hábito que deve aparecer na segunda, quinta, sabado e domingo. Como a data fornecida é terça, o hábito não deve aparecer');
+
+        });
+
+        test('Verificamos quais dias o hábito mensal deve aparecer, com base nas dastas fornecidas', () async {
+            final startDate = DateTime(2026, 01, 25);
+            final today = DateTime(2026, 02, 15);
+            final lastDayFebruary = DateTime(2026, 02, 28);
+
+            final newHabit = HabitModel(
+                id: '1', 
+                iconCode: 0, 
+                name: 'Fazer trilha', 
+                conclusionType: HabitConclusionType.yesNo,
+                frequency: HabitFrequency(
+                    type: HabitFrequencyType.monthly,
+                    selectedDays: [1, 15, 30]
+                ), 
+                startDate: startDate,
+            );
+
+            final isActiveToday = newHabit.isHabitActiveOn(today);
+            final isActiveFebruary = newHabit.isHabitActiveOn(lastDayFebruary);
+            
+            expect(isActiveToday, isTrue, reason: 'O usuário criou um hábito que deve aparecer no dia 1, 15 e 30 de cada mês. Como a data fornecida é dia 15, o hábito deve aparecer hoje');
+            expect(isActiveFebruary, isFalse, reason: 'O usuário criou um hábito que deve aparecer no dia 1, 15 e 30 de cada mês. Como fevereiro não tem dia 30, o hábito não deve aparecer nessa data');
+
+        });
     });
     // FIM
+
+    // TODO: Realizar mais testes
 
     // TODO: Testar os outros tipos de frequencyType, weekly e monthly
 
