@@ -325,9 +325,4 @@ void main(){
     });
     // FIM
 
-    // TODO: Realizar mais testes
-
-    // TODO: Testar os outros tipos de frequencyType, weekly e monthly
-
-
 }
