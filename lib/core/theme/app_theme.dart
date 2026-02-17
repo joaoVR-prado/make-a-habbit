@@ -14,26 +14,34 @@ class AppTheme {
       
     ),
 
+    // Scaffold
+    scaffoldBackgroundColor: AppColors.darkBlue,
+    appBarTheme: AppBarThemeData(
+      backgroundColor: Colors.transparent,
+      elevation: 0
+    ),
+
     // Estilos de texto
     textTheme: GoogleFonts.konkhmerSleokchherTextTheme().copyWith(
-      titleLarge: const TextStyle(fontSize: 20, color: Colors.white),
-      titleMedium: const TextStyle(fontSize: 14, color: Colors.white),
+      titleLarge: const TextStyle(fontSize: 20, color: AppColors.whiteText),
+      titleMedium: const TextStyle(fontSize: 14, color: AppColors.whiteText),
       
-      bodyLarge: const TextStyle(fontSize: 20, color: Colors.white),
+      bodyLarge: const TextStyle(fontSize: 20, color: AppColors.whiteText),
       bodyMedium: const TextStyle(fontSize: 16, color: Colors.black),
-      bodySmall: const TextStyle(fontSize: 8, color: Colors.white),
+      bodySmall: const TextStyle(fontSize: 8, color: AppColors.whiteText),
 
       // Especifico dos cards do calendário
-      labelLarge: const TextStyle(fontSize: 24, color: Colors.white),
-      labelSmall: const TextStyle(fontSize: 12, color: Colors.white)
+      labelLarge: const TextStyle(fontSize: 24, color: AppColors.whiteText),
+      labelSmall: const TextStyle(fontSize: 12, color: AppColors.whiteText)
 
     ),
 
     // Cards do calendário
     cardTheme: CardThemeData(
+      color: AppColors.cardBackgrounColor,
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(16)),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(5)),
+      margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
     ),
 
     // Botão para adicinar um novo hábito
@@ -42,16 +50,19 @@ class AppTheme {
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(16)),
       foregroundColor: Colors.white,
       backgroundColor: AppColors.homePageIconColor,
-      iconSize: 21 // TODO: Figma esta 42x42, entao precisa verificar o tamanho depois
+      iconSize: 42
     ),
 
     textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        textStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 18,    
+
+        )
+      )
       
     )
-
-
-
   );
-
 
 }

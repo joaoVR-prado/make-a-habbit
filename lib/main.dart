@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+import 'package:make_a_habbit/core/theme/app_theme.dart';
 import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
@@ -38,10 +39,12 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Make a Habbit',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
-        useMaterial3: true
-      ),
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      // theme: ThemeData(
+      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+      //   useMaterial3: true
+      // ),
       home: HomePage(),
 
     );
