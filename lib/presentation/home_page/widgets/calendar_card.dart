@@ -1,35 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CalendarCard extends ConsumerStatefulWidget {
-  const CalendarCard({super.key});
+class CalendarCard extends StatelessWidget {
+  final String dayName;
+  final String dayNumber;
+  final bool isSelected;
+  final VoidCallback onTap;
 
-  @override
-  ConsumerState<CalendarCard> createState() => _CalendarCard();
+  const CalendarCard({
+    super.key,
+    required this.dayName,
+    required this.dayNumber,
+    required this.isSelected,
+    required this.onTap
 
-}
+  });
 
-class _CalendarCard extends ConsumerState<CalendarCard>{
-  @override
+   @override
   Widget build(BuildContext context){
     return Card(
       clipBehavior: Clip.hardEdge,
+      margin: const EdgeInsets.all(4),
       child: InkWell(
-        onTap: (){},
+        onTap: onTap,
         child: SizedBox(
           width: 62,
           height: 82,
-          child: Center(
+          child: Padding(
+            padding: const EdgeInsetsGeometry.symmetric(vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text(
-                  'QUI', 
+                  dayName, 
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
                 Text(
-                  '08',
+                  dayNumber,
                   style: Theme.of(context).textTheme.labelLarge,
                 )
               ],
@@ -39,8 +47,6 @@ class _CalendarCard extends ConsumerState<CalendarCard>{
         ),
       )
     );
-
-
   }
 
 }

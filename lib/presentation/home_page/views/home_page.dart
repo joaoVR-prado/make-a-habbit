@@ -5,6 +5,7 @@ import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/calendar_card.dart';
+import 'package:make_a_habbit/presentation/home_page/widgets/horizontal_calendar.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 
@@ -17,12 +18,6 @@ class HomePage extends ConsumerStatefulWidget{
 }
 
 class _HomePageState extends ConsumerState<HomePage>{
-  // Lista do calendário
-  final double _cardWidth = 62.0;
-  final double _padding = 8.0;
-  late final double _itemSize;
-
-  final DateTime currentYear = DateTime.now();
   
   @override
   Widget build(BuildContext context){
@@ -35,7 +30,7 @@ class _HomePageState extends ConsumerState<HomePage>{
           ),
           body: Column(
             children: [
-              CalendarCard(),
+              HorizontalCalendar(),
               // habitsList.isEmpty
               //     ? const Center(
               //         child: Text(
