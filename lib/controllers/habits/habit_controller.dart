@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:riverpod/riverpod.dart';
@@ -56,6 +57,12 @@ class HabitController extends Notifier<List<HabitModel>> {
 final habitControllerProvider = NotifierProvider<HabitController, List<HabitModel>>((){
   return HabitController();
   
+});
+
+final selectedDateProvider = StateProvider<DateTime>((ref){
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day);
+
 });
 
 

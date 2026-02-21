@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/calendar_card.dart';
 
 class HorizontalCalendar extends ConsumerStatefulWidget {
@@ -55,6 +56,8 @@ class _HorizontalCalendarState extends ConsumerState<HorizontalCalendar>{
 
   @override
   Widget build(BuildContext context){
+    final selectedDate = ref.watch(selectedDateProvider);
+
     return SizedBox(
       height: 90,
       child: ListView.builder(
@@ -64,15 +67,16 @@ class _HorizontalCalendarState extends ConsumerState<HorizontalCalendar>{
         itemExtent: _itemSize,
         itemBuilder: (context, index){
           final date = _startDate.add(Duration(days: index));
-          final isSelected = date.day == DateTime.now().day && date.month == DateTime.now().month;
-
+          final isSelected = date.day == selectedDate.day && date.month == selectedDate.month && date.year == selectedDate.year;
           return Padding(
             padding: EdgeInsetsGeometry.symmetric(horizontal: _padding / 2),
             child: CalendarCard(
               dayName: _getDayName(date.weekday),
               dayNumber: date.day.toString(),
               isSelected: isSelected,
-              onTap: (){}
+              onTap: (){
+                ref.read(selectedDateProvider.notifier).state = date;
+              }
             ),
           );
 

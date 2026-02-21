@@ -12,14 +12,15 @@ class HabitModel extends HiveObject {
   // Método para verificarmos se um habito deve aparecer ou não na lista da data fornecida
   bool isHabitActiveOn(DateTime date) {
 
+    final cleanDate = DateTime(date.year, date.month, date.day);
+    final cleanStartDate = DateTime(startDate.year, startDate.month, startDate.day);
+
     // Primeiro valido se o habito ja comecou
-    if(date.isBefore(startDate)) return false;
+    if(cleanDate.isBefore(cleanStartDate)) return false;
 
     // Segundo valido se o habito ja foi concluido
     if(endDate != null){
-      final cleanDate = DateTime(date.year, date.month, date.day);
       final cleanEndDate = DateTime(endDate!.year, endDate!.month, endDate!.day);
-
       if(cleanDate.isAfter(cleanEndDate)) return false;
 
     }
@@ -30,10 +31,10 @@ class HabitModel extends HiveObject {
         return true;
 
       case HabitFrequencyType.weekly:
-        return frequency.selectedDays!.contains(date.weekday);
+        return frequency.selectedDays!.contains(cleanDate.weekday);
 
       case HabitFrequencyType.monthly:
-        return frequency.selectedDays!.contains(date.day);
+        return frequency.selectedDays!.contains(cleanDate.day);
 
     }
     

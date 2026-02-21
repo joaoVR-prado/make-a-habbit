@@ -22,6 +22,10 @@ class _HomePageState extends ConsumerState<HomePage>{
   @override
   Widget build(BuildContext context){
       final habitsList = ref.watch(habitControllerProvider);
+      final selectedDate = ref.watch(selectedDateProvider);
+
+      ref.watch(habitControllerProvider);
+      final habitsForSelectedDate = ref.read(habitControllerProvider.notifier).getHabitsForDate(selectedDate);
 
       return Scaffold(
           appBar: AppBar(
@@ -30,7 +34,44 @@ class _HomePageState extends ConsumerState<HomePage>{
           ),
           body: Column(
             children: [
-              HorizontalCalendar(),
+              Padding(
+                padding: EdgeInsetsGeometry.symmetric(vertical: 16),
+                child: HorizontalCalendar()
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: habitsForSelectedDate.length,
+                  itemBuilder: (context, index) {
+                    final habit = habitsForSelectedDate[index];
+                    return ListTile(
+                      leading: const Icon(
+                          Icons.circle_outlined
+                      ),
+                      title: Text(
+                        habit.name,
+                        style: TextStyle(
+                          color: Colors.white
+                        ),
+                      ),
+                      subtitle: Text(
+                        habit.frequency.type.name,
+                        style: TextStyle(
+                          color: Colors.white
+                        ),
+                      ),
+                      trailing: IconButton(
+                          onPressed: (){
+                              ref.read(habitControllerProvider.notifier).deleteHabit(habit.id);
+      
+                          }, 
+                          icon: Icon(Icons.delete),
+                          color: Colors.red,
+                      ),
+                  );
+                  },
+
+                )
+              )
               // habitsList.isEmpty
               //     ? const Center(
               //         child: Text(
@@ -62,16 +103,16 @@ class _HomePageState extends ConsumerState<HomePage>{
               //     ),
             ],
           ),
-              floatingActionButton: FloatingActionButton(
-                  onPressed: (){
-                      _addTestHabit();
+          floatingActionButton: FloatingActionButton(
+            onPressed: (){
+                _addTestHabit();
 
-                  },
-                  child: Icon(
-                    Icons.add,
-                    color: Colors.white,
-                  ),
-              ),
+            },
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+          ),
       );
 
   }
