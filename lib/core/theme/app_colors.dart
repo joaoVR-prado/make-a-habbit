@@ -15,6 +15,9 @@ class AppColors {
   // Cor de fundo dos cards
   static const cardBackgrounColor = Color(0xFF6E848F);
 
+  // Cor do icone de trailing de habitos com status 'pending'
+  static const pendingStatusIconColor = Color(0xFF37728E); 
+
   // Cores dos cards do calendario
   static const calendarMainColor = Color(0xFF459AC3);
   static const calendarSecondaryColor = Color(0xFF37728E); 
