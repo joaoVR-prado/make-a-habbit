@@ -12,11 +12,14 @@ class AppColors {
   // Cor dos Icones uteis da tela home_page (EX: Botao para adicionar habitos, calendario, pesquisa...)
   static const homePageIconColor = Color(0xFF1CB0F6);
 
-  // Cor de fundo dos cards
+  // Cor de fundo dos cards 
   static const cardBackgrounColor = Color(0xFF6E848F);
 
   // Cor do icone de trailing de habitos com status 'pending'
-  static const pendingStatusIconColor = Color(0xFF37728E); 
+  static const pendingStatusIconColor = Color(0xFF37728E);
+
+  // Cor do bottomNavBar
+  static const bottomAppBarcolor = Color(0xFF6E848F);
 
   // Cores dos cards do calendario
   static const calendarMainColor = Color(0xFF459AC3);

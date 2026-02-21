@@ -32,7 +32,10 @@ class AppTheme {
 
       // Especifico dos cards do calendário
       labelLarge: const TextStyle(fontSize: 24, color: AppColors.whiteText),
-      labelSmall: const TextStyle(fontSize: 12, color: AppColors.whiteText)
+      labelSmall: const TextStyle(fontSize: 12, color: AppColors.whiteText),
+
+      // Especifico para os textbuttons do bottomnavbar
+      labelMedium: const TextStyle(fontSize: 18, color: AppColors.whiteText)
 
     ),
 
@@ -45,6 +48,24 @@ class AppTheme {
     ),
 
     // Botão para adicinar um novo hábito
+    // outlinedButtonTheme: OutlinedButtonThemeData(
+    //   style: OutlinedButton.styleFrom(
+    //     fixedSize: Size(38, 58),
+    //     elevation: 2,
+    //     foregroundColor: Colors.white,
+    //     backgroundColor: AppColors.homePageIconColor,
+    //     side: BorderSide(
+    //       color: AppColors.homePageIconColor,
+    //       width: 1.5,
+    //     ),
+    //     shape: RoundedRectangleBorder(
+    //       borderRadius: BorderRadius.circular(8),
+    //     ),
+    //     textStyle: const TextStyle(
+    //       fontSize: 16,
+    //     ),
+    //   ),
+    // ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(16)),

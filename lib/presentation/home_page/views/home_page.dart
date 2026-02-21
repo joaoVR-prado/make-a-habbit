@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
@@ -30,16 +31,29 @@ class _HomePageState extends ConsumerState<HomePage>{
       final habitsForSelectedDate = ref.read(habitControllerProvider.notifier).getHabitsForDate(selectedDate);
 
       return Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
           appBar: AppBar(
               title: const Text('Meus Hábitos', style: TextStyle(color: Colors.white),),
               centerTitle: true,
           ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: (){
+              _addTestHabit();
+
+            },
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+          ),
           body: Column(
             children: [
+              // Calendario
               Padding(
                 padding: EdgeInsetsGeometry.symmetric(vertical: 16),
                 child: HorizontalCalendar()
               ),
+              // Habitos
               Expanded(
                 child: ListView.builder(
                   itemCount: habitsForSelectedDate.length,
@@ -70,14 +84,47 @@ class _HomePageState extends ConsumerState<HomePage>{
               )
             ],
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: (){
-              _addTestHabit();
-
-            },
-            child: Icon(
-              Icons.add,
-              color: Colors.white,
+          bottomNavigationBar: BottomAppBar(
+            height: 50,
+            color: AppColors.bottomAppBarcolor,
+            // shape: const CircularNotchedRectangle(),
+            // notchMargin: 8.0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: TextButton(
+                    onPressed: (){}, 
+                    child: Text(
+                      'HÁBITOS',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    )
+                  ),
+                ),
+                const SizedBox(width: 48),
+                // Expanded(
+                //   flex: 1,
+                //   child: OutlinedButton(
+                //     onPressed: (){}, 
+                //     child: Icon(
+                //       Icons.add,
+                //       color: Colors.white,
+                //       size: 42,
+                //     ),
+                //   ),
+                // ),
+                Expanded(
+                  flex: 2,
+                  child: TextButton(
+                    onPressed: (){}, 
+                    child: Text(
+                      'RELATÓRIOS',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    )
+                  ),
+                ),
+              ],
             ),
           ),
       );
