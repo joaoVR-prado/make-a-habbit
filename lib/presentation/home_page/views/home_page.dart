@@ -33,45 +33,54 @@ class _HomePageState extends ConsumerState<HomePage>{
       return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
           appBar: AppBar(
-              // title: const Text('Meus Hábitos', style: TextStyle(color: Colors.white),),
-              // centerTitle: true,
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.calendar_month),
-                  color: AppColors.homePageIconColor,
-                  onPressed: () async{
-                    final currentDate = ref.read(selectedDateProvider);
-
-                    final DateTime? selectedDate = await showDatePicker(
-                      context: context, 
-                      initialDate: currentDate,
-                      firstDate: DateTime(DateTime.now().year - 1), // Ano passado
-                      lastDate: DateTime(DateTime.now().year + 1),// Vai até ano que vem
-
-                      builder: (context, child) {
-                        return Theme(
-                          data: Theme.of(context).copyWith(
-                            colorScheme: const ColorScheme.light(
-                              primary: AppColors.homePageIconColor,
-                              onPrimary: Colors.white,
-                              onSurface: Colors.black
-                            )
-                          ), 
-                          child: child!
-                        );
-                      },
+            leading: IconButton(
+              icon: const Icon(Icons.calendar_month, size: 38),
+              color: AppColors.homePageIconColor,
+              onPressed: () async{
+                final currentDate = ref.read(selectedDateProvider);
+            
+                final DateTime? selectedDate = await showDatePicker(
+                  context: context, 
+                  initialDate: currentDate,
+                  firstDate: DateTime(DateTime.now().year - 1), // Ano passado
+                  lastDate: DateTime(DateTime.now().year + 1),// Vai até ano que vem
+            
+                  builder: (context, child) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: const ColorScheme.light(
+                          primary: AppColors.homePageIconColor,
+                          onPrimary: Colors.white,
+                          onSurface: Colors.black
+                        )
+                      ), 
+                      child: child!
                     );
-
-                    if(selectedDate != null && selectedDate != currentDate){
-                      ref.read(selectedDateProvider.notifier).state = selectedDate;
-
-                    }
-
                   },
-
-                )
-              ],
-
+                );
+                if(selectedDate != null && selectedDate != currentDate){
+                  ref.read(selectedDateProvider.notifier).state = selectedDate;
+            
+                }
+              },
+            ),
+            title: Text(
+              '${_getDayName(selectedDate.weekday)} - ${_getMonthName(selectedDate.month)}. ${selectedDate.day} - ${selectedDate.year}',
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+            //centerTitle: true,
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: IconButton(
+                  icon: const Icon(Icons.search, size: 32),
+                  color: AppColors.homePageIconColor,
+                  onPressed: () {
+                    print("Clicou na lupa!");
+                  },
+                ),
+              ),
+            ],
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: (){
@@ -183,6 +192,18 @@ class _HomePageState extends ConsumerState<HomePage>{
         );
 
         ref.read(habitControllerProvider.notifier).addHabit(newHabit);
+
+    }
+
+    String _getDayName(int weekday){
+      const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
+      return days[weekday - 1];
+
+    }
+
+    String _getMonthName(int month){
+      const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAIO', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+      return months[month - 1];
 
     }
 
