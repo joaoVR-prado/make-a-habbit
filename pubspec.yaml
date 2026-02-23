@@ -7,6 +7,8 @@ environment:
   sdk: ^3.10.4
 
 dependencies:
+  flutter_localizations:
+    sdk: flutter
   build_runner: ^2.10.5
   flutter:
     sdk: flutter

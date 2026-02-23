@@ -9,9 +9,10 @@ import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
 import 'package:make_a_habbit/presentation/home_page/views/home_page.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized;
+  WidgetsFlutterBinding.ensureInitialized();
 
   // Iniciar Hive
   await Hive.initFlutter();
@@ -38,6 +39,19 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // Calendario
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate, 
+        GlobalCupertinoLocalizations.delegate,
+
+      ],
+      
+      supportedLocales: const [
+        Locale('pt', 'BR')
+        
+      ],
+
       title: 'Make a Habbit',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

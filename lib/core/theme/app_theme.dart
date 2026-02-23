@@ -46,32 +46,17 @@ class AppTheme {
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(5)),
       margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
     ),
-
-    // Botão para adicinar um novo hábito
-    // outlinedButtonTheme: OutlinedButtonThemeData(
-    //   style: OutlinedButton.styleFrom(
-    //     fixedSize: Size(38, 58),
-    //     elevation: 2,
-    //     foregroundColor: Colors.white,
-    //     backgroundColor: AppColors.homePageIconColor,
-    //     side: BorderSide(
-    //       color: AppColors.homePageIconColor,
-    //       width: 1.5,
-    //     ),
-    //     shape: RoundedRectangleBorder(
-    //       borderRadius: BorderRadius.circular(8),
-    //     ),
-    //     textStyle: const TextStyle(
-    //       fontSize: 16,
-    //     ),
-    //   ),
-    // ),
+    
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(16)),
+      sizeConstraints: BoxConstraints(
+        minWidth: 62,
+        minHeight: 62
+      ),
       foregroundColor: Colors.white,
       backgroundColor: AppColors.homePageIconColor,
-      iconSize: 42
+      iconSize: 48
     ),
 
     textButtonTheme: TextButtonThemeData(

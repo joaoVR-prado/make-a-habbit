@@ -33,8 +33,45 @@ class _HomePageState extends ConsumerState<HomePage>{
       return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
           appBar: AppBar(
-              title: const Text('Meus Hábitos', style: TextStyle(color: Colors.white),),
-              centerTitle: true,
+              // title: const Text('Meus Hábitos', style: TextStyle(color: Colors.white),),
+              // centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  color: AppColors.homePageIconColor,
+                  onPressed: () async{
+                    final currentDate = ref.read(selectedDateProvider);
+
+                    final DateTime? selectedDate = await showDatePicker(
+                      context: context, 
+                      initialDate: currentDate,
+                      firstDate: DateTime(DateTime.now().year - 1), // Ano passado
+                      lastDate: DateTime(DateTime.now().year + 1),// Vai até ano que vem
+
+                      builder: (context, child) {
+                        return Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: const ColorScheme.light(
+                              primary: AppColors.homePageIconColor,
+                              onPrimary: Colors.white,
+                              onSurface: Colors.black
+                            )
+                          ), 
+                          child: child!
+                        );
+                      },
+                    );
+
+                    if(selectedDate != null && selectedDate != currentDate){
+                      ref.read(selectedDateProvider.notifier).state = selectedDate;
+
+                    }
+
+                  },
+
+                )
+              ],
+
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: (){
@@ -84,47 +121,50 @@ class _HomePageState extends ConsumerState<HomePage>{
               )
             ],
           ),
-          bottomNavigationBar: BottomAppBar(
-            height: 50,
-            color: AppColors.bottomAppBarcolor,
-            // shape: const CircularNotchedRectangle(),
-            // notchMargin: 8.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: TextButton(
-                    onPressed: (){}, 
-                    child: Text(
-                      'HÁBITOS',
-                      style: Theme.of(context).textTheme.labelMedium,
-                    )
+          bottomNavigationBar: Padding(
+            padding: EdgeInsetsGeometry.only(bottom: 10),
+            child: BottomAppBar(
+              height: 60,
+              color: AppColors.bottomAppBarcolor,
+              // shape: const CircularNotchedRectangle(),
+              // notchMargin: 8.0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: TextButton(
+                      onPressed: (){}, 
+                      child: Text(
+                        'HÁBITOS',
+                        style: Theme.of(context).textTheme.labelMedium,
+                      )
+                    ),
                   ),
-                ),
-                const SizedBox(width: 48),
-                // Expanded(
-                //   flex: 1,
-                //   child: OutlinedButton(
-                //     onPressed: (){}, 
-                //     child: Icon(
-                //       Icons.add,
-                //       color: Colors.white,
-                //       size: 42,
-                //     ),
-                //   ),
-                // ),
-                Expanded(
-                  flex: 2,
-                  child: TextButton(
-                    onPressed: (){}, 
-                    child: Text(
-                      'RELATÓRIOS',
-                      style: Theme.of(context).textTheme.labelMedium,
-                    )
+                  const SizedBox(width: 48),
+                  // Expanded(
+                  //   flex: 1,
+                  //   child: OutlinedButton(
+                  //     onPressed: (){}, 
+                  //     child: Icon(
+                  //       Icons.add,
+                  //       color: Colors.white,
+                  //       size: 42,
+                  //     ),
+                  //   ),
+                  // ),
+                  Expanded(
+                    flex: 2,
+                    child: TextButton(
+                      onPressed: (){}, 
+                      child: Text(
+                        'RELATÓRIOS',
+                        style: Theme.of(context).textTheme.labelMedium,
+                      )
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
       );
