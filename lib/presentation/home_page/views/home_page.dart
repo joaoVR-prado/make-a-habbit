@@ -7,6 +7,7 @@ import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/calendar_card.dart';
+import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habits_list_tile.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/horizontal_calendar.dart';
 import 'package:riverpod/riverpod.dart';
@@ -75,8 +76,19 @@ class _HomePageState extends ConsumerState<HomePage>{
                 child: IconButton(
                   icon: const Icon(Icons.search, size: 32),
                   color: AppColors.homePageIconColor,
-                  onPressed: () {
-                    print("Clicou na lupa!");
+                  onPressed: () async {
+                    final allHabits = ref.read(habitControllerProvider);
+
+                    final result = await showSearch(
+                      context: context, 
+                      delegate: HabitSearch(habits: allHabits),
+
+                    );
+                    if (result != null){
+                      print('Achou');
+
+                    }
+                   
                   },
                 ),
               ),
@@ -151,17 +163,6 @@ class _HomePageState extends ConsumerState<HomePage>{
                     ),
                   ),
                   const SizedBox(width: 48),
-                  // Expanded(
-                  //   flex: 1,
-                  //   child: OutlinedButton(
-                  //     onPressed: (){}, 
-                  //     child: Icon(
-                  //       Icons.add,
-                  //       color: Colors.white,
-                  //       size: 42,
-                  //     ),
-                  //   ),
-                  // ),
                   Expanded(
                     flex: 2,
                     child: TextButton(
@@ -177,18 +178,18 @@ class _HomePageState extends ConsumerState<HomePage>{
             ),
           ),
       );
-
   }
 
     void _addTestHabit(){
         final newHabit = HabitModel(
-            id: '1', 
-            iconCode: 0, 
-            name: 'Não fumar',
-            description: "Parar de fumar todos os dias",
+            id: '4', 
+            iconCode: 3, 
+            name: 'Ir na missa',
+            description: "Toda quinta",
             conclusionType: HabitConclusionType.yesNo,
-            frequency: HabitFrequency(type: HabitFrequencyType.daily), 
+            frequency: HabitFrequency(type: HabitFrequencyType.weekly, selectedDays: [5]),
             startDate: DateTime.now()
+
         );
 
         ref.read(habitControllerProvider.notifier).addHabit(newHabit);
