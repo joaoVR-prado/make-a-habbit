@@ -23,9 +23,15 @@ class AppColors {
 
   // Cores dos cards do calendario
   static const calendarMainColor = Color(0xFF459AC3);
-  static const calendarSecondaryColor = Color(0xFF37728E); 
+  static const calendarSecondaryColor = Color(0xFF37728E);
 
-  //TODO: Definir cores dos icones de tipos de habitos
+  // Cor dos AlertDialogs
+  static const alertDialogBGColor = Color(0xFF37728E);
 
+  //Cor do texto em Dialogs
+  static const dialogTextColor = Color(0xFF141F23);
+
+  // Cor do textButton "Concluir" e "Aceitar" dos Dialogs
+  static const positiveActionDialogTextColor = Color(0xFF1CB0F6);
 
 }

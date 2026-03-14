@@ -39,6 +39,14 @@ class AppTheme {
 
     ),
 
+    // Cor dos Dialogs
+    dialogTheme: DialogThemeData(
+      backgroundColor: AppColors.alertDialogBGColor,
+      elevation: 4,
+
+    ),
+    
+
     // Cards do calendário
     cardTheme: CardThemeData(
       color: AppColors.cardBackgrounColor,

@@ -3,6 +3,7 @@ import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
+import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 
 class HabitsListTile extends StatelessWidget {
   final HabitModel habit;
@@ -19,8 +20,6 @@ class HabitsListTile extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final habitIcon = HabitIcon.fromCode(habit.iconCode);
-
     return Card(
       color: Colors.transparent,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -28,21 +27,11 @@ class HabitsListTile extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(16)),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        
         // Parte dos icones dos habitos
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: habitIcon.color.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(12)
-          ),
-          child: Icon(
-            habitIcon.iconData,
-            color: habitIcon.color,
-            size: 38,
-          ),
+        leading: CommonIconContainer(
+          habit: habit, 
+          alpha: 0.4
         ),
-
         // Parte do nome e descricao do habito
         title: Text(
           habit.name,

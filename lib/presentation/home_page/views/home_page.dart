@@ -6,6 +6,7 @@ import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
+import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit_dialog.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/calendar_card.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habits_list_tile.dart';
@@ -85,10 +86,17 @@ class _HomePageState extends ConsumerState<HomePage>{
 
                     );
                     if (result != null){
-                      print('Achou');
+                      if (context.mounted){
+                        showDialog(
+                          context: context, 
+                          builder: (BuildContext dialogContext){
+                            return EditOrCompleteHabitDialog(habit: result);
 
+                          }
+
+                        );
+                      }
                     }
-                   
                   },
                 ),
               ),

@@ -80,7 +80,9 @@ class HabitSearch extends SearchDelegate{
     final theme = Theme.of(context);
     return theme.copyWith(
       inputDecorationTheme: InputDecorationTheme(
-        hintStyle: TextStyle(color: Colors.black),
+        hintStyle: TextStyle(
+          color: Colors.white
+        ),
       ),
       // ...
     );
