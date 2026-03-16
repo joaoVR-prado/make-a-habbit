@@ -7,7 +7,7 @@ import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:make_a_habbit/data/repositories/habit_repository.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MockHabitRepository extends Mock implements IHabitRepository{}
 

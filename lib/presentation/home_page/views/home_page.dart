@@ -8,11 +8,9 @@ import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit_dialog.dart';
-import 'package:make_a_habbit/presentation/home_page/widgets/calendar_card.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habits_list_tile.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/horizontal_calendar.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 
 class HomePage extends ConsumerStatefulWidget{
@@ -27,7 +25,6 @@ class _HomePageState extends ConsumerState<HomePage>{
   
   @override
   Widget build(BuildContext context){
-      final habitsList = ref.watch(habitControllerProvider);
       final selectedDate = ref.watch(selectedDateProvider);
 
       ref.watch(habitControllerProvider);
@@ -161,9 +158,9 @@ class _HomePageState extends ConsumerState<HomePage>{
                       children: [
                         HabitsListTile(
                           habit: habit,
-                          habitStatus: habitStatus, // aqui
+                          habitStatus: habitStatus,
                           onTap: (){
-                            print('Teste se ta fununciando: ${habit.name}');
+                            
                           }
                         ),
                         if(index != habitsForSelectedDate.length - 1)
