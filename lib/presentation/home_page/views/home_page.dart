@@ -6,6 +6,7 @@ import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
+import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit_dialog.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/calendar_card.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
@@ -125,12 +126,40 @@ class _HomePageState extends ConsumerState<HomePage>{
                   itemCount: habitsForSelectedDate.length,
                   itemBuilder: (context, index) {
                     final habit = habitsForSelectedDate[index];
+
+                    // Verificacoes sobre a conclusao do habito
+                    final selectedDate = ref.watch(selectedDateProvider);
+                    final getAllConclusions = ref.watch(concludedHabitsControllerProvider);
+
+                    final dailyConclusion = getAllConclusions.where((c) => 
+                      c.habitId == habit.id &&
+                      c.conclusionDate.year == selectedDate.year &&
+                      c.conclusionDate.month == selectedDate.month &&
+                      c.conclusionDate.day == selectedDate.day
+                    ).firstOrNull;
+
+                    HabitStatus habitStatus = HabitStatus.pending;
+
+                    if (habit.conclusionType == HabitConclusionType.goalQuantity) {
+                      final doneQuantity = dailyConclusion?.conclusionValue ?? 0;
+                      final targetQuantity = habit.goalQuantity ?? 1; // Prevenção básica
+
+                      if (doneQuantity >= targetQuantity) {
+                        habitStatus = HabitStatus.done;
+                      }
+                    } else {
+                      // Para o futuro "Sim ou Não": Se existir registro no banco, tá feito!
+                      if (dailyConclusion != null) {
+                        habitStatus = HabitStatus.done;
+                      }
+                    }
+
                     return Column(
                       children: [
                         HabitsListTile(
-                          habit: habit, 
-                          habitStatus: HabitStatus.incomplete, 
-                          onStatusTap: (){
+                          habit: habit,
+                          habitStatus: habitStatus, // aqui
+                          onTap: (){
                             print('Teste se ta fununciando: ${habit.name}');
                           }
                         ),
@@ -190,12 +219,13 @@ class _HomePageState extends ConsumerState<HomePage>{
 
     void _addTestHabit(){
         final newHabit = HabitModel(
-            id: '4', 
-            iconCode: 3, 
-            name: 'Ir na missa',
-            description: "Toda quinta",
-            conclusionType: HabitConclusionType.yesNo,
-            frequency: HabitFrequency(type: HabitFrequencyType.weekly, selectedDays: [5]),
+            id: '5', 
+            iconCode: 4, 
+            name: 'Beber 3 Litros de agua',
+            description: "Todos os Dias",
+            conclusionType: HabitConclusionType.goalQuantity,
+            goalQuantity: 3,
+            frequency: HabitFrequency(type: HabitFrequencyType.daily),
             startDate: DateTime.now()
 
         );

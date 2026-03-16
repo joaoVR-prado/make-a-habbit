@@ -6,11 +6,10 @@ import 'package:riverpod/riverpod.dart';
 
 final habitRepositoryProvider = Provider<IHabitRepository>((ref){
   final habitBox = Hive.box<HabitModel>('habits');
-  final conclusionBox = Hive.box<ConcludedHabitsModel>('conclusions');
 
   return HabitRepository(
-    habitBox, 
-    conclusionBox
+    habitBox
+    
   );
 
 });

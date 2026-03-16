@@ -21,6 +21,12 @@ class AppColors {
   // Cor do bottomNavBar
   static const bottomAppBarcolor = Color(0xFF6E848F);
 
+  // TEXTFORMFIELD QTF
+  // Cor dos icones do TextFormField de QTD
+  static const iconQtdColor = Color(0xFF6E848F);
+  // Cor do texto quantidade
+  static const qtdTextColor = Color(0xFF459AC3);
+
   // Cores dos cards do calendario
   static const calendarMainColor = Color(0xFF459AC3);
   static const calendarSecondaryColor = Color(0xFF37728E);

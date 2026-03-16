@@ -3,6 +3,8 @@ import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
+import 'package:make_a_habbit/presentation/common/widgets/common_vertical_divider.dart';
+import 'package:make_a_habbit/presentation/habits/widgets/complete_habit.dart';
 
 class EditOrCompleteHabitDialog extends StatelessWidget {
   final HabitModel habit;
@@ -15,7 +17,6 @@ class EditOrCompleteHabitDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context){
     return AlertDialog(
-      //contentPadding: EdgeInsetsDirectional.symmetric(vertical: 12, horizontal: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12)
       ),
@@ -23,21 +24,19 @@ class EditOrCompleteHabitDialog extends StatelessWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            habit.name,
-            style: Theme.of(context).textTheme.labelLarge!.copyWith(
-              color: AppColors.dialogTextColor
+          Expanded(
+            child: Text(
+              habit.name,
+              style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                color: AppColors.dialogTextColor
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           CommonIconContainer(habit: habit, alpha: 0.5)
         ],
       ),
-      // contentPadding: EdgeInsets.only(
-      //   left: 16,
-      //   right: 16,
-      //   top: 10,
-      //   bottom: 26
-      // ),
       content: Text(
         'Deseja Editar ou Concluir esse hábito?',
         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -61,20 +60,14 @@ class EditOrCompleteHabitDialog extends StatelessWidget {
             ),
           ),
         ),
-
-        SizedBox(
-          height: 40,
-          child: VerticalDivider(
-            width: 10,
-            thickness: 0.5,
-            color: Color(0xFF459AC3)
-          ),
-        ),
-
+        CommonVerticalDivider(),
         // Concluir
         TextButton(
           onPressed: (){
-            Navigator.pop(context);
+            showDialog(
+              context: context, 
+              builder: (BuildContext context) => CompleteHabit(habit: habit)
+            );
             // Edit
           },
           child: Text(
@@ -84,27 +77,7 @@ class EditOrCompleteHabitDialog extends StatelessWidget {
             ),
           ),
         ),
-          // TextButton.icon(
-          // onPressed: (){
-          //   Navigator.pop(context);
-          //   // Edit
-          // }, 
-          // label: Text(
-          //   'Concluir',
-          //   style: Theme.of(context).textTheme.titleMedium!.copyWith(
-          //     color: AppColors.dialogTextColor
-          //   ),
-          // ),
-          // icon: const Icon(
-          //   Icons.done,
-          //   size: 26,
-          //   color: AppColors.completeHabitIcon,
-
-          // ),
-       // )
-
       ],
-
     );
   }
 }
