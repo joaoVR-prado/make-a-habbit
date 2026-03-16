@@ -142,15 +142,18 @@ class _HomePageState extends ConsumerState<HomePage>{
 
                     if (habit.conclusionType == HabitConclusionType.goalQuantity) {
                       final doneQuantity = dailyConclusion?.conclusionValue ?? 0;
-                      final targetQuantity = habit.goalQuantity ?? 1; // Prevenção básica
+                      final targetQuantity = habit.goalQuantity ?? 1;
 
                       if (doneQuantity >= targetQuantity) {
                         habitStatus = HabitStatus.done;
                       }
                     } else {
-                      // Para o futuro "Sim ou Não": Se existir registro no banco, tá feito!
                       if (dailyConclusion != null) {
-                        habitStatus = HabitStatus.done;
+                        if (dailyConclusion.conclusionValue == true) {
+                          habitStatus = HabitStatus.done;
+                        } else if (dailyConclusion.conclusionValue == false) {
+                          habitStatus = HabitStatus.incomplete;
+                        }
                       }
                     }
 

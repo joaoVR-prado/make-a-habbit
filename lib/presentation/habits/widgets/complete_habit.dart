@@ -5,6 +5,7 @@ import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_horizontal_divider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/goal_qtd_text_field.dart';
+import 'package:make_a_habbit/presentation/habits/widgets/yes_no_habit.dart';
 
 class CompleteHabit extends StatelessWidget{
   final HabitModel habit;
@@ -48,7 +49,7 @@ class CompleteHabit extends StatelessWidget{
           CommonHorizontalDivider(),
           habit.conclusionType == HabitConclusionType.goalQuantity
             ? GoalQtdTextField(habit: habit)
-            : SizedBox() // Aqui vou criar o dialog de sim ou nao do habito
+            : YesNoHabit(habit: habit) // Aqui vou criar o dialog de sim ou nao do habito
         ],
       ),
 

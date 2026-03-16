@@ -76,7 +76,14 @@ class AppTheme {
         )
       )
       
-    )
+    ),
+    
+    chipTheme: ChipThemeData(
+      backgroundColor: AppColors.dialogTextColor, 
+      selectedColor: AppColors.positiveActionDialogTextColor, 
+      checkmarkColor: Colors.white, 
+      side: const BorderSide(color: Colors.transparent),
+    ),
   );
 
 }
