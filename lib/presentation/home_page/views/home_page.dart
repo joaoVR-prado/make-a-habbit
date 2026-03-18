@@ -163,6 +163,7 @@ class _HomePageState extends ConsumerState<HomePage>{
                             
                           }
                         ),
+                        
                         if(index != habitsForSelectedDate.length - 1)
                           Padding(
                             padding: EdgeInsetsGeometry.only(left: 10, right: 10),
@@ -170,7 +171,7 @@ class _HomePageState extends ConsumerState<HomePage>{
                               thickness: 0.3,
                               height: 2,
                             ),
-                        )
+                          )
                       ],
                     );
                   },
