@@ -7,6 +7,7 @@ import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
+import 'package:make_a_habbit/presentation/habits/views/create_habit_page.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit_dialog.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habits_list_tile.dart';
@@ -102,8 +103,11 @@ class _HomePageState extends ConsumerState<HomePage>{
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: (){
-              _addTestHabit();
-
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CreateHabitPage()
+                )
+              );
             },
             child: Icon(
               Icons.add,
@@ -185,15 +189,13 @@ class _HomePageState extends ConsumerState<HomePage>{
             child: BottomAppBar(
               height: 60,
               color: AppColors.bottomAppBarcolor,
-              // shape: const CircularNotchedRectangle(),
-              // notchMargin: 8.0,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(
                     flex: 2,
                     child: TextButton(
-                      onPressed: (){}, 
+                      onPressed: (){}, // TODO: Carregar tela de habitos
                       child: Text(
                         'HÁBITOS',
                         style: Theme.of(context).textTheme.labelMedium,
@@ -204,7 +206,7 @@ class _HomePageState extends ConsumerState<HomePage>{
                   Expanded(
                     flex: 2,
                     child: TextButton(
-                      onPressed: (){}, 
+                      onPressed: (){}, // TODO: Carregar tela de relatórios
                       child: Text(
                         'RELATÓRIOS',
                         style: Theme.of(context).textTheme.labelMedium,

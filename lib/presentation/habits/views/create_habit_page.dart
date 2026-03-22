@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:make_a_habbit/core/theme/app_colors.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class CreateHabitPage extends ConsumerStatefulWidget {
   const CreateHabitPage({super.key});
@@ -59,9 +61,106 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (index){
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                children: [
+                  _buildDummyPage('Tela 1: Escolha a Categoria'),
+                  _buildDummyPage('Tela 2: Tipo de hábito'),
+                  _buildDummyPage('Tela 3: Detalhes e Cores'),
+                  _buildDummyPage('Tela 4: Frequência'),
+                  _buildDummyPage('Tela 5: Lembretes e Resumo'),
+                ],
+              ),
+            ),
+            _buildBottomBar(),
+          ],
+        )
+      ),
+    );
+  }
+  
+  Widget _buildBottomBar(){
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      decoration: const BoxDecoration(
+        color: AppColors.bottomAppBarcolor,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          TextButton(
+            onPressed: _previousPage, 
+            child: Text(
+              _currentPage == 0 ? 'CANCELAR' : 'ANTERIOR',
+              style: Theme.of(context).textTheme.labelMedium,
+            )
+          ),
+          Row(
+            children: List.generate(
+              _totalPages,
+              (index) {
+                final isCompletedOrActive = index <= _currentPage;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isCompletedOrActive 
+                      ? AppColors.positiveActionDialogTextColor
+                      : AppColors.darkBlue,
+                    border: Border.all(
+                      color: AppColors.positiveActionDialogTextColor
+                    )
+                  ),
+                );
+              },
+            ),
+          ),
+          // SmoothPageIndicator(
+          //   controller: _pageController, 
+          //   count: _totalPages,
+          //   effect: ExpandingDotsEffect(
+          //     dotHeight: 8,
+          //     dotWidth: 8,
+          //     spacing: 8,
+          //     expansionFactor: 3,
+          //     dotColor: AppColors.darkBlue,
+          //     activeDotColor: AppColors.calendarMainColor
+          //   ),
+
+          // ),
+          TextButton(
+            onPressed: _nextPage,
+            child: Text(
+              _currentPage == _totalPages -1 ? 'FINALIZAR' : 'PRÓXIMA',
+              style: Theme.of(context).textTheme.labelMedium,
+            )
+          )
+        ],
+      ),
+
+    );
   }
 
+  Widget _buildDummyPage(String title){
+    return Center(
+      child: Text(
+        title,
+      ),
+    );
+  }
 
 }

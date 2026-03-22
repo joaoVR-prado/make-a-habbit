@@ -35,7 +35,7 @@ class AppTheme {
       labelSmall: const TextStyle(fontSize: 12, color: AppColors.whiteText),
 
       // Especifico para os textbuttons do bottomnavbar
-      labelMedium: const TextStyle(fontSize: 18, color: AppColors.whiteText)
+      labelMedium: const TextStyle(fontSize: 18, color: AppColors.whiteText, fontWeight: FontWeight.bold)
 
     ),
 
