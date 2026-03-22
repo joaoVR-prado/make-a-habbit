@@ -27,7 +27,6 @@ class _HomePageState extends ConsumerState<HomePage>{
   @override
   Widget build(BuildContext context){
       final selectedDate = ref.watch(selectedDateProvider);
-
       ref.watch(habitControllerProvider);
       final habitsForSelectedDate = ref.read(habitControllerProvider.notifier).getHabitsForDate(selectedDate);
 
@@ -163,9 +162,6 @@ class _HomePageState extends ConsumerState<HomePage>{
                         HabitsListTile(
                           habit: habit,
                           habitStatus: habitStatus,
-                          onTap: (){
-                            
-                          }
                         ),
                         
                         if(index != habitsForSelectedDate.length - 1)
@@ -222,14 +218,14 @@ class _HomePageState extends ConsumerState<HomePage>{
 
     void _addTestHabit(){
         final newHabit = HabitModel(
-            id: '5', 
-            iconCode: 4, 
-            name: 'Beber 3 Litros de agua',
-            description: "Todos os Dias",
-            conclusionType: HabitConclusionType.goalQuantity,
-            goalQuantity: 3,
-            frequency: HabitFrequency(type: HabitFrequencyType.daily),
-            startDate: DateTime.now()
+          id: '5', 
+          iconCode: 4, 
+          name: 'Beber 3 Litros de agua',
+          description: "Todos os Dias",
+          conclusionType: HabitConclusionType.goalQuantity,
+          goalQuantity: 3,
+          frequency: HabitFrequency(type: HabitFrequencyType.daily),
+          startDate: DateTime.now()
 
         );
 

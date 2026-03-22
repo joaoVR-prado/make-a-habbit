@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
+import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
@@ -8,13 +9,11 @@ import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit
 class HabitsListTile extends StatelessWidget {
   final HabitModel habit;
   final HabitStatus habitStatus;
-  final VoidCallback onTap;
 
   const HabitsListTile({
     super.key,
     required this.habit,
     required this.habitStatus,
-    required this.onTap
 
   });
   
@@ -39,7 +38,7 @@ class HabitsListTile extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           // Parte dos icones dos habitos
           leading: CommonIconContainer(
-            habit: habit, 
+            habitIcon: HabitIcon.fromCode(habit.iconCode), 
             alpha: 0.4
           ),
           // Parte do nome e descricao do habito

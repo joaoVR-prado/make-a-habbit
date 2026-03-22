@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,6 +63,11 @@ final habitControllerProvider = NotifierProvider<HabitController, List<HabitMode
 final selectedDateProvider = StateProvider<DateTime>((ref){
   final now = DateTime.now();
   return DateTime(now.year, now.month, now.day);
+
+});
+
+final draftCategoryProvider = StateProvider<HabitIcon?>((ref) {
+  return null;
 
 });
 
