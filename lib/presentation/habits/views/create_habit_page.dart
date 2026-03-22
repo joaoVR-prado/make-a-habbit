@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
+import 'package:make_a_habbit/presentation/habits/widgets/choose_conclusion_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_habit_category.dart';
 
 class CreateHabitPage extends ConsumerStatefulWidget {
@@ -75,7 +76,8 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
                 children: [
                   //_buildDummyPage('Tela 1: Escolha a Categoria'),
                   ChooseHabitCategory(),
-                  _buildDummyPage('Tela 2: Tipo de hábito'),
+                  ChooseConclusionType(),
+                  //_buildDummyPage('Tela 2: Tipo de hábito'),
                   _buildDummyPage('Tela 3: Detalhes e Cores'),
                   _buildDummyPage('Tela 4: Frequência'),
                   _buildDummyPage('Tela 5: Lembretes e Resumo'),

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
+import 'package:make_a_habbit/data/models/habits/habit_model.dart';
+import 'package:make_a_habbit/presentation/common/widgets/common_create_habit_title.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 
 class ChooseHabitCategory extends ConsumerStatefulWidget {
@@ -21,17 +23,7 @@ class _ChooseHabitCategory extends ConsumerState<ChooseHabitCategory>{
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 38, bottom: 24, left: 24, right: 24),
-          child: SizedBox(
-            width: double.infinity,
-            child: Text(
-              'Selecione uma categoria para o seu hábito:',
-              style: TextTheme.of(context).titleLarge,
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
+        CommonCreateHabitTitle(titleText: 'Selecione uma categoria para \n o seu hábito'),
         Expanded(
           child: GridView.count(
             crossAxisCount: 2,
