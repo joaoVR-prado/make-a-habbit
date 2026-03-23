@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_create_habit_title.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 

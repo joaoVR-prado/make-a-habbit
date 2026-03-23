@@ -93,10 +93,14 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
   
   Widget _buildBottomBar(){
     final selectedCategory = ref.watch(draftCategoryProvider);
+    final selectedType = ref.watch(draftConclusionTypeProvider);
     bool canGoNext = true;
 
     // Regra da tela 1 do cadastro
     if(_currentPage == 0 && selectedCategory == null){
+      canGoNext = false;
+
+    } else if(_currentPage == 1 && selectedType == null){  // Regra da tela 2 do cadastro
       canGoNext = false;
 
     }

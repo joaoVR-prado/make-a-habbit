@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
+import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -66,7 +67,15 @@ final selectedDateProvider = StateProvider<DateTime>((ref){
 
 });
 
-final draftCategoryProvider = StateProvider<HabitIcon?>((ref) {
+
+// Tela 1 do Cadastro
+final draftCategoryProvider = StateProvider.autoDispose<HabitIcon?>((ref) {
+  return null;
+
+});
+
+// Tela 2 do Cadastro
+final draftConclusionTypeProvider = StateProvider.autoDispose<HabitConclusionType?>((ref) {
   return null;
 
 });

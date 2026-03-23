@@ -26,7 +26,7 @@ class AppTheme {
       titleLarge: const TextStyle(fontSize: 20, color: AppColors.whiteText, fontWeight: FontWeight.bold),
       titleMedium: const TextStyle(fontSize: 14, color: AppColors.whiteText), // Titulo do listTile dos habitos
       
-      bodyLarge: const TextStyle(fontSize: 20, color: AppColors.whiteText),
+      bodyLarge: const TextStyle(fontSize: 20, color: AppColors.whiteText, fontWeight: FontWeight.bold),
       bodyMedium: const TextStyle(fontSize: 16, color: Colors.black),
       bodySmall: const TextStyle(fontSize: 8, color: AppColors.whiteText), // Descricao do listTile dos habitos
 
