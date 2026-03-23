@@ -80,6 +80,25 @@ final draftConclusionTypeProvider = StateProvider.autoDispose<HabitConclusionTyp
 
 });
 
+// Tela 3 do Cadastro
+final draftConclusionNameProvider = StateProvider.autoDispose<String>((ref) {
+  return '';
+
+});
+
+final draftConclusionGoalQuantityProvider = StateProvider.autoDispose<String>((ref) {
+  return '';
+
+});
+
+
+final draftConclusionDescriptionQuantityProvider = StateProvider.autoDispose<String>((ref) {
+  return '';
+
+});
+
+
+
 
 
 

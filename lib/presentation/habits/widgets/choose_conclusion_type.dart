@@ -20,7 +20,7 @@ class _ChooseConclusionType extends ConsumerState<ChooseConclusionType>{
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        CommonCreateHabitTitle(titleText: 'Escolha uma opção de avaliação \n do seu progresso'),
+        CommonCreateHabitTitle(titleText: 'Escolha uma opção de avaliação \n do seu progresso:'),
         _buildHabitTypeCard(
           context: context, 
           ref: ref, 
@@ -57,7 +57,7 @@ class _ChooseConclusionType extends ConsumerState<ChooseConclusionType>{
           child: Card(
             margin: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(6)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             color: isSelected 
               ? AppColors.homePageIconColor
               : AppColors.cardBackgrounColor,
@@ -67,10 +67,10 @@ class _ChooseConclusionType extends ConsumerState<ChooseConclusionType>{
                 ref.read(draftConclusionTypeProvider.notifier).state = type;
               },
               child: Padding(
-                padding: const EdgeInsetsGeometry.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Text(
                   title,
-                  style: TextTheme.of(context).bodyLarge,
+                  style: Theme.of(context).textTheme.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -78,10 +78,10 @@ class _ChooseConclusionType extends ConsumerState<ChooseConclusionType>{
           ),
         ),
         Padding(
-          padding: EdgeInsetsGeometry.only(bottom: 12),
+          padding: EdgeInsets.only(bottom: 12),
           child: Text(
             subtitle,
-            style: TextTheme.of(context).labelSmall!.copyWith(
+            style: Theme.of(context).textTheme.labelSmall!.copyWith(
               fontSize: 10
             ),
           ),

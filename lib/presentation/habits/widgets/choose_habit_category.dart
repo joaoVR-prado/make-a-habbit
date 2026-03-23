@@ -22,7 +22,7 @@ class _ChooseHabitCategory extends ConsumerState<ChooseHabitCategory>{
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        CommonCreateHabitTitle(titleText: 'Selecione uma categoria para \n o seu hábito'),
+        CommonCreateHabitTitle(titleText: 'Selecione uma categoria para \n o seu hábito:'),
         Expanded(
           child: GridView.count(
             crossAxisCount: 2,
