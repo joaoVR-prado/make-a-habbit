@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
+import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_conclusion_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_habit_category.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_habit_name.dart';
@@ -96,6 +97,9 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
   Widget _buildBottomBar(){
     final selectedCategory = ref.watch(draftCategoryProvider);
     final selectedType = ref.watch(draftConclusionTypeProvider);
+    final selectedName = ref.watch(draftConclusionNameProvider);
+    final selectedQuantity = ref.watch(draftConclusionGoalQuantityProvider);
+
     bool canGoNext = true;
 
     // Regra da tela 1 do cadastro
@@ -105,6 +109,24 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     } else if(_currentPage == 1 && selectedType == null){  // Regra da tela 2 do cadastro
       canGoNext = false;
 
+    } else if(_currentPage == 2){  // Regra de tela 3 do cadastro
+
+      if (selectedName.trim().isEmpty) {
+        canGoNext = false;
+      } else if (selectedType == HabitConclusionType.goalQuantity) {
+        if (selectedQuantity.trim().isEmpty || selectedQuantity == '0') {
+          canGoNext = false;
+
+        }
+      }
+      // if(selectedType == HabitConclusionType.yesNo && selectedName.isEmpty){
+      //   canGoNext = false;
+        
+      // } else if(selectedType == HabitConclusionType.goalQuantity && selectedQuantity.isEmpty || selectedQuantity == '0'){
+      //   canGoNext = false;
+
+      // }
+      
     }
 
     // TODO: Novas Regras

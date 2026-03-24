@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
@@ -15,16 +16,22 @@ class ChooseHabitName extends ConsumerStatefulWidget {
 }
 
 class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
-  // final habitNameController = TextEditingController();
-  // final habitDescriptionController = TextEditingController();
+  late final TextEditingController _qtdController;
 
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  //   habitNameController.dispose();
-  //   habitDescriptionController.dispose();
+  @override
+  void initState() {
+    super.initState();
+    _qtdController = TextEditingController(
+      text: ref.read(draftConclusionGoalQuantityProvider)
+    );
+  }
 
-  // }
+  @override
+  void dispose() {
+    super.dispose();
+    _qtdController.dispose();
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,36 +44,40 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
           context: context,
           ref: ref,
           provider: draftConclusionNameProvider,
-          label: 'Hábito',
-          hint: 'Ex: Treino de Musculação...',
+          label: 'Ex: Treino de Musculação...',
+          hint: 'Hábito', //Hábito
           keyboardType: TextInputType.text
 
         ),
 
         if(selectedHabitType == HabitConclusionType.goalQuantity) ...[
+          // _buildTextInputCard(
+          //   context: context,
+          //   ref: ref,
+          //   provider: draftConclusionGoalQuantityProvider,
+          //   label: 'Ex: Beber água 2x ao dia', //Meta diária
+          //   hint: 'Meta diária',
+          //   keyboardType: TextInputType.number
+
+          // ),
           const SizedBox(height: 16),
-          _buildTextInputCard(
+          _buildQuantityInputCard(
             context: context,
             ref: ref,
-            provider: draftConclusionNameProvider,
-            label: 'Meta diária',
-            hint: 'Ex: Beber água 2x ao dia',
-            keyboardType: TextInputType.number
-
+            label: 'Ex: Beber água 2x ao dia.', 
+            hint: '0',
           ),
 
         ],
+        _buildTextInputCard(
+          context: context,
+          ref: ref,
+          provider: draftConclusionDescriptionQuantityProvider,
+          label: 'Ex: Quero ler 10 páginas de um livro por dia pois...', //Descrição(opcional)
+          hint: 'Descrição(opcional)',
+          keyboardType: TextInputType.text
 
-          _buildTextInputCard(
-            context: context,
-            ref: ref,
-            provider: draftConclusionNameProvider,
-            label: 'Descrição',
-            hint: 'Descrição(opcional)',
-            keyboardType: TextInputType.text
-
-          ),
-        
+        ),
       ],
     );
   }
@@ -80,34 +91,25 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
     required TextInputType keyboardType,
   }){
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16, bottom: 8),
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.labelSmall!.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
-            ),
-          ),
-        ),
         SizedBox(
           width: double.infinity,
           child: Card(
-            margin: const EdgeInsets.symmetric(horizontal: 12),
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             elevation: 0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             color: AppColors.cardBackgrounColor,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               child: TextFormField(
                 initialValue: ref.read(provider),
                 keyboardType: keyboardType,
                 style: Theme.of(context).textTheme.bodyLarge,
                 decoration: InputDecoration(
                   hintText: hint,
-                  hintStyle: TextStyle(color: Colors.grey.withValues(alpha: 0.5)),
+                  hintStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Colors.black.withValues(alpha: 0.5)
+                  ),
                   border: InputBorder.none,
                 ),
                 onChanged: (value) {
@@ -117,10 +119,96 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
             ),
           ),
         ),
+        Padding(
+          padding: EdgeInsets.only(bottom: 4),
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall!.copyWith(
+              fontSize: 10
+            ),
+          ),
+        ),
       ],
     );
 
+  }
 
+  Widget _buildQuantityInputCard({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String label,
+    required String hint,
+  }) {
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          child: Card(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            color: AppColors.cardBackgrounColor,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), 
+              child: TextFormField(
+                controller: _qtdController,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                decoration: InputDecoration(
+                  hintText: hint,
+                  hintStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Colors.black.withValues(alpha: 0.5)
+                  ),
+                  border: InputBorder.none,
+                  prefixIcon: IconButton(
+                    onPressed: () {
+                      int currentValue = int.tryParse(_qtdController.text) ?? 0;
+                      if (currentValue > 0) {
+                        currentValue--;
+                        _qtdController.text = currentValue.toString();
+                        ref.read(draftConclusionGoalQuantityProvider.notifier).state = currentValue.toString();
+                      }
+                    }, 
+                    icon: Icon(
+                      Icons.remove, 
+                      color: Colors.white,
+                      size: 32,
+                    )
+                  ),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      int currentValue = int.tryParse(_qtdController.text) ?? 0;
+                      currentValue++;
+                      _qtdController.text = currentValue.toString();
+                      ref.read(draftConclusionGoalQuantityProvider.notifier).state = currentValue.toString();
+                    }, 
+                    icon: Icon(
+                      Icons.add,
+                      size: 32,
+                      color: Colors.white
+                    )
+                  )
+                ),
+                onChanged: (value) {
+                  ref.read(draftConclusionGoalQuantityProvider.notifier).state = value;
+                },
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall!.copyWith(fontSize: 10),
+          ),
+        ),
+      ],
+    );
   }
 
 }
