@@ -45,7 +45,6 @@ class EditOrCompleteHabitDialog extends StatelessWidget {
         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
           color: AppColors.dialogTextColor
         ),
-      
       ),
       actionsAlignment: MainAxisAlignment.spaceAround,
       actionsPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),

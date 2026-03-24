@@ -45,10 +45,8 @@ class CompleteHabit extends StatelessWidget{
                 fontSize: 10,
                 color: AppColors.dialogTextColor,
                 fontWeight: FontWeight.bold
-
               ),
             ),
-            
           ),
           CommonHorizontalDivider(),
           habit.conclusionType == HabitConclusionType.goalQuantity

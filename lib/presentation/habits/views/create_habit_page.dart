@@ -4,6 +4,7 @@ import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_conclusion_type.dart';
+import 'package:make_a_habbit/presentation/habits/widgets/choose_frequency_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_habit_category.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_habit_name.dart';
 
@@ -80,9 +81,10 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
                   ChooseHabitCategory(),
                   ChooseConclusionType(),
                   ChooseHabitName(),
+                  ChooseFrequencyType(),
                   //_buildDummyPage('Tela 2: Tipo de hábito'),
                   //_buildDummyPage('Tela 3: Detalhes e Cores'),
-                  _buildDummyPage('Tela 4: Frequência'),
+                  //_buildDummyPage('Tela 4: Frequência'),
                   _buildDummyPage('Tela 5: Lembretes e Resumo'),
                 ],
               ),
@@ -111,7 +113,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
     } else if(_currentPage == 2){  // Regra de tela 3 do cadastro
 
-      if (selectedName.trim().isEmpty) {
+      if (selectedName.trim().isEmpty || selectedName.trim().length < 3) {
         canGoNext = false;
       } else if (selectedType == HabitConclusionType.goalQuantity) {
         if (selectedQuantity.trim().isEmpty || selectedQuantity == '0') {
@@ -119,13 +121,6 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
         }
       }
-      // if(selectedType == HabitConclusionType.yesNo && selectedName.isEmpty){
-      //   canGoNext = false;
-        
-      // } else if(selectedType == HabitConclusionType.goalQuantity && selectedQuantity.isEmpty || selectedQuantity == '0'){
-      //   canGoNext = false;
-
-      // }
       
     }
 

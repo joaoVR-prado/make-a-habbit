@@ -51,15 +51,6 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
         ),
 
         if(selectedHabitType == HabitConclusionType.goalQuantity) ...[
-          // _buildTextInputCard(
-          //   context: context,
-          //   ref: ref,
-          //   provider: draftConclusionGoalQuantityProvider,
-          //   label: 'Ex: Beber água 2x ao dia', //Meta diária
-          //   hint: 'Meta diária',
-          //   keyboardType: TextInputType.number
-
-          // ),
           const SizedBox(height: 16),
           _buildQuantityInputCard(
             context: context,
