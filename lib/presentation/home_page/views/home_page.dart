@@ -68,7 +68,6 @@ class _HomePageState extends ConsumerState<HomePage>{
               '${_getDayName(selectedDate.weekday)} - ${_getMonthName(selectedDate.month)}. ${selectedDate.day} - ${selectedDate.year}',
               style: Theme.of(context).textTheme.labelMedium,
             ),
-            //centerTitle: true,
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
@@ -89,9 +88,7 @@ class _HomePageState extends ConsumerState<HomePage>{
                           context: context, 
                           builder: (BuildContext dialogContext){
                             return EditOrCompleteHabitDialog(habit: result);
-
                           }
-
                         );
                       }
                     }

@@ -101,6 +101,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     final selectedType = ref.watch(draftConclusionTypeProvider);
     final selectedName = ref.watch(draftConclusionNameProvider);
     final selectedQuantity = ref.watch(draftConclusionGoalQuantityProvider);
+    final selectedFrequencyType = ref.watch(draftFrequencyTypeProvider);
 
     bool canGoNext = true;
 
@@ -122,6 +123,9 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
         }
       }
       
+    } else if(_currentPage == 3 && selectedFrequencyType == null){
+      canGoNext = false;
+
     }
 
     // TODO: Novas Regras

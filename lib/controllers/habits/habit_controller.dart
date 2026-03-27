@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
+import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
@@ -94,6 +95,11 @@ final draftConclusionGoalQuantityProvider = StateProvider.autoDispose<String>((r
 
 final draftConclusionDescriptionQuantityProvider = StateProvider.autoDispose<String>((ref) {
   return '';
+
+});
+
+final draftFrequencyTypeProvider = StateProvider.autoDispose<HabitFrequencyType?>((ref){
+  return null;
 
 });
 

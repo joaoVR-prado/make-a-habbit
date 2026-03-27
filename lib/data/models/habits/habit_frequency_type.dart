@@ -18,3 +18,20 @@ enum HabitFrequencyType {
 
 
 }
+
+extension HabitFrequencyTypeUI on HabitFrequencyType{
+  String get title{
+    switch (this){
+      case HabitFrequencyType.daily:
+        return 'Todos os dias';
+
+      case HabitFrequencyType.weekly:
+        return 'Alguns dias da semana';
+
+      case HabitFrequencyType.monthly:
+        return 'Dias especificos do mês';
+
+    }
+  }
+
+}
