@@ -103,11 +103,6 @@ final draftFrequencyTypeProvider = StateProvider.autoDispose<HabitFrequencyType?
 
 });
 
-final draftEveryDayProvider = StateProvider.autoDispose<List<int>>((ref) {
-  return [];
-
-});
-
 final draftWeeklyDaysProvider = StateProvider.autoDispose<List<int>>((ref) {
   return [];
 

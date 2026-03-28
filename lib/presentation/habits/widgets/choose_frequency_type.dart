@@ -90,41 +90,23 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
     );
   }
 
-  //here
 
-  Widget _buildFrequencyTypeDaysCard({
+  Widget _buildWeeklyTypeDaysCard({
     required BuildContext context,
     required String text,
     required bool isSelected,
-    required VoidCallback onTap
+    required VoidCallback onTap,
   }){
     return Card(
-      margin: const EdgeInsets.all(4),
+      margin: const EdgeInsets.all(4), //AppColors.cardBackgrounColor
       elevation: isSelected ? 4 : 0,
-      color: isSelected ? AppColors.calendarMainColor : AppColors.cardBackgrounColor,
+      color: isSelected ? AppColors.positiveActionDialogTextColor : AppColors.cardBackgrounColor,
       clipBehavior: Clip.hardEdge,
       child: SizedBox(
-        width: 56,
-        height: 56,
+        width: 112, // 56
+        height: 36, // 56
         child: Stack(
           children: [
-            if(isSelected) ...[
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: 32,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: AppColors.calendarSecondaryColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(6),
-                      topRight: Radius.circular(6)
-                    )
-                  ),
-                ),
-              )
-            ],
             Positioned.fill(
               child: Material(
                 color: Colors.transparent,
@@ -137,7 +119,8 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
                       child: Text(
                         text,
                         style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                          color: isSelected ? Colors.white : Colors.black 
+                          color: isSelected ? Colors.white : Colors.black,
+                          fontSize: 22
                         ),
                       ),
                     ),
@@ -146,13 +129,56 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
               )
             )
           ],
-        
         ),
       ),
-
     );
-
   }
+
+  Widget _buildMonthlyTypeDaysCard({
+    required BuildContext context,
+    required String text,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }){
+    
+    final double cardWidth = text == 'Último' ? 68.0 : 38.0;
+
+    return Card(
+      margin: const EdgeInsets.all(4), //AppColors.cardBackgrounColor
+      elevation: isSelected ? 4 : 0,
+      color: isSelected ? AppColors.positiveActionDialogTextColor : Colors.transparent,
+      clipBehavior: Clip.hardEdge,
+      child: SizedBox(
+        width: cardWidth,
+        height: 38,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onTap,
+                  child: SizedBox(
+                    width: 38,
+                    height: 38,
+                    child: Center(
+                      child: Text(
+                        text,
+                        style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                          fontSize: 20
+                        )
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildWeeklySelector(
     BuildContext context,
@@ -160,7 +186,8 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
   ){
     final selectedDays = ref.watch(draftWeeklyDaysProvider);
 
-    final weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+    //final weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']; 
+    final weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
     return Wrap(
       spacing: 8,
@@ -170,7 +197,7 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
         final dayIndex = index + 1;
         final isSelected = selectedDays.contains(dayIndex);
 
-        return _buildFrequencyTypeDaysCard(
+        return _buildWeeklyTypeDaysCard(
           context: context, 
           text: weekDays[index], 
           isSelected: isSelected, 
@@ -197,19 +224,19 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
     final selectedDays = ref.watch(draftMonthlyDaysProvider);
 
     return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+      spacing: 2,
+      runSpacing: 2,
       alignment: WrapAlignment.center,
       children: List.generate(32, (index) {
         
         final dayValue = index + 1; 
         
         // Se for o 32, o texto será "Últ", senão será o próprio número
-        final text = dayValue == 32 ? 'Últ' : dayValue.toString();
+        final text = dayValue == 32 ? 'Último' : dayValue.toString();
         
         final isSelected = selectedDays.contains(dayValue);
 
-        return _buildFrequencyTypeDaysCard(
+        return _buildMonthlyTypeDaysCard(
           context: context,
           text: text,
           isSelected: isSelected,
