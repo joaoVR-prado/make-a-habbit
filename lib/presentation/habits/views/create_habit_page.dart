@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
+import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_conclusion_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_frequency_type.dart';
@@ -102,6 +103,8 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     final selectedName = ref.watch(draftConclusionNameProvider);
     final selectedQuantity = ref.watch(draftConclusionGoalQuantityProvider);
     final selectedFrequencyType = ref.watch(draftFrequencyTypeProvider);
+    final selectedWeeklyDays = ref.watch(draftWeeklyDaysProvider);
+    final selectedMonthlyDays = ref.watch(draftMonthlyDaysProvider);
 
     bool canGoNext = true;
 
@@ -123,8 +126,17 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
         }
       }
       
-    } else if(_currentPage == 3 && selectedFrequencyType == null){
-      canGoNext = false;
+    } else if(_currentPage == 3 ){
+      if(selectedFrequencyType == null){
+        canGoNext = false;
+      } else if(selectedFrequencyType == HabitFrequencyType.weekly && selectedWeeklyDays.isEmpty){
+        canGoNext = false;
+
+      } else if(selectedFrequencyType == HabitFrequencyType.monthly && selectedMonthlyDays.isEmpty){
+        canGoNext = false;
+
+      }
+      
 
     }
 
