@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
-import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
@@ -87,7 +86,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     
     final reminderTime = ref.read(draftReminderTimeNotificationProvider);
     final isStreakEnabled = ref.read(draftEnableStreakProvider);
-    
+
     // OPERAÇÔES DO HIVE
 
     // Ve o tipo de frequencia para salavr os dias escolhidos

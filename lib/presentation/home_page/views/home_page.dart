@@ -133,13 +133,12 @@ class _HomePageState extends ConsumerState<HomePage>{
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
                       onTap: () {
-                        // Clicou, volta pra hoje instantaneamente!
                         ref.read(selectedDateProvider.notifier).state = DateTime.now();
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppColors.positiveActionDialogTextColor, // Cor de destaque do app
+                          color: AppColors.positiveActionDialogTextColor,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -249,10 +248,10 @@ class _HomePageState extends ConsumerState<HomePage>{
       );
   }
 
-  void _deleteAllHabits(){
-    ref.read(habitControllerProvider.notifier).clearAllData();
+  // void _deleteAllHabits(){
+  //   ref.read(habitControllerProvider.notifier).clearAllData();
 
-  }
+  // }
 
   String _getDayName(int weekday){
     const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
