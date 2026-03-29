@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
+import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_vertical_divider.dart';
@@ -33,7 +34,10 @@ class EditOrCompleteHabitDialog extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          CommonIconContainer(habit: habit, alpha: 0.5)
+          CommonIconContainer(
+            habitIcon: HabitIcon.fromCode(habit.iconCode), 
+            alpha: 0.5
+          )
         ],
       ),
       content: Text(
@@ -41,7 +45,6 @@ class EditOrCompleteHabitDialog extends StatelessWidget {
         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
           color: AppColors.dialogTextColor
         ),
-      
       ),
       actionsAlignment: MainAxisAlignment.spaceAround,
       actionsPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),

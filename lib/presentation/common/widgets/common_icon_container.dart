@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 
 class CommonIconContainer extends StatelessWidget {
-  final HabitModel habit;
+  final HabitIcon habitIcon; //final HabitModel habit;
   final double alpha;
+  final double? size;
+  final double? padding;
   const CommonIconContainer ({
     super.key,
-    required this.habit,
-    required this.alpha
+    required this.habitIcon,
+    required this.alpha,
+    this.size,
+    this.padding
   });
 
   @override 
   Widget build(BuildContext context){
-    final habitIcon = HabitIcon.fromCode(habit.iconCode);
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(padding ?? 12),
       decoration: BoxDecoration(
         backgroundBlendMode: BlendMode.color,
         color: habitIcon.color.withValues(alpha: alpha),
@@ -27,11 +29,10 @@ class CommonIconContainer extends StatelessWidget {
       shadows: [
         Shadow(
           color: Colors.black,
-          offset: Offset(0.5, 0.5), // X and Y offset
-          //blurRadius: 4.0
+          offset: Offset(0.5, 0.5),
         )
       ],
-      size: 38,
+      size: size ?? 38,
     ),
   );
 

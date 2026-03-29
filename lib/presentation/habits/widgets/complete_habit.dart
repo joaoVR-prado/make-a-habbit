@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
+import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_horizontal_divider.dart';
@@ -26,7 +27,10 @@ class CompleteHabit extends StatelessWidget{
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            trailing: CommonIconContainer(habit: habit, alpha: 0.5),
+            trailing: CommonIconContainer(
+              habitIcon: HabitIcon.fromCode(habit.iconCode), 
+              alpha: 0.5
+            ),
             title: Text(
               habit.name,
               style: TextTheme.of(context).titleMedium!.copyWith(
@@ -41,10 +45,8 @@ class CompleteHabit extends StatelessWidget{
                 fontSize: 10,
                 color: AppColors.dialogTextColor,
                 fontWeight: FontWeight.bold
-
               ),
             ),
-            
           ),
           CommonHorizontalDivider(),
           habit.conclusionType == HabitConclusionType.goalQuantity

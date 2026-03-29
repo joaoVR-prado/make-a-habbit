@@ -23,10 +23,10 @@ class AppTheme {
 
     // Estilos de texto
     textTheme: GoogleFonts.konkhmerSleokchherTextTheme().copyWith(
-      titleLarge: const TextStyle(fontSize: 20, color: AppColors.whiteText),
+      titleLarge: const TextStyle(fontSize: 20, color: AppColors.whiteText, fontWeight: FontWeight.bold),
       titleMedium: const TextStyle(fontSize: 14, color: AppColors.whiteText), // Titulo do listTile dos habitos
       
-      bodyLarge: const TextStyle(fontSize: 20, color: AppColors.whiteText),
+      bodyLarge: const TextStyle(fontSize: 20, color: AppColors.whiteText, fontWeight: FontWeight.bold),
       bodyMedium: const TextStyle(fontSize: 16, color: Colors.black),
       bodySmall: const TextStyle(fontSize: 8, color: AppColors.whiteText), // Descricao do listTile dos habitos
 
@@ -35,7 +35,7 @@ class AppTheme {
       labelSmall: const TextStyle(fontSize: 12, color: AppColors.whiteText),
 
       // Especifico para os textbuttons do bottomnavbar
-      labelMedium: const TextStyle(fontSize: 18, color: AppColors.whiteText)
+      labelMedium: const TextStyle(fontSize: 18, color: AppColors.whiteText, fontWeight: FontWeight.bold)
 
     ),
 

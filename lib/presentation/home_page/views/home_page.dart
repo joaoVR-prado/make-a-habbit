@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
+import 'package:make_a_habbit/presentation/habits/views/create_habit_page.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit_dialog.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habits_list_tile.dart';
@@ -26,9 +24,14 @@ class _HomePageState extends ConsumerState<HomePage>{
   @override
   Widget build(BuildContext context){
       final selectedDate = ref.watch(selectedDateProvider);
-
       ref.watch(habitControllerProvider);
       final habitsForSelectedDate = ref.read(habitControllerProvider.notifier).getHabitsForDate(selectedDate);
+
+      final today = DateTime.now();
+      final isToday = 
+        selectedDate.year == today.year &&
+        selectedDate.month == today.month &&
+        selectedDate.day == today.day;
 
       return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -68,7 +71,6 @@ class _HomePageState extends ConsumerState<HomePage>{
               '${_getDayName(selectedDate.weekday)} - ${_getMonthName(selectedDate.month)}. ${selectedDate.day} - ${selectedDate.year}',
               style: Theme.of(context).textTheme.labelMedium,
             ),
-            //centerTitle: true,
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
@@ -89,9 +91,7 @@ class _HomePageState extends ConsumerState<HomePage>{
                           context: context, 
                           builder: (BuildContext dialogContext){
                             return EditOrCompleteHabitDialog(habit: result);
-
                           }
-
                         );
                       }
                     }
@@ -101,8 +101,16 @@ class _HomePageState extends ConsumerState<HomePage>{
             ],
           ),
           floatingActionButton: FloatingActionButton(
-            onPressed: (){
-              _addTestHabit();
+            // onPressed: (){
+            //   _deleteAllHabits();
+            // },
+            onPressed: () async{
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CreateHabitPage()
+                )
+              );
+              ref.invalidate(habitControllerProvider);
 
             },
             child: Icon(
@@ -117,6 +125,33 @@ class _HomePageState extends ConsumerState<HomePage>{
                 padding: EdgeInsetsGeometry.symmetric(vertical: 16),
                 child: HorizontalCalendar()
               ),
+              if (!isToday)
+                Padding(
+                  padding: const EdgeInsets.only(right: 16, bottom: 8),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () {
+                        ref.read(selectedDateProvider.notifier).state = DateTime.now();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.positiveActionDialogTextColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Hoje',
+                          style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                            color: Colors.white, // Letra branca pra destacar
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               // Habitos
               Expanded(
                 child: ListView.builder(
@@ -159,10 +194,8 @@ class _HomePageState extends ConsumerState<HomePage>{
                         HabitsListTile(
                           habit: habit,
                           habitStatus: habitStatus,
-                          onTap: (){
-                            
-                          }
                         ),
+                        
                         if(index != habitsForSelectedDate.length - 1)
                           Padding(
                             padding: EdgeInsetsGeometry.only(left: 10, right: 10),
@@ -170,7 +203,7 @@ class _HomePageState extends ConsumerState<HomePage>{
                               thickness: 0.3,
                               height: 2,
                             ),
-                        )
+                          )
                       ],
                     );
                   },
@@ -184,15 +217,13 @@ class _HomePageState extends ConsumerState<HomePage>{
             child: BottomAppBar(
               height: 60,
               color: AppColors.bottomAppBarcolor,
-              // shape: const CircularNotchedRectangle(),
-              // notchMargin: 8.0,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(
                     flex: 2,
                     child: TextButton(
-                      onPressed: (){}, 
+                      onPressed: (){}, // TODO: Carregar tela de habitos
                       child: Text(
                         'HÁBITOS',
                         style: Theme.of(context).textTheme.labelMedium,
@@ -203,7 +234,7 @@ class _HomePageState extends ConsumerState<HomePage>{
                   Expanded(
                     flex: 2,
                     child: TextButton(
-                      onPressed: (){}, 
+                      onPressed: (){}, // TODO: Carregar tela de relatórios
                       child: Text(
                         'RELATÓRIOS',
                         style: Theme.of(context).textTheme.labelMedium,
@@ -217,34 +248,21 @@ class _HomePageState extends ConsumerState<HomePage>{
       );
   }
 
-    void _addTestHabit(){
-        final newHabit = HabitModel(
-            id: '5', 
-            iconCode: 4, 
-            name: 'Beber 3 Litros de agua',
-            description: "Todos os Dias",
-            conclusionType: HabitConclusionType.goalQuantity,
-            goalQuantity: 3,
-            frequency: HabitFrequency(type: HabitFrequencyType.daily),
-            startDate: DateTime.now()
+  // void _deleteAllHabits(){
+  //   ref.read(habitControllerProvider.notifier).clearAllData();
 
-        );
+  // }
 
-        ref.read(habitControllerProvider.notifier).addHabit(newHabit);
+  String _getDayName(int weekday){
+    const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
+    return days[weekday - 1];
 
-    }
+  }
 
-    String _getDayName(int weekday){
-      const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
-      return days[weekday - 1];
+  String _getMonthName(int month){
+    const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAIO', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+    return months[month - 1];
 
-    }
-
-    String _getMonthName(int month){
-      const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAIO', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
-      return months[month - 1];
-
-    }
-
+  }
 
 }

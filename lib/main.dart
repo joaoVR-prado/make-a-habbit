@@ -27,6 +27,7 @@ void main() async {
 
   // Iniciar as Box do Hive
   await Hive.openBox<HabitModel>('habits');
+  await Hive.openBox<NotificationConfigModel>('notifications');
   await Hive.openBox<ConcludedHabitsModel>('conclusions');
 
   runApp(ProviderScope(child: const MainApp()));
