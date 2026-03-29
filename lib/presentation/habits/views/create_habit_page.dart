@@ -87,12 +87,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     
     final reminderTime = ref.read(draftReminderTimeNotificationProvider);
     final isStreakEnabled = ref.read(draftEnableStreakProvider);
-
-    print('Descricao: $habitDescription');
-    print('endDate: $endDate');
-    print('notificationTime: $reminderTime');
-    print('streak: $isStreakEnabled');
-
+    
     // OPERAÇÔES DO HIVE
 
     // Ve o tipo de frequencia para salavr os dias escolhidos
