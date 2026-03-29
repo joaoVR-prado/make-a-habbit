@@ -56,6 +56,27 @@ class _HorizontalCalendarState extends ConsumerState<HorizontalCalendar>{
 
   @override
   Widget build(BuildContext context){
+    // Scroll para o dia atual:
+    ref.listen<DateTime>(selectedDateProvider, (previousDate, newDate){
+      if (previousDate != newDate) {
+        final daysFromStart = _daysBetween(_startDate, newDate);
+        final targetOffset = daysFromStart * _itemSize;
+
+        final screenWidth = MediaQuery.of(context).size.width;
+        final centeredOffset = targetOffset - (screenWidth / 2) + (_itemSize / 2);
+
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            centeredOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+            
+          );
+        }
+      }
+
+    });
+
     final selectedDate = ref.watch(selectedDateProvider);
 
     return SizedBox(

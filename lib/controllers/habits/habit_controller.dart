@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
@@ -98,6 +99,7 @@ final draftConclusionDescriptionQuantityProvider = StateProvider.autoDispose<Str
 
 });
 
+// Tela 4 do Cadastro
 final draftFrequencyTypeProvider = StateProvider.autoDispose<HabitFrequencyType?>((ref){
   return null;
 
@@ -113,7 +115,26 @@ final draftMonthlyDaysProvider = StateProvider.autoDispose<List<int>>((ref) {
 
 });
 
+// Tela 5 do cadastro
+
+final draftStartDateProvider = StateProvider.autoDispose<DateTime?>((ref){
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day + 1);
+
+});
+
+final draftEndDateProvider = StateProvider.autoDispose<DateTime?>((ref){
+  return null;
+
+});
+
+final draftReminderTimeNotificationProvider = StateProvider.autoDispose<TimeOfDay?>((ref){
+  return null;
+
+});
 
 
+final draftEnableStreakProvider = StateProvider.autoDispose<bool>((ref){
+  return false;
 
-
+});

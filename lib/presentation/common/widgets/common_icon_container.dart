@@ -16,7 +16,6 @@ class CommonIconContainer extends StatelessWidget {
 
   @override 
   Widget build(BuildContext context){
-    //final habitIcon = HabitIcon.fromCode(habit.iconCode);
     return Container(
       padding: EdgeInsets.all(padding ?? 12),
       decoration: BoxDecoration(

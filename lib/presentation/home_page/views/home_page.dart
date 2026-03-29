@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/presentation/habits/views/create_habit_page.dart';
@@ -29,6 +26,12 @@ class _HomePageState extends ConsumerState<HomePage>{
       final selectedDate = ref.watch(selectedDateProvider);
       ref.watch(habitControllerProvider);
       final habitsForSelectedDate = ref.read(habitControllerProvider.notifier).getHabitsForDate(selectedDate);
+
+      final today = DateTime.now();
+      final isToday = 
+        selectedDate.year == today.year &&
+        selectedDate.month == today.month &&
+        selectedDate.day == today.day;
 
       return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -98,12 +101,17 @@ class _HomePageState extends ConsumerState<HomePage>{
             ],
           ),
           floatingActionButton: FloatingActionButton(
-            onPressed: (){
-              Navigator.of(context).push(
+            // onPressed: (){
+            //   _deleteAllHabits();
+            // },
+            onPressed: () async{
+              await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const CreateHabitPage()
                 )
               );
+              ref.invalidate(habitControllerProvider);
+
             },
             child: Icon(
               Icons.add,
@@ -117,6 +125,34 @@ class _HomePageState extends ConsumerState<HomePage>{
                 padding: EdgeInsetsGeometry.symmetric(vertical: 16),
                 child: HorizontalCalendar()
               ),
+              if (!isToday)
+                Padding(
+                  padding: const EdgeInsets.only(right: 16, bottom: 8),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () {
+                        // Clicou, volta pra hoje instantaneamente!
+                        ref.read(selectedDateProvider.notifier).state = DateTime.now();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.positiveActionDialogTextColor, // Cor de destaque do app
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Hoje',
+                          style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                            color: Colors.white, // Letra branca pra destacar
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               // Habitos
               Expanded(
                 child: ListView.builder(
@@ -213,34 +249,21 @@ class _HomePageState extends ConsumerState<HomePage>{
       );
   }
 
-    void _addTestHabit(){
-        final newHabit = HabitModel(
-          id: '5', 
-          iconCode: 4, 
-          name: 'Beber 3 Litros de agua',
-          description: "Todos os Dias",
-          conclusionType: HabitConclusionType.goalQuantity,
-          goalQuantity: 3,
-          frequency: HabitFrequency(type: HabitFrequencyType.daily),
-          startDate: DateTime.now()
+  void _deleteAllHabits(){
+    ref.read(habitControllerProvider.notifier).clearAllData();
 
-        );
+  }
 
-        ref.read(habitControllerProvider.notifier).addHabit(newHabit);
+  String _getDayName(int weekday){
+    const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
+    return days[weekday - 1];
 
-    }
+  }
 
-    String _getDayName(int weekday){
-      const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB', 'DOM'];
-      return days[weekday - 1];
+  String _getMonthName(int month){
+    const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAIO', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+    return months[month - 1];
 
-    }
-
-    String _getMonthName(int month){
-      const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAIO', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
-      return months[month - 1];
-
-    }
-
+  }
 
 }

@@ -185,8 +185,6 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
     WidgetRef ref
   ){
     final selectedDays = ref.watch(draftWeeklyDaysProvider);
-
-    //final weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']; 
     final weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
     return Wrap(
@@ -205,17 +203,11 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
             final notifier = ref.read(draftWeeklyDaysProvider.notifier);
             if(isSelected){
               notifier.state = selectedDays.where((d) => d != dayIndex).toList();
-
             } else{
               notifier.state = [...selectedDays, dayIndex];
-
             }
-
           }
-
-          
         );
-
       }),
     );
   }
@@ -231,7 +223,7 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
         
         final dayValue = index + 1; 
         
-        // Se for o 32, o texto será "Últ", senão será o próprio número
+        // Se for o 32, o texto será "Último", senão será o próprio número
         final text = dayValue == 32 ? 'Último' : dayValue.toString();
         
         final isSelected = selectedDays.contains(dayValue);
