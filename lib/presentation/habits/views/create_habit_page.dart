@@ -90,7 +90,6 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     // Verifica se é edição de hábito
     var uuid = Uuid();
     final existingId = ref.read(draftHabitIdProvider);
-    print(existingId);
 
     // OPERAÇÔES DO HIVE
 
@@ -156,7 +155,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     );
 
     await notificationsBox.put(newHabit.id, newNotification);
-    
+
     ref.invalidate(habitControllerProvider);
     clearHabitDrafts(ref);
 

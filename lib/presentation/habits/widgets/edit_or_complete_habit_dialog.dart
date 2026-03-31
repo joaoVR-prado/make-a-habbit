@@ -56,7 +56,6 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
         // Editar
         TextButton(
           onPressed: (){
-            //Navigator.pop(context);
             _startHabitEdition(
               context, 
               ref, 
@@ -119,17 +118,8 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
 
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => const CreateHabitPage())
-      
+
     );
-
-    // Navigator.pop(context); 
-
-    // await Navigator.of(context).push(
-    //   MaterialPageRoute(builder: (context) => const CreateHabitPage())
-
-    // );
-
-    // ref.invalidate(habitControllerProvider);
 
   }
 }
