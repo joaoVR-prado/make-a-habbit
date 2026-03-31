@@ -87,6 +87,10 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     final reminderTime = ref.read(draftReminderTimeNotificationProvider);
     final isStreakEnabled = ref.read(draftEnableStreakProvider);
 
+    // Verifica se é edição de hábito
+    var uuid = Uuid();
+    final existingId = ref.read(draftHabitIdProvider);
+
     // OPERAÇÔES DO HIVE
 
     // Ve o tipo de frequencia para salavr os dias escolhidos
@@ -120,8 +124,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
       );
     }
 
-    var uuid = Uuid();
-    final id = uuid.v4();
+    final id = existingId ?? uuid.v4();
     final notificationId = id;
     
     final newHabit = HabitModel(
@@ -153,11 +156,15 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
     await notificationsBox.put(newHabit.id, newNotification);
 
+    ref.invalidate(habitControllerProvider);
+    clearHabitDrafts(ref);
+
     if(mounted){
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Hábito criado com sucesso!',
+            existingId == null ? 'Hábito criado com sucesso!' 
+            : 'Hábito atualizado com sucesso!' ,
             style: Theme.of(context).textTheme.labelMedium,
             
           ),
