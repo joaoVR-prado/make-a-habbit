@@ -156,6 +156,9 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     );
 
     await notificationsBox.put(newHabit.id, newNotification);
+    
+    ref.invalidate(habitControllerProvider);
+    clearHabitDrafts(ref);
 
     if(mounted){
       ScaffoldMessenger.of(context).showSnackBar(

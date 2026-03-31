@@ -70,77 +70,95 @@ final selectedDateProvider = StateProvider<DateTime>((ref){
 });
 
 // ID usado para vermos se sera um habito novo ou edicao de um ja ativo
-final draftHabitIdProvider = StateProvider.autoDispose<String?>((ref) {
+final draftHabitIdProvider = StateProvider<String?>((ref) {
   return null;
-  
+
 });
 
 
 // Tela 1 do Cadastro
-final draftCategoryProvider = StateProvider.autoDispose<HabitIcon?>((ref) {
+final draftCategoryProvider = StateProvider<HabitIcon?>((ref) {
   return null;
 
 });
 
 // Tela 2 do Cadastro
-final draftConclusionTypeProvider = StateProvider.autoDispose<HabitConclusionType?>((ref) {
+final draftConclusionTypeProvider = StateProvider<HabitConclusionType?>((ref) {
   return null;
 
 });
 
 // Tela 3 do Cadastro
-final draftConclusionNameProvider = StateProvider.autoDispose<String>((ref) {
+final draftConclusionNameProvider = StateProvider<String>((ref) {
   return '';
 
 });
 
-final draftConclusionGoalQuantityProvider = StateProvider.autoDispose<String>((ref) {
+final draftConclusionGoalQuantityProvider = StateProvider<String>((ref) {
   return '';
 
 });
 
 
-final draftConclusionDescriptionQuantityProvider = StateProvider.autoDispose<String>((ref) {
+final draftConclusionDescriptionQuantityProvider = StateProvider<String>((ref) {
   return '';
 
 });
 
 // Tela 4 do Cadastro
-final draftFrequencyTypeProvider = StateProvider.autoDispose<HabitFrequencyType?>((ref){
+final draftFrequencyTypeProvider = StateProvider<HabitFrequencyType?>((ref){
   return null;
 
 });
 
-final draftWeeklyDaysProvider = StateProvider.autoDispose<List<int>>((ref) {
+final draftWeeklyDaysProvider = StateProvider<List<int>>((ref) {
   return [];
 
 });
 
-final draftMonthlyDaysProvider = StateProvider.autoDispose<List<int>>((ref) {
+final draftMonthlyDaysProvider = StateProvider<List<int>>((ref) {
   return [];
 
 });
 
 // Tela 5 do cadastro
 
-final draftStartDateProvider = StateProvider.autoDispose<DateTime?>((ref){
+final draftStartDateProvider = StateProvider<DateTime?>((ref){
   final now = DateTime.now();
   return DateTime(now.year, now.month, now.day + 1);
 
 });
 
-final draftEndDateProvider = StateProvider.autoDispose<DateTime?>((ref){
+final draftEndDateProvider = StateProvider<DateTime?>((ref){
   return null;
 
 });
 
-final draftReminderTimeNotificationProvider = StateProvider.autoDispose<TimeOfDay?>((ref){
+final draftReminderTimeNotificationProvider = StateProvider<TimeOfDay?>((ref){
   return null;
 
 });
 
 
-final draftEnableStreakProvider = StateProvider.autoDispose<bool>((ref){
+final draftEnableStreakProvider = StateProvider<bool>((ref){
   return false;
 
 });
+
+// Limpador de drafts
+void clearHabitDrafts(WidgetRef ref) {
+  ref.invalidate(draftHabitIdProvider);
+  ref.invalidate(draftCategoryProvider);
+  ref.invalidate(draftConclusionTypeProvider);
+  ref.invalidate(draftConclusionNameProvider);
+  ref.invalidate(draftConclusionGoalQuantityProvider);
+  ref.invalidate(draftConclusionDescriptionQuantityProvider);
+  ref.invalidate(draftFrequencyTypeProvider);
+  ref.invalidate(draftWeeklyDaysProvider);
+  ref.invalidate(draftMonthlyDaysProvider);
+  ref.invalidate(draftStartDateProvider);
+  ref.invalidate(draftEndDateProvider);
+  ref.invalidate(draftReminderTimeNotificationProvider);
+  ref.invalidate(draftEnableStreakProvider);
+  
+}

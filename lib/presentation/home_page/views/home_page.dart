@@ -110,6 +110,7 @@ class _HomePageState extends ConsumerState<HomePage>{
             //   _deleteAllHabits();
             // },
             onPressed: () async{
+              clearHabitDrafts(ref);
               await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const CreateHabitPage()

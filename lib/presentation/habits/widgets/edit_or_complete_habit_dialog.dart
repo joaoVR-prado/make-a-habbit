@@ -94,8 +94,7 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
 
   void _startHabitEdition(BuildContext context, WidgetRef ref, HabitModel habit){
     ref.read(draftHabitIdProvider.notifier).state = habit.id;
-    print(habit.id);
-    
+
     ref.read(draftConclusionNameProvider.notifier).state = habit.name;
     ref.read(draftConclusionTypeProvider.notifier).state = habit.conclusionType;
     ref.read(draftConclusionGoalQuantityProvider.notifier).state = habit.goalQuantity?.toString() ?? '';
@@ -118,12 +117,19 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
       ref.read(draftReminderTimeNotificationProvider.notifier).state = null;
     }
 
-    Navigator.pop(context); 
-
-    Navigator.of(context).push(
+    Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => const CreateHabitPage())
-
+      
     );
+
+    // Navigator.pop(context); 
+
+    // await Navigator.of(context).push(
+    //   MaterialPageRoute(builder: (context) => const CreateHabitPage())
+
+    // );
+
+    // ref.invalidate(habitControllerProvider);
 
   }
 }
