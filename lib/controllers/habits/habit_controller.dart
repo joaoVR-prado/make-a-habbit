@@ -69,6 +69,12 @@ final selectedDateProvider = StateProvider<DateTime>((ref){
 
 });
 
+// ID usado para vermos se sera um habito novo ou edicao de um ja ativo
+final draftHabitIdProvider = StateProvider.autoDispose<String?>((ref) {
+  return null;
+  
+});
+
 
 // Tela 1 do Cadastro
 final draftCategoryProvider = StateProvider.autoDispose<HabitIcon?>((ref) {
