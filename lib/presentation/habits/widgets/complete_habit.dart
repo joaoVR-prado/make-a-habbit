@@ -51,7 +51,7 @@ class CompleteHabit extends StatelessWidget{
           CommonHorizontalDivider(),
           habit.conclusionType == HabitConclusionType.goalQuantity
             ? GoalQtdTextField(habit: habit)
-            : YesNoHabit(habit: habit) // Aqui vou criar o dialog de sim ou nao do habito
+            : YesNoHabit(habit: habit)
         ],
       ),
 

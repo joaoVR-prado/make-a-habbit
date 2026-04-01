@@ -170,7 +170,8 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
                 );
 
                 if (context.mounted){
-                  Navigator.pop(context);
+                  Navigator.pop(context);// Sai da modal de conclusao
+                  Navigator.pop(context); // sai da modal de edicao
 
                 }
               
