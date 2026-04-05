@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/controllers/notifications/notifications_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
@@ -162,22 +163,27 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
                 CommonVerticalDivider(),
                 // Concluir
                 TextButton(
-                  onPressed: (){
-                    ref.read(habitControllerProvider.notifier).deleteHabit(habit.id);
-                    Navigator.pop(context); // Sai da modal de confirmacao
-                    Navigator.pop(context); // Sai da modal de edicao
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Hábito excluido com sucesso!',
-                          style: Theme.of(context).textTheme.labelMedium,
-                          
-                        ),
-                        backgroundColor: AppColors.calendarMainColor,
-                        duration: Duration(seconds: 3),
-                      ),
-                    );
+                  onPressed: () async {
+                    // Deleta Notificacoes
+                    await NotificationsController.deleteHabitNotifications(habit.notificationId!);
 
+                    ref.read(habitControllerProvider.notifier).deleteHabit(habit.id);
+                    if(context.mounted){
+                      Navigator.pop(context); // Sai da modal de confirmacao
+                      Navigator.pop(context); // Sai da modal de edicao
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Hábito excluido com sucesso!',
+                            style: Theme.of(context).textTheme.labelMedium,
+                            
+                          ),
+                          backgroundColor: AppColors.calendarMainColor,
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+
+                    }
                   },
                   child: Text(
                     'Confirmar',

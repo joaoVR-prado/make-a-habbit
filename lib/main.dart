@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+import 'package:make_a_habbit/controllers/notifications/notifications_controller.dart';
+import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/theme/app_theme.dart';
 import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
@@ -10,6 +12,7 @@ import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
 import 'package:make_a_habbit/presentation/home_page/views/home_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +32,33 @@ void main() async {
   await Hive.openBox<HabitModel>('habits');
   await Hive.openBox<NotificationConfigModel>('notifications');
   await Hive.openBox<ConcludedHabitsModel>('conclusions');
+
+  // Inicia a biblioteca Awesome_notifications
+  AwesomeNotifications().initialize(
+    // TODO: Colocar icone do coelho na pasta android/app/src/main/res/drawable
+    'resource://mipmap/ic_launcher',
+    [
+      NotificationChannel(
+        channelGroupKey: 'habit_channel_group',
+        channelKey: 'habit_reminders_v2', 
+        channelName: 'Notificacoes de Habitos', 
+        channelDescription: 'Canal de notificacoes para lembrete de habitos',
+        defaultColor: AppColors.darkBlue,
+        ledColor: Colors.white,
+        importance: NotificationImportance.Max,
+        defaultPrivacy: NotificationPrivacy.Public,
+        locked: true,
+        channelShowBadge: true
+
+      )
+    ]
+
+  );
+
+  // Configura app para escutar notificacoes fora do app
+  AwesomeNotifications().setListeners(
+    onActionReceivedMethod: NotificationsController.onActionReceivedMethod,
+  );
 
   runApp(ProviderScope(child: const MainApp()));
   
