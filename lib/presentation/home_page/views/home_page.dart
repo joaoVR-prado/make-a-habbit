@@ -91,6 +91,11 @@ class _HomePageState extends ConsumerState<HomePage>{
 
                     );
                     if (result != null){
+                      final today = DateTime.now();
+                      final targetDate = _getClosestValidDateForHabit(result, today);
+
+                      ref.read(selectedDateProvider.notifier).state = targetDate;
+
                       if (context.mounted){
                         showDialog(
                           context: context, 
@@ -298,6 +303,31 @@ class _HomePageState extends ConsumerState<HomePage>{
   String _getMonthName(int month){
     const months = ['JAN', 'FEV', 'MAR', 'ABR', 'MAIO', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
     return months[month - 1];
+
+  }
+
+  // Metodo para corrigir o bug da edicao e melhorar navegacao ao pesquisar
+  DateTime _getClosestValidDateForHabit(HabitModel habit, DateTime referenceDate){
+    if(habit.isHabitActiveOn(referenceDate)){
+      return referenceDate;
+
+    }
+
+    for(int i = 1; i <= 31; i++){
+
+      // Checa datas passadas
+      DateTime pastDate = referenceDate.subtract(Duration(days: i));
+      if(habit.isHabitActiveOn(pastDate)) return pastDate;
+
+      // Checa datas futuras
+      DateTime futureDate = referenceDate.add(Duration(days: i));
+      if(habit.isHabitActiveOn(futureDate)) return futureDate;
+
+    }
+
+    // Fallback para habitos que ja foram concluidos
+    return referenceDate;
+
 
   }
 

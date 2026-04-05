@@ -68,6 +68,7 @@ class HabitSearch extends SearchDelegate{
             ),
             onTap: (){
               close(context, habit);
+              
             },
           ),
         );
