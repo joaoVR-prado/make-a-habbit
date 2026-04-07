@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
@@ -11,7 +12,6 @@ import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit
 import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habits_list_tile.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/horizontal_calendar.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 
 class HomePage extends ConsumerStatefulWidget{
     const HomePage({super.key});
@@ -111,10 +111,7 @@ class _HomePageState extends ConsumerState<HomePage>{
             ],
           ),
           floatingActionButton: FloatingActionButton(
-            // onPressed: (){
-            //   _deleteAllHabits();
-            // },
-            onPressed: () async{
+           onPressed: () async{
               clearHabitDrafts(ref);
               await Navigator.of(context).push(
                 MaterialPageRoute(
@@ -124,6 +121,21 @@ class _HomePageState extends ConsumerState<HomePage>{
               ref.invalidate(habitControllerProvider);
 
             },
+            // onPressed: () async {
+            //   await AwesomeNotifications().createNotification(
+            //     content: NotificationContent(
+            //       id: 999,
+            //       channelKey: 'habit_reminders_v2',
+            //       title: 'Teste de Notificacao',
+            //       body: '123, a som, testando som',
+            //       category: NotificationCategory.Message,
+            //     ),
+
+            //   );
+            // },
+            // onPressed: (){
+            //   _deleteAllHabits();
+            // },
             child: Icon(
               Icons.add,
               color: Colors.white,

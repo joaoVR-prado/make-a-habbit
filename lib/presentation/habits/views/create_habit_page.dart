@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
@@ -91,8 +92,8 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     var uuid = Uuid();
     final existingId = ref.read(draftHabitIdProvider);
 
-    // OPERAÇÔES DO HIVE
-
+    // OPERAÇÔES DO HIVE //
+    
     // Ve o tipo de frequencia para salavr os dias escolhidos
     List<int>? selectedDays;
     if (frequencyType == HabitFrequencyType.weekly) {
@@ -155,6 +156,31 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     );
 
     await notificationsBox.put(newHabit.id, newNotification);
+
+
+    // Lógica das notificações //
+
+    if(existingId != null){
+      // Cancela notificacao 
+      await AwesomeNotifications().cancel(newHabit.notificationId!);
+
+      // Cancela streak
+      await AwesomeNotifications().cancel(newHabit.notificationId! + 10000);
+
+    }
+
+    // Agenda notificacao de lembrete
+    if(reminderTime != null){
+      _scheduleHabitReminder(newHabit);
+
+    }
+
+    // Agenda notificacao de Streak
+    if(isStreakEnabled){
+      _scheduleStreakReminder(newHabit, currentStreak: 0);
+      
+
+    }
 
     ref.invalidate(habitControllerProvider);
     clearHabitDrafts(ref);
@@ -312,6 +338,120 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
             ),
           )
         ],
+      ),
+    );
+  }
+
+  // Funcoes para criarmos a notificacao //
+
+  // Agenda notificacao de lembrete
+  Future<void> _scheduleHabitReminder(HabitModel habit) async {
+    final notificationTime = habit.notificationTime!;
+
+    // Cria as propriedades base para reutilizar
+    final String title = 'Hora do seu hábito!';
+    final String body = 'Não se esqueça de completar o hábito ${habit.name}';
+    final NotificationCategory category = NotificationCategory.Reminder;
+
+    // Verifica a frequencia
+    if (habit.frequency.type == HabitFrequencyType.daily) {
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: habit.notificationId!, 
+          channelKey: 'habit_reminders_v2',
+          title: title,
+          body: body,
+          category: category,
+          wakeUpScreen: true, 
+          //fullScreenIntent: true,
+          //criticalAlert: true,
+        ),
+        schedule: NotificationCalendar(
+          hour: notificationTime.hour,
+          minute: notificationTime.minute,
+          second: 0,
+          repeats: true,
+          preciseAlarm: true
+        ),
+      );
+    } else if (habit.frequency.type == HabitFrequencyType.weekly) { // Habitos semanais
+      for (int weekday in habit.frequency.selectedDays!) {
+        await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: habit.notificationId! + weekday, 
+            channelKey: 'habit_reminders_v2',
+            title: title,
+            body: body,
+            category: category,
+            wakeUpScreen: true, 
+            //fullScreenIntent: true,
+            //criticalAlert: true,
+          ),
+          schedule: NotificationCalendar(
+            weekday: weekday,
+            hour: notificationTime.hour,
+            minute: notificationTime.minute,
+            second: 0,
+            repeats: true,
+            preciseAlarm: true
+          ),
+        );
+      }
+    } else if (habit.frequency.type == HabitFrequencyType.monthly) { // Habitos mensais
+      for (int day in habit.frequency.selectedDays!) {
+        await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: habit.notificationId! + day + 100, // ID único para evitar conflito
+            channelKey: 'habit_reminders_v2',
+            title: title,
+            body: body,
+            category: category,
+            wakeUpScreen: true, 
+            //fullScreenIntent: true,
+            //criticalAlert: true,
+          ),
+          schedule: NotificationCalendar(
+            day: day,
+            hour: notificationTime.hour,
+            minute: notificationTime.minute,
+            second: 0,
+            repeats: true,
+            preciseAlarm: true
+          ),
+        );
+      }
+    }
+  }
+
+  // Função para agendar a notificação de Ofensiva (Sempre às 12h)
+  Future<void> _scheduleStreakReminder(HabitModel habit, {required int currentStreak}) async {
+    final streakNotificationId = habit.notificationId! + 10000; // Cria id Unico para nao gberar conflito com a notificacao acima
+
+    String notification;
+    if (currentStreak == 0) {
+      notification = 'Vamos começar sua ofensiva de ${habit.name} hoje? ';
+    } else {
+      notification = 'Você completou ${habit.name} por $currentStreak dias, parabéns! Continue persistindo! ';
+    }
+
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: streakNotificationId,
+        channelKey: 'habit_reminders_v2',
+        title: 'Sua Ofensiva! ',
+        body: notification,
+        category: NotificationCategory.Status,
+        wakeUpScreen: true, 
+        //fullScreenIntent: true,
+        //criticalAlert: true,
+      ),
+      schedule: NotificationCalendar( // Repete todos os dias ao meio dia
+        hour: 12,
+        minute: 0,
+        second: 0,
+        repeats: true,
+        preciseAlarm: true
+
       ),
     );
   }

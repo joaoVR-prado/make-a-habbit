@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
@@ -178,6 +179,25 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
 
           },
           onTap: () async{
+            // Verifica permissao do usuario para mostrar notificacoes
+            bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+            if (!isAllowed) {
+              // TODO: Mostrar seu alerta personalizado antes aqui!
+              isAllowed = await AwesomeNotifications().requestPermissionToSendNotifications();
+
+            }
+
+            if (!isAllowed) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Precisamos da permissão para te lembrar do hábito!')),
+                );
+              }
+              return; // Sai do onTap
+            }
+
+            if (!context.mounted) return;
+            
             final initialTime = reminderTime ?? TimeOfDay.now();
             final TimeOfDay? selectedTime = await showTimePicker(
               context: context, 
@@ -323,7 +343,24 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
         style: Theme.of(context).textTheme.titleLarge,
       ),
       value: isStreakEnabled,
-      onChanged: (bool newValue) {
+      onChanged: (bool newValue) async {
+        // Valida permissao do usuario para mostrar notificacoes
+        if (newValue == true) {
+          bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+          
+          if (!isAllowed) {
+            isAllowed = await AwesomeNotifications().requestPermissionToSendNotifications();
+          }
+          
+          if (!isAllowed) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Permita as notificações para usar a Ofensiva!')),
+              );
+            }
+            return; // Sai do onChanged sem salvar
+          }
+        }
         ref.read(draftEnableStreakProvider.notifier).state = newValue;
       },
     ),
