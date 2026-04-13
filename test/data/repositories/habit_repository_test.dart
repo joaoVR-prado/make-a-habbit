@@ -1,4 +1,4 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
@@ -9,7 +9,6 @@ import 'package:make_a_habbit/data/models/notifications/notification_config_mode
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:make_a_habbit/data/repositories/habit_repository.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MockHabitRepository extends Mock implements IHabitRepository{}
 

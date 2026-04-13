@@ -20,12 +20,9 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
   @override
   void initState() {
     super.initState();
-    // _qtdController = TextEditingController(
-    //   text: ref.read(draftConclusionGoalQuantityProvider)
     final quantity = ref.read(draftHabitProvider).goalQuantity;
     _qtdController = TextEditingController(text: quantity);
 
-    // );
   }
 
   @override
@@ -37,7 +34,6 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
 
   @override
   Widget build(BuildContext context) {
-    // final selectedHabitType = ref.watch(draftConclusionTypeProvider);
     final draftState = ref.watch(draftHabitProvider);
     final selectedHabitType = draftState.conclusionType;
 

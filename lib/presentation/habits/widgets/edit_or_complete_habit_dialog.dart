@@ -5,7 +5,6 @@ import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/controllers/notifications/notifications_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
