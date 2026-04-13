@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
-import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
-import 'package:make_a_habbit/data/models/habits/habit_type.dart';
-import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/presentation/habits/views/create_habit_page.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit_dialog.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
@@ -27,10 +25,8 @@ class _HomePageState extends ConsumerState<HomePage>{
   @override
   Widget build(BuildContext context){
       final selectedDate = ref.watch(selectedDateProvider);
-      ref.watch(habitControllerProvider);
-      final habitsForSelectedDate = ref.read(habitControllerProvider.notifier).getHabitsForDate(selectedDate);
-
       final currentTab = ref.watch(homeTabProvider);
+      final displayHabits = ref.watch(dailyHabitsDisplayProvider);
 
       final today = DateTime.now();
       final isToday = 
@@ -112,7 +108,7 @@ class _HomePageState extends ConsumerState<HomePage>{
           ),
           floatingActionButton: FloatingActionButton(
            onPressed: () async{
-              clearHabitDrafts(ref);
+               ref.read(draftHabitProvider.notifier).clear();
               await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const CreateHabitPage()
@@ -121,28 +117,13 @@ class _HomePageState extends ConsumerState<HomePage>{
               ref.invalidate(habitControllerProvider);
 
             },
-            // onPressed: () async {
-            //   await AwesomeNotifications().createNotification(
-            //     content: NotificationContent(
-            //       id: 999,
-            //       channelKey: 'habit_reminders_v2',
-            //       title: 'Teste de Notificacao',
-            //       body: '123, a som, testando som',
-            //       category: NotificationCategory.Message,
-            //     ),
-
-            //   );
-            // },
-            // onPressed: (){
-            //   _deleteAllHabits();
-            // },
             child: Icon(
               Icons.add,
               color: Colors.white,
             ),
           ),
           body: currentTab == 0 
-          ? _buildHabits(isToday: isToday, habitsForSelectedDate: habitsForSelectedDate)
+          ? _buildHabits(isToday: isToday, displayHabits: displayHabits)
           : Center(child: Text('Tela de Relatórios em construção!')),
           bottomNavigationBar: BottomAppBar(
             height: 60,
@@ -200,14 +181,9 @@ class _HomePageState extends ConsumerState<HomePage>{
       );
   }
 
-  // void _deleteAllHabits(){
-  //   ref.read(habitControllerProvider.notifier).clearAllData();
-
-  // }
-
   Widget _buildHabits({
     required bool isToday,
-    required List<HabitModel> habitsForSelectedDate,
+    required List<HabitDisplayModel> displayHabits,
 
   }){
     return Column(
@@ -247,48 +223,16 @@ class _HomePageState extends ConsumerState<HomePage>{
         // Habitos
         Expanded(
           child: ListView.builder(
-            itemCount: habitsForSelectedDate.length,
+            itemCount: displayHabits.length,
             itemBuilder: (context, index) {
-              final habit = habitsForSelectedDate[index];
-
-              // Verificacoes sobre a conclusao do habito
-              final selectedDate = ref.watch(selectedDateProvider);
-              final getAllConclusions = ref.watch(concludedHabitsControllerProvider);
-
-              final dailyConclusion = getAllConclusions.where((c) => 
-                c.habitId == habit.id &&
-                c.conclusionDate.year == selectedDate.year &&
-                c.conclusionDate.month == selectedDate.month &&
-                c.conclusionDate.day == selectedDate.day
-              ).firstOrNull;
-
-              HabitStatus habitStatus = HabitStatus.pending;
-
-              if (habit.conclusionType == HabitConclusionType.goalQuantity) {
-                final doneQuantity = dailyConclusion?.conclusionValue ?? 0;
-                final targetQuantity = habit.goalQuantity ?? 1;
-
-                if (doneQuantity >= targetQuantity) {
-                  habitStatus = HabitStatus.done;
-                }
-              } else {
-                if (dailyConclusion != null) {
-                  if (dailyConclusion.conclusionValue == true) {
-                    habitStatus = HabitStatus.done;
-                  } else if (dailyConclusion.conclusionValue == false) {
-                    habitStatus = HabitStatus.incomplete;
-                  }
-                }
-              }
-
+              final habitItem = displayHabits[index];
               return Column(
                 children: [
                   HabitsListTile(
-                    habit: habit,
-                    habitStatus: habitStatus,
+                    habit: habitItem.habit,
+                    habitStatus: habitItem.status,
                   ),
-                  
-                  if(index != habitsForSelectedDate.length - 1)
+                  if(index != displayHabits.length - 1)
                     Padding(
                       padding: EdgeInsetsGeometry.only(left: 10, right: 10),
                       child: const Divider(
@@ -299,7 +243,6 @@ class _HomePageState extends ConsumerState<HomePage>{
                 ],
               );
             },
-
           )
         )
       ],
@@ -340,7 +283,5 @@ class _HomePageState extends ConsumerState<HomePage>{
     // Fallback para habitos que ja foram concluidos
     return referenceDate;
 
-
   }
-
 }

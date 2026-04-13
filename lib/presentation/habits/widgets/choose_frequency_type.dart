@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_create_habit_title.dart';
@@ -16,7 +16,9 @@ class ChooseFrequencyType extends ConsumerStatefulWidget {
 class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{ 
   @override
   Widget build(BuildContext context) {
-    final selectedFrequency = ref.watch(draftFrequencyTypeProvider);
+    final draftState = ref.watch(draftHabitProvider);
+    final selectedFrequency = draftState.frequencyType;
+    
     return Column(
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
@@ -33,7 +35,9 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
                   InkWell(
                     borderRadius: BorderRadius.circular(12),
                     onTap: () {
-                      ref.read(draftFrequencyTypeProvider.notifier).state = type;
+                      //ref.read(draftFrequencyTypeProvider.notifier).state = type;
+                      ref.read(draftHabitProvider.notifier).updateFrequencyType(type);
+
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -184,7 +188,7 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
     BuildContext context,
     WidgetRef ref
   ){
-    final selectedDays = ref.watch(draftWeeklyDaysProvider);
+    final selectedDays = ref.watch(draftHabitProvider).weeklyDays;
     final weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
     return Wrap(
@@ -200,11 +204,10 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
           text: weekDays[index], 
           isSelected: isSelected, 
           onTap: (){
-            final notifier = ref.read(draftWeeklyDaysProvider.notifier);
             if(isSelected){
-              notifier.state = selectedDays.where((d) => d != dayIndex).toList();
+              ref.read(draftHabitProvider.notifier).updateWeeklyDays( selectedDays.where((d) => d != dayIndex).toList());
             } else{
-              notifier.state = [...selectedDays, dayIndex];
+              ref.read(draftHabitProvider.notifier).updateWeeklyDays( [...selectedDays, dayIndex]);
             }
           }
         );
@@ -213,7 +216,7 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
   }
 
   Widget _buildMonthlySelector(BuildContext context, WidgetRef ref) {
-    final selectedDays = ref.watch(draftMonthlyDaysProvider);
+    final selectedDays = ref.watch(draftHabitProvider).monthlyDays;
 
     return Wrap(
       spacing: 2,
@@ -232,13 +235,11 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
           context: context,
           text: text,
           isSelected: isSelected,
-          onTap: () {
-            final notifier = ref.read(draftMonthlyDaysProvider.notifier);
-            
+          onTap: () {   
             if (isSelected) {
-              notifier.state = selectedDays.where((d) => d != dayValue).toList();
+              ref.read(draftHabitProvider.notifier).updateMonthlyDays(selectedDays.where((d) => d != dayValue).toList());
             } else {
-              notifier.state = [...selectedDays, dayValue];
+              ref.read(draftHabitProvider.notifier).updateMonthlyDays([...selectedDays, dayValue]);
             }
           },
         );

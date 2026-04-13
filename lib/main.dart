@@ -86,10 +86,6 @@ class MainApp extends StatelessWidget {
       title: 'Make a Habbit',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
-      //   useMaterial3: true
-      // ),
       home: HomePage(),
 
     );

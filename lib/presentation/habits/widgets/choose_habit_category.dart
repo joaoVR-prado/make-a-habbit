@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_create_habit_title.dart';
@@ -18,7 +18,8 @@ class _ChooseHabitCategory extends ConsumerState<ChooseHabitCategory>{
   final habitCategories = HabitIcon.values;
   @override
   Widget build(BuildContext context) {
-    final selectedCategory = ref.watch(draftCategoryProvider);
+    final draftState = ref.watch(draftHabitProvider);
+    final selectedCategory = draftState.category;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -44,7 +45,7 @@ class _ChooseHabitCategory extends ConsumerState<ChooseHabitCategory>{
                   child: InkWell(
                     borderRadius: BorderRadius.circular(6),
                     onTap: (){
-                      ref.read(draftCategoryProvider.notifier).state = currentCategory;
+                      ref.read(draftHabitProvider.notifier).updateCategory(currentCategory);
           
                     }, 
                     child: Padding(

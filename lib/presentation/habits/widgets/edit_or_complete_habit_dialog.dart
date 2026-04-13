@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/controllers/notifications/notifications_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
+import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
+import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_horizontal_divider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_vertical_divider.dart';
@@ -63,12 +66,19 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton(
-                  onPressed: (){
-                    _startHabitEdition(
-                      context, 
-                      ref, 
-                      habit
-                    );
+                  onPressed: () async {
+                    //Navigator.of(context).pop(); 
+                    final repository = ref.read(habitRepositoryProvider);
+                    final config = await repository.getNotification(habit.id);
+
+                    if (context.mounted) {
+                      _startHabitEdition(
+                        context, 
+                        ref, 
+                        habit,
+                        config
+                      );
+                    }
                     // Edit
                   },
                   child: Text(
@@ -200,35 +210,20 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
     );
   }
 
-  void _startHabitEdition(BuildContext context, WidgetRef ref, HabitModel habit){
-    ref.read(draftHabitIdProvider.notifier).state = habit.id;
+  void _startHabitEdition(BuildContext context, WidgetRef ref, HabitModel habit, NotificationConfigModel? config){
+    ref.read(draftHabitProvider.notifier).loadForEdit(habit, config);
 
-    ref.read(draftConclusionNameProvider.notifier).state = habit.name;
-    ref.read(draftConclusionTypeProvider.notifier).state = habit.conclusionType;
-    ref.read(draftConclusionGoalQuantityProvider.notifier).state = habit.goalQuantity?.toString() ?? '';
-    ref.read(draftConclusionDescriptionQuantityProvider.notifier).state = habit.description ?? '';
-    ref.read(draftCategoryProvider.notifier).state = HabitIcon.fromCode(habit.iconCode);
+    Navigator.of(context).pop();
 
-    ref.read(draftFrequencyTypeProvider.notifier).state = habit.frequency.type;
-    if (habit.frequency.type == HabitFrequencyType.weekly) {
-      ref.read(draftWeeklyDaysProvider.notifier).state = habit.frequency.selectedDays ?? [];
-    } else if (habit.frequency.type == HabitFrequencyType.monthly) {
-      ref.read(draftMonthlyDaysProvider.notifier).state = habit.frequency.selectedDays ?? [];
-    }
-
-    ref.read(draftStartDateProvider.notifier).state = habit.startDate;
-    ref.read(draftEndDateProvider.notifier).state = habit.endDate;
-
-    if (habit.notificationTime != null) {
-      ref.read(draftReminderTimeNotificationProvider.notifier).state = TimeOfDay.fromDateTime(habit.notificationTime!);
-    } else {
-      ref.read(draftReminderTimeNotificationProvider.notifier).state = null;
-    }
-
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const CreateHabitPage())
 
     );
+
+    // Navigator.of(context).pushReplacement(
+    //   MaterialPageRoute(builder: (context) => const CreateHabitPage())
+
+    // );
 
   }
 }

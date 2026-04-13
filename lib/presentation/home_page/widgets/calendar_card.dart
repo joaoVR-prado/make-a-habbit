@@ -53,7 +53,6 @@ class CalendarCard extends StatelessWidget {
                       padding: const EdgeInsetsGeometry.symmetric(vertical: 8),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         mainAxisAlignment: isSelected ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceEvenly,
                         children: [
                           Text(

@@ -1,9 +1,11 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
+import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:make_a_habbit/data/repositories/habit_repository.dart';
 import 'package:mocktail/mocktail.dart';
@@ -48,10 +50,17 @@ void main(){
                 startDate: DateTime(2026, 01, 24)
             );
 
+            final newNotification = NotificationConfigModel(
+              isReminderEnabled: false, 
+              isStreakEnabled: false, 
+              customTimeNotification: []
+            
+            );
+
             when(() => mockRepository.addHabit(newHabit)).thenAnswer((_) async{});
 
             final controller = providerContainer.read(habitControllerProvider.notifier);
-            await controller.addHabit(newHabit);
+            await controller.addHabit(newHabit, newNotification);
 
             // Valida se o estado mudou
             final currentList = providerContainer.read(habitControllerProvider);
@@ -129,6 +138,13 @@ void main(){
                 startDate: DateTime(2026, 01, 24)
             );
 
+            final newNotification = NotificationConfigModel(
+              isReminderEnabled: false, 
+              isStreakEnabled: false, 
+              customTimeNotification: []
+            
+            );
+
             when(() => mockRepository.updateHabit(editedNewHabit)).thenAnswer((_) async {});
 
             final controller = providerContainer.read(habitControllerProvider.notifier);
@@ -136,7 +152,7 @@ void main(){
             expect(providerContainer.read(habitControllerProvider).first.name, 'Diminuir o café para 2 xícaras ao dia, todos os dias');
             
             // Edita o hábito
-            await controller.updateHabit(editedNewHabit);
+            await controller.updateHabit(editedNewHabit, newNotification);
 
             final currentList = providerContainer.read(habitControllerProvider);
             final habitInCurrentList = currentList.first;

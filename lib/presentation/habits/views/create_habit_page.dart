@@ -1,7 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive_ce/hive.dart';
+import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
@@ -72,56 +72,41 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
   }
 
   void _saveDraft() async{
-    final name = ref.read(draftConclusionNameProvider);
-    final selectedCategory = ref.read(draftCategoryProvider);
-    final conclusionType = ref.read(draftConclusionTypeProvider)!;
-    final goalQuantityStr = ref.read(draftConclusionGoalQuantityProvider);
-    final habitDescription = ref.read(draftConclusionDescriptionQuantityProvider);
-    
-    final frequencyType = ref.read(draftFrequencyTypeProvider)!;
-    final weeklyDays = ref.read(draftWeeklyDaysProvider);
-    final monthlyDays = ref.read(draftMonthlyDaysProvider);
-    
-    final startDate = ref.read(draftStartDateProvider)!;
-    final endDate = ref.read(draftEndDateProvider);
-    
-    final reminderTime = ref.read(draftReminderTimeNotificationProvider);
-    final isStreakEnabled = ref.read(draftEnableStreakProvider);
+    final draftState = ref.read(draftHabitProvider);
 
     // Verifica se é edição de hábito
     var uuid = Uuid();
-    final existingId = ref.read(draftHabitIdProvider);
+    final existingId = draftState.existingId;
 
     // OPERAÇÔES DO HIVE //
-    
     // Ve o tipo de frequencia para salavr os dias escolhidos
     List<int>? selectedDays;
-    if (frequencyType == HabitFrequencyType.weekly) {
-      selectedDays = weeklyDays;
-    } else if (frequencyType == HabitFrequencyType.monthly) {
-      selectedDays = monthlyDays;
+    if (draftState.frequencyType == HabitFrequencyType.weekly) {
+      selectedDays = draftState.weeklyDays;
+    } else if (draftState.frequencyType == HabitFrequencyType.monthly) {
+      selectedDays = draftState.monthlyDays;
     }
 
     final habitFrequency = HabitFrequency(
-      type: frequencyType,
+      type: draftState.frequencyType!,
       selectedDays: selectedDays,
 
     );
 
     int? goalQuantity;
-    if (conclusionType == HabitConclusionType.goalQuantity) {
-      goalQuantity = int.tryParse(goalQuantityStr);
+    if (draftState.conclusionType == HabitConclusionType.goalQuantity) {
+      goalQuantity = int.tryParse(draftState.goalQuantity);
     }
 
     DateTime? notificationDateTime;
-    if (reminderTime != null) {
+    if (draftState.reminderTime != null) {
       final now = DateTime.now();
       notificationDateTime = DateTime(
         now.year, 
         now.month, 
         now.day, 
-        reminderTime.hour, 
-        reminderTime.minute
+        draftState.reminderTime!.hour, 
+        draftState.reminderTime!.minute
       );
     }
 
@@ -130,60 +115,52 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     
     final newHabit = HabitModel(
       id: id,
-      iconCode: selectedCategory!.code,
-      name: name.trim(),
-      description: habitDescription,
-      conclusionType: conclusionType,
+      iconCode: draftState.category!.code, //selectedCategory!.code,
+      name:draftState.name.trim(),
+      description: draftState.description,
+      conclusionType: draftState.conclusionType!,
       goalQuantity: goalQuantity,
       frequency: habitFrequency,
-      startDate: startDate,
-      endDate: endDate,
-      notificationId: notificationId.hashCode,
+      startDate: draftState.startDate!,
+      endDate: draftState.endDate,
+      notificationId: notificationId.hashCode.abs(),
       notificationTime: notificationDateTime,
 
     );
 
-    // Chama a box de habitos
-    final habitBox = Hive.box<HabitModel>('habits');
-    await habitBox.put(newHabit.id, newHabit);
-
-    // Chama a box de notificacoes
-    final notificationsBox = Hive.box<NotificationConfigModel>('notifications');
     final newNotification = NotificationConfigModel(
-      isReminderEnabled: reminderTime != null,
-      isStreakEnabled: isStreakEnabled,
+      isReminderEnabled: draftState.reminderTime != null,
+      isStreakEnabled: draftState.isStreakEnabled,
       customTimeNotification: notificationDateTime != null ? [notificationDateTime] : [],
+
     );
 
-    await notificationsBox.put(newHabit.id, newNotification);
+    if (existingId == null) {
+      await ref.read(habitControllerProvider.notifier).addHabit(newHabit, newNotification);
 
+    } else {
+      await ref.read(habitControllerProvider.notifier).updateHabit(newHabit, newNotification);
+
+    }
 
     // Lógica das notificações //
-
     if(existingId != null){
-      // Cancela notificacao 
-      await AwesomeNotifications().cancel(newHabit.notificationId!);
-
-      // Cancela streak
-      await AwesomeNotifications().cancel(newHabit.notificationId! + 10000);
+      // Cancela notificacao e streak
+      await AwesomeNotifications().cancelSchedulesByGroupKey(newHabit.id);
 
     }
 
     // Agenda notificacao de lembrete
-    if(reminderTime != null){
+    if(draftState.reminderTime != null){
       _scheduleHabitReminder(newHabit);
 
     }
 
     // Agenda notificacao de Streak
-    if(isStreakEnabled){
+    if(draftState.isStreakEnabled){
       _scheduleStreakReminder(newHabit, currentStreak: 0);
       
-
     }
-
-    ref.invalidate(habitControllerProvider);
-    clearHabitDrafts(ref);
 
     if(mounted){
       ScaffoldMessenger.of(context).showSnackBar(
@@ -199,7 +176,9 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
         ),
       );
       Navigator.pop(context);
+
     }
+
   }
 
   @override
@@ -236,56 +215,36 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
   }
   
   Widget _buildBottomBar(){
-    final selectedCategory = ref.watch(draftCategoryProvider);
-    final selectedType = ref.watch(draftConclusionTypeProvider);
-    final selectedName = ref.watch(draftConclusionNameProvider);
-    final selectedQuantity = ref.watch(draftConclusionGoalQuantityProvider);
-    final selectedFrequencyType = ref.watch(draftFrequencyTypeProvider);
-    final selectedWeeklyDays = ref.watch(draftWeeklyDaysProvider);
-    final selectedMonthlyDays = ref.watch(draftMonthlyDaysProvider);
-    final selectedStartDate = ref.watch(draftStartDateProvider);
-
-    // Dados opcionais qque não podem morrer na transicao de telas
-    ref.watch(draftConclusionDescriptionQuantityProvider);
+    final draftState = ref.watch(draftHabitProvider);
 
     bool canGoNext = true;
 
     // Regra da tela 1 do cadastro
-    if(_currentPage == 0 && selectedCategory == null){
+    if(_currentPage == 0 && draftState.category == null){
       canGoNext = false;
 
-    } else if(_currentPage == 1 && selectedType == null){  // Regra da tela 2 do cadastro
+    } else if(_currentPage == 1 && draftState.conclusionType == null){  // Regra da tela 2 do cadastro
       canGoNext = false;
 
     } else if(_currentPage == 2){  // Regra de tela 3 do cadastro
-
-      if (selectedName.trim().isEmpty || selectedName.trim().length < 3) {
+      if (draftState.name.trim().isEmpty || draftState.name.trim().length < 3) {
         canGoNext = false;
-      } else if (selectedType == HabitConclusionType.goalQuantity) {
-        if (selectedQuantity.trim().isEmpty || selectedQuantity == '0') {
+      } else if (draftState.conclusionType == HabitConclusionType.goalQuantity) {
+        if (draftState.goalQuantity.trim().isEmpty || draftState.goalQuantity == '0') {
           canGoNext = false;
-
         }
       }
       
-    } else if(_currentPage == 3 ){
-      if(selectedFrequencyType == null){
+    } else if(_currentPage == 3 ){ // Regra da tela 4
+      if(draftState.frequencyType == null){
         canGoNext = false;
-      } else if(selectedFrequencyType == HabitFrequencyType.weekly && selectedWeeklyDays.isEmpty){
+      } else if(draftState.frequencyType == HabitFrequencyType.weekly && draftState.weeklyDays.isEmpty){
         canGoNext = false;
-
-      } else if(selectedFrequencyType == HabitFrequencyType.monthly && selectedMonthlyDays.isEmpty){
+      } else if(draftState.frequencyType == HabitFrequencyType.monthly && draftState.monthlyDays.isEmpty){
         canGoNext = false;
-
       }
-
-    } else if(_currentPage == 4){
-      if(selectedStartDate == null){
-        canGoNext = false;
-
-      }
-
     }
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: const BoxDecoration(
@@ -342,13 +301,11 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     );
   }
 
-  // Funcoes para criarmos a notificacao //
-
   // Agenda notificacao de lembrete
   Future<void> _scheduleHabitReminder(HabitModel habit) async {
+    if (habit.notificationTime == null) return;
     final notificationTime = habit.notificationTime!;
-
-    // Cria as propriedades base para reutilizar
+    final String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
     final String title = 'Hora do seu hábito!';
     final String body = 'Não se esqueça de completar o hábito ${habit.name}';
     final NotificationCategory category = NotificationCategory.Reminder;
@@ -359,73 +316,89 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
         content: NotificationContent(
           id: habit.notificationId!, 
           channelKey: 'habit_reminders_v2',
+          groupKey: habit.id,
           title: title,
           body: body,
           category: category,
           wakeUpScreen: true, 
-          //fullScreenIntent: true,
-          //criticalAlert: true,
         ),
         schedule: NotificationCalendar(
+          timeZone: localTimeZone, // <--- ADICIONADO AQUI
           hour: notificationTime.hour,
           minute: notificationTime.minute,
           second: 0,
+          millisecond: 0,
           repeats: true,
-          preciseAlarm: true
+          preciseAlarm: true,
+          allowWhileIdle: true
         ),
       );
     } else if (habit.frequency.type == HabitFrequencyType.weekly) { // Habitos semanais
       for (int weekday in habit.frequency.selectedDays!) {
+        int androidWeekday = weekday == 7 ? 1 : weekday + 1;
+
         await AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: habit.notificationId! + weekday, 
             channelKey: 'habit_reminders_v2',
+            groupKey: habit.id,
             title: title,
             body: body,
             category: category,
             wakeUpScreen: true, 
-            //fullScreenIntent: true,
-            //criticalAlert: true,
           ),
           schedule: NotificationCalendar(
-            weekday: weekday,
+            timeZone: localTimeZone,
+            weekday: androidWeekday,
             hour: notificationTime.hour,
             minute: notificationTime.minute,
             second: 0,
+            millisecond: 0,
             repeats: true,
-            preciseAlarm: true
+            preciseAlarm: true,
+            allowWhileIdle: true
           ),
         );
       }
     } else if (habit.frequency.type == HabitFrequencyType.monthly) { // Habitos mensais
       for (int day in habit.frequency.selectedDays!) {
+        
+       //DIA 32: O Calendário nativo só vai até 31
+        int validDay = day;
+        if (day == 32) {
+          validDay = 28; 
+
         await AwesomeNotifications().createNotification(
           content: NotificationContent(
-            id: habit.notificationId! + day + 100, // ID único para evitar conflito
+            id: habit.notificationId! + day + 100, 
             channelKey: 'habit_reminders_v2',
+            groupKey: habit.id,
             title: title,
             body: body,
             category: category,
             wakeUpScreen: true, 
-            //fullScreenIntent: true,
-            //criticalAlert: true,
           ),
           schedule: NotificationCalendar(
-            day: day,
+            timeZone: localTimeZone, 
+            day: validDay,           
             hour: notificationTime.hour,
             minute: notificationTime.minute,
             second: 0,
+            millisecond: 0,
             repeats: true,
-            preciseAlarm: true
+            preciseAlarm: true,
+            allowWhileIdle: true
           ),
         );
+        }
       }
     }
   }
 
   // Função para agendar a notificação de Ofensiva (Sempre às 12h)
   Future<void> _scheduleStreakReminder(HabitModel habit, {required int currentStreak}) async {
-    final streakNotificationId = habit.notificationId! + 10000; // Cria id Unico para nao gberar conflito com a notificacao acima
+    final streakNotificationId = habit.notificationId! + 10000; 
+    final String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
 
     String notification;
     if (currentStreak == 0) {
@@ -439,19 +412,20 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
         id: streakNotificationId,
         channelKey: 'habit_reminders_v2',
         title: 'Sua Ofensiva! ',
+        groupKey: habit.id,
         body: notification,
         category: NotificationCategory.Status,
         wakeUpScreen: true, 
-        //fullScreenIntent: true,
-        //criticalAlert: true,
       ),
-      schedule: NotificationCalendar( // Repete todos os dias ao meio dia
+      schedule: NotificationCalendar( 
+        timeZone: localTimeZone, // <--- ADICIONADO AQUI
         hour: 12,
         minute: 0,
         second: 0,
+        millisecond: 0,
         repeats: true,
-        preciseAlarm: true
-
+        preciseAlarm: true,
+        allowWhileIdle: true
       ),
     );
   }

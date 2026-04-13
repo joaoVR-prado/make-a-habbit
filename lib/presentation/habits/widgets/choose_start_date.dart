@@ -1,7 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_create_habit_title.dart';
 
@@ -17,39 +17,26 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
   @override
   Widget build(BuildContext context) {
     // Dia de inicio
-    final startDate = ref.watch(draftStartDateProvider);
-    final isSelectedStart = startDate != null;
-    String textStartDate = 'Amanhã';
+    final draftState = ref.watch(draftHabitProvider);
+    final startDate = draftState.startDate!;
+    String textStartDate = '';
 
-    if(startDate != null){
-      final today = DateTime.now();
-      final tomorrow = today.add(const Duration(days: 1));
+    final today = DateTime.now();
+    final tomorrow = today.add(const Duration(days: 1));
 
-      final isToday =
-        startDate.year == today.year &&
-        startDate.month == today.month &&
-        startDate.day == today.day;
-      
-      final isTomorrow = 
-        startDate.year == tomorrow.year && 
-        startDate.month == tomorrow.month && 
-        startDate.day == tomorrow.day;
+    if (startDate.year == today.year && startDate.month == today.month && startDate.day == today.day) {
+      textStartDate = 'Hoje';
+    } else if (startDate.year == tomorrow.year && startDate.month == tomorrow.month && startDate.day == tomorrow.day) {
+      textStartDate = 'Amanhã';
+    } else {
+      final day = startDate.day.toString().padLeft(2, '0');
+      final month = startDate.month.toString().padLeft(2, '0');
+      final year = startDate.year;
+      textStartDate = '$day/$month/$year';
 
-      if(isToday){
-        textStartDate = 'Hoje';
-      }else if (isTomorrow) {
-        textStartDate = 'Amanhã';
-      }else {
-        final day = startDate.day.toString().padLeft(2, '0');
-        final month = startDate.month.toString().padLeft(2, '0');
-        final year = startDate.year;
-        textStartDate = '$day/$month/$year';
-
-      }
     }
-    
-    // Dia de fim (Opcional)
-    final endDate = ref.watch(draftEndDateProvider);
+
+    final endDate = draftState.endDate;
     final isSelectedEnd = endDate != null;
     String textEndDate = 'Opcional';
 
@@ -81,13 +68,13 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
 
     }
     // Horário de lembrete
-    final reminderTime = ref.watch(draftReminderTimeNotificationProvider);
+    final reminderTime = draftState.reminderTime;
     final isReminderSelected = reminderTime != null;
 
     final reminderText = isReminderSelected ? reminderTime.format(context) : 'Vazio';
 
     // Habilitar Streak
-    final isStreakEnabled = ref.watch(draftEnableStreakProvider);
+    final isStreakEnabled = draftState.isStreakEnabled;
 
     return Column(
       children: [
@@ -98,11 +85,11 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
           leadingIcon: Icons.calendar_month, 
           tileTitle: 'Data de início', 
           selectedDate: textStartDate, 
-          isSelected: isSelectedStart, 
+          isSelected: true, 
           onTap: () async{
             final now = DateTime.now();
             final todayOnly = DateTime(now.year, now.month, now.day);
-            final todayOrSelectedDate = ref.read(draftStartDateProvider) ?? todayOnly.add(const Duration(days: 1));
+            final todayOrSelectedDate = startDate;
             final DateTime? selectedDate = await showDatePicker(
               context: context, 
               initialDate: todayOrSelectedDate,
@@ -122,7 +109,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
               },
             );
             if(selectedDate != null){
-              ref.read(draftStartDateProvider.notifier).state = selectedDate;
+              ref.read(draftHabitProvider.notifier).updateStartDate(selectedDate);
         
             }
           }
@@ -135,11 +122,9 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
           selectedDate: textEndDate, 
           isSelected: isSelectedEnd, 
           onTap: () async{
-            final now = DateTime.now();
-            final todayOnly = DateTime(now.year, now.month, now.day);
-            final startDate = ref.read(draftStartDateProvider);
-            final firstDateAllowed = startDate ?? todayOnly;
-            final initialDate = ref.read(draftEndDateProvider) ?? firstDateAllowed;
+            final draftState = ref.watch(draftHabitProvider);
+            final firstDateAllowed = draftState.startDate!;
+            final initialDate = draftState.endDate ?? firstDateAllowed;
               final DateTime? selectedDate = await showDatePicker(
                 context: context, 
                 initialDate: initialDate,
@@ -159,12 +144,12 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
                 },
               );
               if(selectedDate != null){
-                ref.read(draftEndDateProvider.notifier).state = selectedDate;
+               ref.read(draftHabitProvider.notifier).updateEndDate(selectedDate);
           
               }
           },
           onClear: () {
-            ref.read(draftEndDateProvider.notifier).state = null;
+            ref.read(draftHabitProvider.notifier).clearEndDate();
           },
         ),
         // Horário de Lembrte
@@ -175,14 +160,13 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
           selectedDate: reminderText,
           isSelected: isReminderSelected,
           onClear: () {
-            ref.read(draftReminderTimeNotificationProvider.notifier).state = null;
+            ref.read(draftHabitProvider.notifier).clearReminderTime();
 
           },
           onTap: () async{
-            // Verifica permissao do usuario para mostrar notificacoes
             bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
             if (!isAllowed) {
-              // TODO: Mostrar seu alerta personalizado antes aqui!
+              // TODO: Mostrar alerta personalizado antes aqui
               isAllowed = await AwesomeNotifications().requestPermissionToSendNotifications();
 
             }
@@ -190,7 +174,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
             if (!isAllowed) {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Precisamos da permissão para te lembrar do hábito!')),
+                  const SnackBar(content: Text('Precisamos da sua permissão para te lembrar do hábito!')),
                 );
               }
               return; // Sai do onTap
@@ -216,7 +200,8 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
               },
             );
             if(selectedTime != null){
-              ref.read(draftReminderTimeNotificationProvider.notifier).state = selectedTime;
+              //ref.read(draftReminderTimeNotificationProvider.notifier).state = selectedTime;
+              ref.read(draftHabitProvider.notifier).updateReminderTime(selectedTime);
 
             }
 
@@ -322,49 +307,50 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
   required String tileTitle,
   required bool isStreakEnabled,
 
-}){
-  return Padding(
-    padding: EdgeInsetsGeometry.symmetric(
-      vertical: 8,
-      horizontal: 8
-    ),
-    child: SwitchListTile(
-      activeThumbColor: Colors.white,
-      activeTrackColor: AppColors.positiveActionDialogTextColor,
-      inactiveThumbColor: Colors.black87,
-      inactiveTrackColor: AppColors.cardBackgrounColor,
-      secondary: Icon(
-        secondaryIcon,
-        color: AppColors.positiveActionDialogTextColor,
-        size: 38,
+  }){
+    return Padding(
+      padding: EdgeInsetsGeometry.symmetric(
+        vertical: 8,
+        horizontal: 8
       ),
-      title: Text(
-        tileTitle, 
-        style: Theme.of(context).textTheme.titleLarge,
-      ),
-      value: isStreakEnabled,
-      onChanged: (bool newValue) async {
-        // Valida permissao do usuario para mostrar notificacoes
-        if (newValue == true) {
-          bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-          
-          if (!isAllowed) {
-            isAllowed = await AwesomeNotifications().requestPermissionToSendNotifications();
-          }
-          
-          if (!isAllowed) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Permita as notificações para usar a Ofensiva!')),
-              );
+      child: SwitchListTile(
+        activeThumbColor: Colors.white,
+        activeTrackColor: AppColors.positiveActionDialogTextColor,
+        inactiveThumbColor: Colors.black87,
+        inactiveTrackColor: AppColors.cardBackgrounColor,
+        secondary: Icon(
+          secondaryIcon,
+          color: AppColors.positiveActionDialogTextColor,
+          size: 38,
+        ),
+        title: Text(
+          tileTitle, 
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        value: isStreakEnabled,
+        onChanged: (bool newValue) async {
+          // Valida permissao do usuario para mostrar notificacoes
+          if (newValue == true) {
+            bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+            
+            if (!isAllowed) {
+              isAllowed = await AwesomeNotifications().requestPermissionToSendNotifications();
             }
-            return; // Sai do onChanged sem salvar
+            
+            if (!isAllowed) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Permita as notificações para usar a Ofensiva!')),
+                );
+              }
+              return; // Sai do onChanged sem salvar
+            }
           }
-        }
-        ref.read(draftEnableStreakProvider.notifier).state = newValue;
-      },
-    ),
-  );
-}
+          //ref.read(draftEnableStreakProvider.notifier).state = newValue;
+          ref.read(draftHabitProvider.notifier).toggleStreak(newValue);
+        },
+      ),
+    );
+  }
 
 }
