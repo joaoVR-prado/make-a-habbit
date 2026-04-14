@@ -1,5 +1,6 @@
 import 'package:hive_ce/hive.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
+import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
 
 abstract class IHabitRepository{
   List<HabitModel> getAllHabits();
@@ -8,19 +9,19 @@ abstract class IHabitRepository{
   Future<void> updateHabit(HabitModel habit);
   Future<void> deleteHabit(String id);
   Future<void> clearAllData();
-
-  // List<ConcludedHabitsModel> getHistory(String habitId);
-  // Future<void> markAsDone(ConcludedHabitsModel conclusion);
-  // Future<void> removeConclusion(String conclusionKey);
+  Future<void> saveNotification(String habitId, NotificationConfigModel notification);
+  Future<NotificationConfigModel?> getNotification(String habitId);
 
 }
 
 class HabitRepository implements IHabitRepository {
   final Box<HabitModel> _habitBox;
+  final Box<NotificationConfigModel> _notificationBox;
   //final Box<ConcludedHabitsModel> _conclusionBox;
 
   HabitRepository(
     this._habitBox,
+    this._notificationBox
     //this._conclusionBox
 
   );
@@ -63,24 +64,20 @@ class HabitRepository implements IHabitRepository {
 
   }
 
-  // Hábitos Concluidos
-  // @override 
-  // List<ConcludedHabitsModel> getHistory(String habitId){
-  //   return _conclusionBox.values
-  //     .where((conclusion) => conclusion.habitId == habitId)
-  //     .toList();
+  // NOTIFICACOES //
+  @override
+  Future<void> saveNotification(String habitId, NotificationConfigModel notification) async{
+    final notificationBox = Hive.box<NotificationConfigModel>('notifications');
+    await notificationBox.put(habitId, notification);
 
-  // }
+  }
 
-  // @override
-  // Future<void> markAsDone(ConcludedHabitsModel conclusion) async{
-  //   await _conclusionBox.add(conclusion);
-
-  // }
-
-  // @override   
-  // Future<void> removeConclusion(String conclusionKey) async{
-  //   await _conclusionBox.delete(conclusionKey);
+  @override
+  Future<NotificationConfigModel?> getNotification(String habitId) async {
+    // O Hive é maravilhoso, é só dar um .get() passando o ID!
+    return _notificationBox.get(habitId); 
+    
+  }
 
 }
 

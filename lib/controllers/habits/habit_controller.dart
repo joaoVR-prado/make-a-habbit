@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
+import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
+import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
+import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HabitController extends Notifier<List<HabitModel>> {
   @override
@@ -16,16 +16,19 @@ class HabitController extends Notifier<List<HabitModel>> {
 
   }
 
-  Future<void> addHabit(HabitModel habit) async {
+  Future<void> addHabit(HabitModel habit, NotificationConfigModel notification) async {
     final repository = ref.read(habitRepositoryProvider);
     await repository.addHabit(habit);
+    await repository.saveNotification(habit.id, notification);
+
     state = [...state, habit];
 
   }
 
-  Future<void> updateHabit(HabitModel habit) async {
+  Future<void> updateHabit(HabitModel habit, NotificationConfigModel notification) async {
     final repository = ref.read(habitRepositoryProvider);
     await repository.updateHabit(habit);
+    await repository.saveNotification(habit.id, notification);
 
     state = [
       for(final i in state)
@@ -69,96 +72,56 @@ final selectedDateProvider = StateProvider<DateTime>((ref){
 
 });
 
-// ID usado para vermos se sera um habito novo ou edicao de um ja ativo
-final draftHabitIdProvider = StateProvider<String?>((ref) {
-  return null;
 
+// Listagem dos habitos
+final dailyHabitsDisplayProvider = Provider.autoDispose<List<HabitDisplayModel>>((ref){
+
+  // Verificacoes sobre a conclusao do habito
+  final selectedDate = ref.watch(selectedDateProvider);
+  final allHabits = ref.watch(habitControllerProvider);
+  final allConclusions = ref.watch(concludedHabitsControllerProvider);
+  final activeHabitsForDate = allHabits.where((h) => h.isHabitActiveOn(selectedDate)).toList();
+
+  return activeHabitsForDate.map((habit) {
+    final dailyConclusion = allConclusions.where((c) => 
+      c.habitId == habit.id &&
+      c.conclusionDate.year == selectedDate.year &&
+      c.conclusionDate.month == selectedDate.month &&
+      c.conclusionDate.day == selectedDate.day
+    ).firstOrNull;
+
+    HabitStatus habitStatus = HabitStatus.pending;
+
+    if (habit.conclusionType == HabitConclusionType.goalQuantity) {
+      final doneQuantity = dailyConclusion?.conclusionValue ?? 0;
+      final targetQuantity = habit.goalQuantity ?? 1;
+      if (doneQuantity >= targetQuantity) {
+        habitStatus = HabitStatus.done;
+      }
+    } else {
+      if (dailyConclusion != null) {
+        if (dailyConclusion.conclusionValue == true) {
+          habitStatus = HabitStatus.done;
+        } else if (dailyConclusion.conclusionValue == false) {
+          habitStatus = HabitStatus.incomplete;
+        }
+      }
+    }
+
+    // Retorna os habitos filtrados para a UI
+    return HabitDisplayModel(habit: habit, status: habitStatus);
+  }).toList();
 });
 
+// Classe para a UI
+class HabitDisplayModel{
+  final HabitModel habit;
+  final HabitStatus status;
 
-// Tela 1 do Cadastro
-final draftCategoryProvider = StateProvider<HabitIcon?>((ref) {
-  return null;
+  HabitDisplayModel({
+    required this.habit,
+    required this.status,
 
-});
+  });
 
-// Tela 2 do Cadastro
-final draftConclusionTypeProvider = StateProvider<HabitConclusionType?>((ref) {
-  return null;
-
-});
-
-// Tela 3 do Cadastro
-final draftConclusionNameProvider = StateProvider<String>((ref) {
-  return '';
-
-});
-
-final draftConclusionGoalQuantityProvider = StateProvider<String>((ref) {
-  return '';
-
-});
-
-
-final draftConclusionDescriptionQuantityProvider = StateProvider<String>((ref) {
-  return '';
-
-});
-
-// Tela 4 do Cadastro
-final draftFrequencyTypeProvider = StateProvider<HabitFrequencyType?>((ref){
-  return null;
-
-});
-
-final draftWeeklyDaysProvider = StateProvider<List<int>>((ref) {
-  return [];
-
-});
-
-final draftMonthlyDaysProvider = StateProvider<List<int>>((ref) {
-  return [];
-
-});
-
-// Tela 5 do cadastro
-
-final draftStartDateProvider = StateProvider<DateTime?>((ref){
-  final now = DateTime.now();
-  return DateTime(now.year, now.month, now.day + 1);
-
-});
-
-final draftEndDateProvider = StateProvider<DateTime?>((ref){
-  return null;
-
-});
-
-final draftReminderTimeNotificationProvider = StateProvider<TimeOfDay?>((ref){
-  return null;
-
-});
-
-
-final draftEnableStreakProvider = StateProvider<bool>((ref){
-  return false;
-
-});
-
-// Limpador de drafts
-void clearHabitDrafts(WidgetRef ref) {
-  ref.invalidate(draftHabitIdProvider);
-  ref.invalidate(draftCategoryProvider);
-  ref.invalidate(draftConclusionTypeProvider);
-  ref.invalidate(draftConclusionNameProvider);
-  ref.invalidate(draftConclusionGoalQuantityProvider);
-  ref.invalidate(draftConclusionDescriptionQuantityProvider);
-  ref.invalidate(draftFrequencyTypeProvider);
-  ref.invalidate(draftWeeklyDaysProvider);
-  ref.invalidate(draftMonthlyDaysProvider);
-  ref.invalidate(draftStartDateProvider);
-  ref.invalidate(draftEndDateProvider);
-  ref.invalidate(draftReminderTimeNotificationProvider);
-  ref.invalidate(draftEnableStreakProvider);
-  
 }

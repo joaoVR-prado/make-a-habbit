@@ -65,8 +65,3 @@ class ConcludedHabitsController extends Notifier<List<ConcludedHabitsModel>>  {
   }
 
 }
-
-// final concludedHabitsControllerProvider = NotifierProvider<ConcludedHabitsController, List<ConcludedHabitsModel>>(() {
-//   return ConcludedHabitsController();
-  
-// });

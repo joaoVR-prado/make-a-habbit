@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_create_habit_title.dart';
@@ -16,7 +16,9 @@ class ChooseConclusionType extends ConsumerStatefulWidget {
 class _ChooseConclusionType extends ConsumerState<ChooseConclusionType>{
   @override
   Widget build(BuildContext context) {
-    final selectedHabitType = ref.watch(draftConclusionTypeProvider);
+    //final selectedHabitType = ref.watch(draftConclusionTypeProvider);
+    final draftState = ref.watch(draftHabitProvider);
+    final selectedHabitType = draftState.conclusionType;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -64,7 +66,8 @@ class _ChooseConclusionType extends ConsumerState<ChooseConclusionType>{
             child: InkWell(
               borderRadius: BorderRadius.circular(6),
               onTap: (){
-                ref.read(draftConclusionTypeProvider.notifier).state = type;
+                //ref.read(draftConclusionTypeProvider.notifier).state = type;
+                ref.read(draftHabitProvider.notifier).updateConclusionType(type);
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),

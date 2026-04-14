@@ -21,7 +21,7 @@ class AppColors {
   // Cor do bottomNavBar
   static const bottomAppBarcolor = Color(0xFF6E848F);
 
-  // TEXTFORMFIELD QTF
+  // TEXTFORMFIELD QTD
   // Cor dos icones do TextFormField de QTD
   static const iconQtdColor = Color(0xFF6E848F);
   // Cor do texto quantidade

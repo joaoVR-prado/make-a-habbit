@@ -1,13 +1,14 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
+import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:make_a_habbit/data/repositories/habit_repository.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MockHabitRepository extends Mock implements IHabitRepository{}
 
@@ -48,10 +49,18 @@ void main(){
                 startDate: DateTime(2026, 01, 24)
             );
 
+            final newNotification = NotificationConfigModel(
+              isReminderEnabled: false, 
+              isStreakEnabled: false, 
+              customTimeNotification: []
+            
+            );
+
             when(() => mockRepository.addHabit(newHabit)).thenAnswer((_) async{});
+            when(() => mockRepository.saveNotification(newHabit.id, newNotification)).thenAnswer((_) async {});
 
             final controller = providerContainer.read(habitControllerProvider.notifier);
-            await controller.addHabit(newHabit);
+            await controller.addHabit(newHabit, newNotification);
 
             // Valida se o estado mudou
             final currentList = providerContainer.read(habitControllerProvider);
@@ -63,6 +72,7 @@ void main(){
 
             // Verifica se o repositório foi chamado
             verify(() => mockRepository.addHabit(newHabit)).called(1);
+            verify(() => mockRepository.saveNotification(newHabit.id, newNotification)).called(1);
 
         });
 
@@ -129,14 +139,22 @@ void main(){
                 startDate: DateTime(2026, 01, 24)
             );
 
+            final newNotification = NotificationConfigModel(
+              isReminderEnabled: false, 
+              isStreakEnabled: false, 
+              customTimeNotification: []
+            
+            );
+
             when(() => mockRepository.updateHabit(editedNewHabit)).thenAnswer((_) async {});
+            when(() => mockRepository.saveNotification(newHabit.id, newNotification)).thenAnswer((_) async {});
 
             final controller = providerContainer.read(habitControllerProvider.notifier);
             // Verificamos se o estado da lista ainda é o antigo
             expect(providerContainer.read(habitControllerProvider).first.name, 'Diminuir o café para 2 xícaras ao dia, todos os dias');
             
             // Edita o hábito
-            await controller.updateHabit(editedNewHabit);
+            await controller.updateHabit(editedNewHabit, newNotification);
 
             final currentList = providerContainer.read(habitControllerProvider);
             final habitInCurrentList = currentList.first;
@@ -147,12 +165,13 @@ void main(){
             expect(habitInCurrentList.name, equals('Diminuir o café para 4 xícaras ao dia, todos os dias exceto final de semana'));
             expect(habitInCurrentList.conclusionType, HabitConclusionType.goalQuantity, reason: 'O método de conclusão do hábito não foi alterado, então deve ser o mesmo');
             expect(habitInCurrentList.goalQuantity, 4, reason: 'Quantidade para concluir o hábito foi alterado');
-            expect(habitInCurrentList.frequency.type, HabitFrequencyType.weekly, reason: 'O tipo de frequência permanece o mesmo');
+            expect(habitInCurrentList.frequency.type, HabitFrequencyType.weekly, reason: 'O tipo de frequência deve ser alterado para semanal');
             expect(habitInCurrentList.frequency.selectedDays, equals([1, 2, 3, 4, 5]), reason: 'Os dias do hábito foram alterados');
             expect(habitInCurrentList.startDate, equals(DateTime(2026, 01, 24)));
 
             // Verifica se o repositório foi chamado
             verify(() => mockRepository.updateHabit(editedNewHabit)).called(1);
+            verify(() => mockRepository.saveNotification(newHabit.id, newNotification)).called(1);
 
         });
 
