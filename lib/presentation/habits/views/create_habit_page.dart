@@ -216,7 +216,6 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
   
   Widget _buildBottomBar(){
     final draftState = ref.watch(draftHabitProvider);
-
     bool canGoNext = true;
 
     // Regra da tela 1 do cadastro
