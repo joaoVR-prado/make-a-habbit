@@ -34,8 +34,6 @@ class ConcludedHabitsController extends Notifier<List<ConcludedHabitsModel>>  {
       i.conclusionDate.day == formattedDate.day 
     );
 
-    // TODO: Chamar repositorio
-
     if(existingIndex >= 0){
       state = [
         for(int i =0; i < state.length; i++)
