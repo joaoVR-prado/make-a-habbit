@@ -325,28 +325,5 @@ void main(){
         });
     });
 
-    group('TESTES DE ESTADO DO RASCUNHO', () {
-      late ProviderContainer container;
-
-      setUp((){
-        container = ProviderContainer();
-
-      });
-
-      tearDown((){
-        container.dispose();
-
-      });
-
-      // test('O estado inicial do rascunho desve ser vazio', (){
-      //   final draftState = container.read(draftHabitProvider);
-
-      //   expect(draftState.ca, matcher)
-
-      // });
-
-
-    });
-    // FIM
 
 }
