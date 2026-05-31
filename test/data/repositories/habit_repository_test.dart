@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
@@ -343,5 +344,119 @@ void main(){
         });
     });
     // FIM
+
+    group('TESTES DE ESTADO DO RASCUNHO', () {
+      late ProviderContainer container;
+
+      setUp((){
+        container = ProviderContainer();
+
+      });
+
+      tearDown((){
+        container.dispose();
+
+      });
+
+        test('O estado inicial do rascunho desve ser vazio', (){
+            final draftState = container.read(draftHabitProvider);
+
+            expect(draftState.existingId, isNull, reason: 'O ID ainda não foi criado, então deve estar vazio');
+            expect(draftState.name, isEmpty, reason: 'O Nome ainda não foi criado, então deve estar vazio');
+            expect(draftState.category, isNull, reason: 'A Categoria ainda não foi criada, então deve estar vazia');
+            expect(draftState.conclusionType, isNull, reason: 'O Método de Conclusão ainda não foi criado, então deve estar vazio');
+            expect(draftState.isStreakEnabled, isFalse, reason: 'A ofensiva por padrão vem desativada');
+            expect(draftState.weeklyDays, isEmpty, reason: 'Não temos um hábito criado, então lógicamente não temos dias selecionados');
+            expect(draftState.monthlyDays, isEmpty, reason: 'Não temos um hábito criado, então lógicamente não temos dias selecionados');
+
+        });
+
+        test('O Notifier deve atualizar as propriedades individuais corretamente', (){
+            final notifier = container.read(draftHabitProvider.notifier);
+
+            // Criamos um ato de atualização
+            notifier.updateName('Beber 2L de água');
+            notifier.updateConclusionType(HabitConclusionType.goalQuantity);
+            notifier.updateGoalQuantity('2');
+
+            // Lemos a atualização
+            final updatedState = container.read(draftHabitProvider);
+
+            // Lemos se a atualização realmente aconteceu e se ela bate com o que foi passado
+            expect(updatedState.name, 'Beber 2L de água');
+            expect(updatedState.conclusionType, HabitConclusionType.goalQuantity);
+            expect(updatedState.goalQuantity, '2');
+
+        });
+
+        test('O método clear() deve limpar todos os valores para o valor inicial', (){
+            final notifier = container.read(draftHabitProvider.notifier);
+
+            // Criamos um ato de atualização
+            notifier.updateName('Hábito a ser limpo');
+            notifier.updateStartDate(DateTime(2026, 05, 31));
+            notifier.updateGoalQuantity('2026');
+
+            // Limpamos o hábito
+            notifier.clear();
+
+            final clearedState = container.read(draftHabitProvider);
+
+            // Lemos se a limpeza realmente aconteceu
+            expect(clearedState.name, isEmpty, reason: 'O nome deve estar vazio');
+            // Validamos dia, mes e ano da data de inicio, que deve estar como Datetime.now()
+            final today = DateTime.now();
+            expect(clearedState.startDate?.day, today.day, reason: 'A data de inicio deve voltar para hoje');
+            expect(clearedState.startDate?.month, today.month);
+            expect(clearedState.startDate?.year, today.year);
+
+            expect(clearedState.goalQuantity, isEmpty, reason: 'A meta deve estar vazia');
+
+        });
+
+        test('O método loadForEdit() deve preencher o rascunho inteiro com os dados do Hábito', (){
+            // Criamos um Hábito
+            final habitToEdit = HabitModel(
+                id: '999', 
+                iconCode: 1, 
+                name: 'Ler 10 páginas do Senhor dos Anéis', 
+                conclusionType: HabitConclusionType.goalQuantity,
+                goalQuantity: 10, 
+                frequency: HabitFrequency(
+                    type: HabitFrequencyType.daily,
+                    selectedDays: []
+                ), 
+                startDate: DateTime(2026, 1, 1),
+                notificationTime: DateTime(2026, 1, 1, 20, 30)
+
+            );
+
+            final config = NotificationConfigModel(
+                isReminderEnabled: true, 
+                isStreakEnabled: true, 
+                customTimeNotification: []
+
+            );
+
+            final notifier = container.read(draftHabitProvider.notifier);
+            
+            // Carregamos o hábito e sua configuração de notificação
+            notifier.loadForEdit(habitToEdit, config);
+
+            // Lemos o estado
+            final loadedState = container.read(draftHabitProvider);
+
+            expect(loadedState.existingId, '999');
+            expect(loadedState.name, 'Ler 10 páginas do Senhor dos Anéis');
+            expect(loadedState.conclusionType, HabitConclusionType.goalQuantity);
+            expect(loadedState.goalQuantity, '10');
+     
+            expect(loadedState.reminderTime?.hour, 20);
+            expect(loadedState.reminderTime?.minute, 30);
+            expect(loadedState.isStreakEnabled, isTrue);
+                    
+        });
+
+    });
 
 }
