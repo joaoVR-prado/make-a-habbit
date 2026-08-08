@@ -189,10 +189,10 @@ packages:
     dependency: transitive
     description:
       name: equatable
-      sha256: "3e0141505477fd8ad55d6eb4e7776d3fe8430be8e497ccb1521370c3f21a3e2b"
+      sha256: "3bce007a596ff8b3119c45d68aaef631272537c03d30e5d4534dd24bf4c5eaa2"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.8"
+    version: "2.1.0"
   fake_async:
     dependency: transitive
     description:
@@ -318,7 +318,7 @@ packages:
     source: hosted
     version: "2.3.4"
   hive_ce_generator:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: hive_ce_generator
       sha256: b19ac263cb37529513508ba47352c41e6de72ba879952898d9c18c9c8a955921
@@ -462,7 +462,7 @@ packages:
     source: hosted
     version: "2.0.0"
   mocktail:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: mocktail
       sha256: "890df3f9688106f25755f26b1c60589a92b3ab91a22b8b224947ad041bf172d8"
