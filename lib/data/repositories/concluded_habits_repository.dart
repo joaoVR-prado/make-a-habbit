@@ -1,47 +1,44 @@
 import 'package:hive_ce/hive.dart';
 import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
+import 'package:make_a_habbit/domain/repositories/conclusion_repository.dart';
 
-abstract class IConcludedHabitsRepository{
-  List<ConcludedHabitsModel> getAllConclusions();
-  List<ConcludedHabitsModel> getHistory(String habitId);
-  Future<void> saveOrUpdateConclusion(ConcludedHabitsModel conclusion);
-  Future<void> removeConclusion(String habitId, DateTime date);
+export 'package:make_a_habbit/domain/repositories/conclusion_repository.dart';
 
-}
+class HiveConclusionRepository implements ConclusionRepository {
+  HiveConclusionRepository(this._box);
 
-class ConcludedHabitsRepository implements IConcludedHabitsRepository {
-  final Box<ConcludedHabitsModel> _conclusionBox;
-
-  ConcludedHabitsRepository(this._conclusionBox);
+  final Box<ConcludedHabitsModel> _box;
 
   @override
-  List<ConcludedHabitsModel> getAllConclusions(){
-    return _conclusionBox.values.toList();
-
-  }
+  List<ConcludedHabitsModel> getAll() =>
+      _box.values.toList(growable: false);
 
   @override
-  List<ConcludedHabitsModel> getHistory(String habitId){
-    return _conclusionBox.values
+  List<ConcludedHabitsModel> getHistory(String habitId) => _box.values
       .where((conclusion) => conclusion.habitId == habitId)
-      .toList();
+      .toList(growable: false);
 
+  @override
+  Future<void> save(ConcludedHabitsModel conclusion) {
+    return _box.put(_key(conclusion.habitId, conclusion.conclusionDate), conclusion);
   }
 
   @override
-  Future<void> saveOrUpdateConclusion(ConcludedHabitsModel conclusion) async{
-    final date = conclusion.conclusionDate;
-    final uniqueKey = '${conclusion.habitId}_${date.year}-${date.month}-${date.day}';
-
-    await _conclusionBox.put(uniqueKey, conclusion);
-
+  Future<void> delete(String habitId, DateTime date) {
+    return _box.delete(_key(habitId, date));
   }
 
   @override
-  Future<void> removeConclusion(String habitId, DateTime date) async {
-    final uniqueKey = '${habitId}_${date.year}-${date.month}-${date.day}';
-    await _conclusionBox.delete(uniqueKey);
-
+  Future<void> deleteByHabit(String habitId) async {
+    final keys = _box.keys.where((key) => _box.get(key)?.habitId == habitId);
+    await _box.deleteAll(keys.toList(growable: false));
   }
 
+  @override
+  Future<void> clear() async {
+    await _box.clear();
+  }
+
+  String _key(String habitId, DateTime date) =>
+      '${habitId}_${date.year}-${date.month}-${date.day}';
 }

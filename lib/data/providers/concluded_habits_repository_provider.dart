@@ -4,13 +4,13 @@ import 'package:make_a_habbit/controllers/habits/concluded_habits_controller.dar
 import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
 import 'package:make_a_habbit/data/repositories/concluded_habits_repository.dart';
 
-final concludedHabitsRepositoryProvider = Provider<IConcludedHabitsRepository>((ref){
-  final box = Hive.box<ConcludedHabitsModel>('conclusions');
-  return ConcludedHabitsRepository(box);
-
+final concludedHabitsRepositoryProvider = Provider<ConclusionRepository>((ref) {
+  return HiveConclusionRepository(
+    Hive.box<ConcludedHabitsModel>('conclusions'),
+  );
 });
 
-final concludedHabitsControllerProvider = NotifierProvider<ConcludedHabitsController, List<ConcludedHabitsModel>>(() {
-  return ConcludedHabitsController();
-
-});
+final concludedHabitsControllerProvider =
+    NotifierProvider<ConcludedHabitsController, List<ConcludedHabitsModel>>(
+      ConcludedHabitsController.new,
+    );

@@ -84,7 +84,7 @@ void main() {
         var calls = 0;
         await openDialog(tester, (_) async {
           calls++;
-          throw Exception('storage failure');
+          throw Exception('Erro de armazenamento');
         });
 
         await tester.tap(find.text('Confirmar'));

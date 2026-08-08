@@ -6,20 +6,22 @@ import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
+import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
 
 class HabitController extends Notifier<List<HabitModel>> {
   @override
   List<HabitModel> build(){
     final repository = ref.read(habitRepositoryProvider);
 
-    return repository.getAllHabits();
+    return repository.getAll();
 
   }
 
   Future<void> addHabit(HabitModel habit, NotificationConfigModel notification) async {
     final repository = ref.read(habitRepositoryProvider);
-    await repository.addHabit(habit);
-    await repository.saveNotification(habit.id, notification);
+    final notifications = ref.read(notificationConfigRepositoryProvider);
+    await repository.add(habit);
+    await notifications.save(habit.id, notification);
 
     state = [...state, habit];
 
@@ -27,8 +29,9 @@ class HabitController extends Notifier<List<HabitModel>> {
 
   Future<void> updateHabit(HabitModel habit, NotificationConfigModel notification) async {
     final repository = ref.read(habitRepositoryProvider);
-    await repository.updateHabit(habit);
-    await repository.saveNotification(habit.id, notification);
+    final notifications = ref.read(notificationConfigRepositoryProvider);
+    await repository.update(habit);
+    await notifications.save(habit.id, notification);
 
     state = [
       for(final i in state)
@@ -40,15 +43,27 @@ class HabitController extends Notifier<List<HabitModel>> {
 
   Future<void> deleteHabit(String id) async {
     final repository = ref.read(habitRepositoryProvider);
-    await repository.deleteHabit(id);
+    final notifications = ref.read(notificationConfigRepositoryProvider);
+    final conclusions = ref.read(concludedHabitsRepositoryProvider);
+
+    await conclusions.deleteByHabit(id);
+    await notifications.delete(id);
+    await repository.delete(id);
     state = state.where((i) => i.id !=id).toList();
+    ref.invalidate(concludedHabitsControllerProvider);
 
   }
 
   Future<void> clearAllData() async {
     final repository = ref.read(habitRepositoryProvider);
-    await repository.clearAllData();
+    final notifications = ref.read(notificationConfigRepositoryProvider);
+    final conclusions = ref.read(concludedHabitsRepositoryProvider);
+
+    await conclusions.clear();
+    await notifications.clear();
+    await repository.clear();
     state = [];
+    ref.invalidate(concludedHabitsControllerProvider);
 
   }
 
