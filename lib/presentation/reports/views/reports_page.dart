@@ -29,8 +29,6 @@ class ReportsPage extends ConsumerWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 2,
-                // crossAxisSpacing: 8,
-                // mainAxisSpacing: 8,
                 childAspectRatio: 1,
                 children: [
                   _buildStatCard(context, 'Taxa de Sucesso', '${stats.generalSuccessRate.toStringAsFixed(1)}%', Icons.bolt),
