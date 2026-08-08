@@ -7,7 +7,7 @@ import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
-import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
+import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_horizontal_divider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_vertical_divider.dart';
@@ -64,8 +64,10 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
               children: [
                 TextButton(
                   onPressed: () async {
-                    final repository = ref.read(habitRepositoryProvider);
-                    final config = await repository.getNotification(habit.id);
+                    final repository = ref.read(
+                      notificationConfigRepositoryProvider,
+                    );
+                    final config = repository.get(habit.id);
                     if (context.mounted) {
                       _startHabitEdition(context, ref, config);
                     }

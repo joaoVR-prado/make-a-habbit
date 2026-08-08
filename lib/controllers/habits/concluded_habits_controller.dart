@@ -6,7 +6,7 @@ class ConcludedHabitsController extends Notifier<List<ConcludedHabitsModel>>  {
   @override
   List<ConcludedHabitsModel> build(){
     final repository = ref.read(concludedHabitsRepositoryProvider);
-    return repository.getAllConclusions();
+    return repository.getAll();
 
   }
 
@@ -25,7 +25,7 @@ class ConcludedHabitsController extends Notifier<List<ConcludedHabitsModel>>  {
       conclusionValue: value
     );
 
-    await repository.saveOrUpdateConclusion(newConclusion);
+    await repository.save(newConclusion);
 
     final existingIndex = state.indexWhere((i) =>
       i.habitId == habitId &&
@@ -51,7 +51,7 @@ class ConcludedHabitsController extends Notifier<List<ConcludedHabitsModel>>  {
     final repository = ref.read(concludedHabitsRepositoryProvider);
     final formattedDate = DateTime(date.year, date.month, date.day);
 
-    await repository.removeConclusion(habitId, formattedDate);
+    await repository.delete(habitId, formattedDate);
 
     state = state.where((c) => 
       !(c.habitId == habitId && 
