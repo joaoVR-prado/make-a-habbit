@@ -11,6 +11,8 @@ import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habits_list_tile.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/horizontal_calendar.dart';
 
+import '../../reports/views/reports_page.dart';
+
 class HomePage extends ConsumerStatefulWidget{
     const HomePage({super.key});
 
@@ -124,7 +126,8 @@ class _HomePageState extends ConsumerState<HomePage>{
           ),
           body: currentTab == 0 
           ? _buildHabits(isToday: isToday, displayHabits: displayHabits)
-          : Center(child: Text('Tela de Relatórios em construção!')),
+          : const ReportsPage(),
+          //: Center(child: Text('Tela de Relatórios em construção!')),
           bottomNavigationBar: BottomAppBar(
             height: 60,
             padding: EdgeInsets.zero,

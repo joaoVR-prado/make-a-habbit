@@ -49,3 +49,4 @@ app.*.map.json
 /hive_data/
 *.hive
 *.lock
+docs/refactoring-plan.md

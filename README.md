@@ -108,7 +108,7 @@ Visão geral do que já existe no código e do que ainda está planejado ou inco
 - [x] Marcar conclusões por data e listagem no calendário / home
 - [x] Notificações locais para lembretes (`awesome_notifications`)
 - [ ] **RF-01 / §4.3** — Tela de **relatórios de hábitos**: listagem, filtros, métricas por hábito, calendário mensal e estados vazios (RN-01 / RN-02)
-- [ ] Ícone dedicado para o canal de notificações Android (há TODO no código)
+- [ ] Ícone dedicado para o canal de notificações Android 
 - [ ] Cobertura de testes e builds de release documentados em CI
 
 ---
