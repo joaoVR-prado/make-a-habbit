@@ -34,7 +34,7 @@ void main() async {
   await Hive.openBox<ConcludedHabitsModel>('conclusions');
 
   // Inicia a biblioteca Awesome_notifications
-  AwesomeNotifications().initialize(
+  await AwesomeNotifications().initialize(
     // TODO: Colocar icone do coelho na pasta android/app/src/main/res/drawable
     'resource://mipmap/ic_launcher',
     [
@@ -56,7 +56,7 @@ void main() async {
   );
 
   // Configura app para escutar notificacoes fora do app
-  AwesomeNotifications().setListeners(
+  await AwesomeNotifications().setListeners(
     onActionReceivedMethod: NotificationsController.onActionReceivedMethod,
   );
 

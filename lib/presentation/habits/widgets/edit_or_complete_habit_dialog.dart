@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
-import 'package:make_a_habbit/controllers/notifications/notifications_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
 import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
+import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_horizontal_divider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_vertical_divider.dart';
@@ -131,10 +131,7 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
       return;
     }
 
-    final notificationId = habit.notificationId;
-    if (notificationId != null) {
-      await NotificationsController.deleteHabitNotifications(notificationId);
-    }
+    await ref.read(notificationSchedulerProvider).cancelForHabit(habit.id);
     await ref.read(habitControllerProvider.notifier).deleteHabit(habit.id);
   }
 
