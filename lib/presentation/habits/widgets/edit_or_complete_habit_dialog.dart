@@ -15,20 +15,20 @@ import 'package:make_a_habbit/presentation/habits/views/create_habit_page.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/complete_habit.dart';
 
 class EditOrCompleteHabitDialog extends ConsumerWidget {
-  final HabitModel habit;
-
-  const EditOrCompleteHabitDialog ({
+  const EditOrCompleteHabitDialog({
     super.key,
-    required this.habit
+    required this.habit,
+    this.deleteHabit,
   });
 
+  final HabitModel habit;
+  final Future<void> Function(WidgetRef ref)? deleteHabit;
+
   @override
-  Widget build(BuildContext context, WidgetRef ref){
+  Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12)
-      ),
-      titlePadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      titlePadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -36,26 +36,24 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
             child: Text(
               habit.name,
               style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                color: AppColors.dialogTextColor
+                color: AppColors.dialogTextColor,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ),
           CommonIconContainer(
-            habitIcon: HabitIcon.fromCode(habit.iconCode), 
-            alpha: 0.5
-          )
+            habitIcon: HabitIcon.fromCode(habit.iconCode),
+            alpha: 0.5,
+          ),
         ],
       ),
       content: Text(
-        'Deseja Editar ou Concluir esse hábito?',
+        'Deseja editar ou concluir esse hábito?',
         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-          color: AppColors.dialogTextColor
+          color: AppColors.dialogTextColor,
         ),
       ),
-      // actionsAlignment: MainAxisAlignment.spaceAround,
-      // actionsPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
       actionsPadding: EdgeInsets.zero,
       actions: [
         Column(
@@ -66,41 +64,31 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
               children: [
                 TextButton(
                   onPressed: () async {
-                    //Navigator.of(context).pop(); 
                     final repository = ref.read(habitRepositoryProvider);
                     final config = await repository.getNotification(habit.id);
-
                     if (context.mounted) {
-                      _startHabitEdition(
-                        context, 
-                        ref, 
-                        habit,
-                        config
-                      );
+                      _startHabitEdition(context, ref, config);
                     }
-                    // Edit
                   },
                   child: Text(
                     'EDITAR',
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: AppColors.dialogTextColor
+                      color: AppColors.dialogTextColor,
                     ),
                   ),
                 ),
-                CommonVerticalDivider(),
-                // Concluir
+                const CommonVerticalDivider(),
                 TextButton(
-                  onPressed: (){
-                    showDialog(
-                      context: context, 
-                      builder: (BuildContext context) => CompleteHabit(habit: habit)
+                  onPressed: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (_) => CompleteHabit(habit: habit),
                     );
-                    // Edit
                   },
                   child: Text(
                     'CONCLUIR',
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: AppColors.positiveActionDialogTextColor
+                      color: AppColors.positiveActionDialogTextColor,
                     ),
                   ),
                 ),
@@ -110,119 +98,164 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: TextButton(
-                onPressed: (){
-                  showDialog(
+                onPressed: () {
+                  showDialog<void>(
                     context: context,
-                    builder: (BuildContext context){
-                      return _buildDeleteConfirmation(context, ref);
-
-                    }
+                    builder: (_) => _DeleteHabitConfirmationDialog(
+                      onConfirm: () => _deleteHabit(ref),
+                    ),
                   );
-                }, 
+                },
                 child: Text(
                   'EXCLUIR HÁBITO',
                   style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     color: Colors.red,
-                    fontWeight: FontWeight.bold
+                    fontWeight: FontWeight.bold,
                   ),
-                )
+                ),
               ),
             ),
-            SizedBox(
-              height: 10,
-            )
+            const SizedBox(height: 10),
           ],
-        )
-        // Editar
-        
+        ),
       ],
     );
   }
 
-  Widget _buildDeleteConfirmation(BuildContext context, WidgetRef ref){
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12)
-      ),
-      content: Text(
-        'Deseja Realmente excluir esse hábito?',
-        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-          color: AppColors.dialogTextColor
+  Future<void> _deleteHabit(WidgetRef ref) async {
+    final callback = deleteHabit;
+    if (callback != null) {
+      await callback(ref);
+      return;
+    }
+
+    final notificationId = habit.notificationId;
+    if (notificationId != null) {
+      await NotificationsController.deleteHabitNotifications(notificationId);
+    }
+    await ref.read(habitControllerProvider.notifier).deleteHabit(habit.id);
+  }
+
+  void _startHabitEdition(
+    BuildContext context,
+    WidgetRef ref,
+    NotificationConfigModel? config,
+  ) {
+    ref.read(draftHabitProvider.notifier).loadForEdit(habit, config);
+    Navigator.of(context).pop();
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const CreateHabitPage()),
+    );
+  }
+}
+
+class _DeleteHabitConfirmationDialog extends StatefulWidget {
+  const _DeleteHabitConfirmationDialog({required this.onConfirm});
+
+  final Future<void> Function() onConfirm;
+
+  @override
+  State<_DeleteHabitConfirmationDialog> createState() =>
+      _DeleteHabitConfirmationDialogState();
+}
+
+class _DeleteHabitConfirmationDialogState
+    extends State<_DeleteHabitConfirmationDialog> {
+  bool _isDeleting = false;
+  String? _errorMessage;
+
+  Future<void> _confirmDeletion() async {
+    if (_isDeleting) return;
+    setState(() {
+      _isDeleting = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await widget.onConfirm();
+      if (!mounted) return;
+
+      final messenger = ScaffoldMessenger.of(context);
+      final successTextStyle = Theme.of(context).textTheme.labelMedium;
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            'Hábito excluído com sucesso!',
+            style: successTextStyle,
+          ),
+          backgroundColor: AppColors.calendarMainColor,
+          duration: const Duration(seconds: 3),
         ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isDeleting = false;
+        _errorMessage = 'Não foi possível excluir o hábito. Tente novamente!';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Deseja realmente excluir esse hábito?',
+            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+              color: AppColors.dialogTextColor,
+            ),
+          ),
+          if (_errorMessage != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              _errorMessage!,
+              key: const Key('delete_habit_error'),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.red,
+              ),
+            ),
+          ],
+        ],
       ),
       actionsPadding: EdgeInsets.zero,
       actions: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton(
-                  onPressed: (){
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    'Cancelar',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: AppColors.dialogTextColor
-                    ),
-                  ),
+            TextButton(
+              onPressed: _isDeleting ? null : () => Navigator.pop(context),
+              child: Text(
+                'Cancelar',
+                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  color: AppColors.dialogTextColor,
                 ),
-                CommonVerticalDivider(),
-                // Concluir
-                TextButton(
-                  onPressed: () async {
-                    // Deleta Notificacoes
-                    await NotificationsController.deleteHabitNotifications(habit.notificationId!);
-
-                    ref.read(habitControllerProvider.notifier).deleteHabit(habit.id);
-                    if(context.mounted){
-                      Navigator.pop(context); // Sai da modal de confirmacao
-                      Navigator.pop(context); // Sai da modal de edicao
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Hábito excluido com sucesso!',
-                            style: Theme.of(context).textTheme.labelMedium,
-                            
-                          ),
-                          backgroundColor: AppColors.calendarMainColor,
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-
-                    }
-                  },
-                  child: Text(
+              ),
+            ),
+            const CommonVerticalDivider(),
+            TextButton(
+              onPressed: _isDeleting ? null : _confirmDeletion,
+              child: _isDeleting
+                ? const SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(
                     'Confirmar',
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: AppColors.positiveActionDialogTextColor
+                      color: AppColors.positiveActionDialogTextColor,
                     ),
                   ),
-                ),
-              ],
             ),
           ],
-        )  // Editar
+        ),
       ],
     );
-  }
-
-  void _startHabitEdition(BuildContext context, WidgetRef ref, HabitModel habit, NotificationConfigModel? config){
-    ref.read(draftHabitProvider.notifier).loadForEdit(habit, config);
-
-    Navigator.of(context).pop();
-
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const CreateHabitPage())
-
-    );
-
-    // Navigator.of(context).pushReplacement(
-    //   MaterialPageRoute(builder: (context) => const CreateHabitPage())
-
-    // );
-
   }
 }
