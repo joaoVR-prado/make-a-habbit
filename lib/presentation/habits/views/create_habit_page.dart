@@ -1,4 +1,3 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
@@ -9,6 +8,8 @@ import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
+import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
+import 'package:make_a_habbit/domain/services/notification_schedule_planner.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_conclusion_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_frequency_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_habit_category.dart';
@@ -111,7 +112,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     }
 
     final id = existingId ?? uuid.v4();
-    final notificationId = id;
+    final notificationId = const NotificationSchedulePlanner().baseIdForHabit(id);
     
     final newHabit = HabitModel(
       id: id,
@@ -123,7 +124,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
       frequency: habitFrequency,
       startDate: draftState.startDate!,
       endDate: draftState.endDate,
-      notificationId: notificationId.hashCode.abs(),
+      notificationId: notificationId,
       notificationTime: notificationDateTime,
 
     );
@@ -143,31 +144,28 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
     }
 
-    // Lógica das notificações //
-    if(existingId != null){
-      // Cancela notificacao e streak
-      await AwesomeNotifications().cancelSchedulesByGroupKey(newHabit.id);
-
-    }
-
-    // Agenda notificacao de lembrete
-    if(draftState.reminderTime != null){
-      _scheduleHabitReminder(newHabit);
-
-    }
-
-    // Agenda notificacao de Streak
-    if(draftState.isStreakEnabled){
-      _scheduleStreakReminder(newHabit, currentStreak: 0);
-      
+    var notificationSchedulingFailed = false;
+    try {
+      await ref.read(notificationSchedulerProvider).replaceSchedules(
+        habit: newHabit,
+        reminderEnabled: draftState.reminderTime != null,
+        streakEnabled: draftState.isStreakEnabled,
+        currentStreak: 0,
+        now: DateTime.now(),
+      );
+    } catch (_) {
+      notificationSchedulingFailed = true;
     }
 
     if(mounted){
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            existingId == null ? 'Hábito criado com sucesso!' 
-            : 'Hábito atualizado com sucesso!' ,
+            notificationSchedulingFailed
+                ? 'Hábito salvo, mas não foi possível agendar o lembrete.'
+                : existingId == null
+                    ? 'Hábito criado com sucesso!'
+                    : 'Hábito atualizado com sucesso!',
             style: Theme.of(context).textTheme.labelMedium,
             
           ),
@@ -299,134 +297,4 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
       ),
     );
   }
-
-  // Agenda notificacao de lembrete
-  Future<void> _scheduleHabitReminder(HabitModel habit) async {
-    if (habit.notificationTime == null) return;
-    final notificationTime = habit.notificationTime!;
-    final String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
-    final String title = 'Hora do seu hábito!';
-    final String body = 'Não se esqueça de completar o hábito ${habit.name}';
-    final NotificationCategory category = NotificationCategory.Reminder;
-
-    // Verifica a frequencia
-    if (habit.frequency.type == HabitFrequencyType.daily) {
-      await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          id: habit.notificationId!, 
-          channelKey: 'habit_reminders_v2',
-          groupKey: habit.id,
-          title: title,
-          body: body,
-          category: category,
-          wakeUpScreen: true, 
-        ),
-        schedule: NotificationCalendar(
-          timeZone: localTimeZone, // <--- ADICIONADO AQUI
-          hour: notificationTime.hour,
-          minute: notificationTime.minute,
-          second: 0,
-          millisecond: 0,
-          repeats: true,
-          preciseAlarm: true,
-          allowWhileIdle: true
-        ),
-      );
-    } else if (habit.frequency.type == HabitFrequencyType.weekly) { // Habitos semanais
-      for (int weekday in habit.frequency.selectedDays!) {
-        int androidWeekday = weekday == 7 ? 1 : weekday + 1;
-
-        await AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: habit.notificationId! + weekday, 
-            channelKey: 'habit_reminders_v2',
-            groupKey: habit.id,
-            title: title,
-            body: body,
-            category: category,
-            wakeUpScreen: true, 
-          ),
-          schedule: NotificationCalendar(
-            timeZone: localTimeZone,
-            weekday: androidWeekday,
-            hour: notificationTime.hour,
-            minute: notificationTime.minute,
-            second: 0,
-            millisecond: 0,
-            repeats: true,
-            preciseAlarm: true,
-            allowWhileIdle: true
-          ),
-        );
-      }
-    } else if (habit.frequency.type == HabitFrequencyType.monthly) { // Habitos mensais
-      for (int day in habit.frequency.selectedDays!) {
-        
-       //DIA 32: O Calendário nativo só vai até 31
-        int validDay = day;
-        if (day == 32) {
-          validDay = 28; 
-
-        await AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: habit.notificationId! + day + 100, 
-            channelKey: 'habit_reminders_v2',
-            groupKey: habit.id,
-            title: title,
-            body: body,
-            category: category,
-            wakeUpScreen: true, 
-          ),
-          schedule: NotificationCalendar(
-            timeZone: localTimeZone, 
-            day: validDay,           
-            hour: notificationTime.hour,
-            minute: notificationTime.minute,
-            second: 0,
-            millisecond: 0,
-            repeats: true,
-            preciseAlarm: true,
-            allowWhileIdle: true
-          ),
-        );
-        }
-      }
-    }
-  }
-
-  // Função para agendar a notificação de Ofensiva (Sempre às 12h)
-  Future<void> _scheduleStreakReminder(HabitModel habit, {required int currentStreak}) async {
-    final streakNotificationId = habit.notificationId! + 10000; 
-    final String localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
-
-    String notification;
-    if (currentStreak == 0) {
-      notification = 'Vamos começar sua ofensiva de ${habit.name} hoje? ';
-    } else {
-      notification = 'Você completou ${habit.name} por $currentStreak dias, parabéns! Continue persistindo! ';
-    }
-
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: streakNotificationId,
-        channelKey: 'habit_reminders_v2',
-        title: 'Sua Ofensiva! ',
-        groupKey: habit.id,
-        body: notification,
-        category: NotificationCategory.Status,
-        wakeUpScreen: true, 
-      ),
-      schedule: NotificationCalendar( 
-        timeZone: localTimeZone, // <--- ADICIONADO AQUI
-        hour: 12,
-        minute: 0,
-        second: 0,
-        millisecond: 0,
-        repeats: true,
-        preciseAlarm: true,
-        allowWhileIdle: true
-      ),
-    );
-  }
-
 }

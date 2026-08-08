@@ -1,8 +1,8 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
+import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_create_habit_title.dart';
 
 class ChooseStartDate extends ConsumerStatefulWidget {
@@ -164,10 +164,11 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
 
           },
           onTap: () async{
-            bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+            final scheduler = ref.read(notificationSchedulerProvider);
+            bool isAllowed = await scheduler.isPermissionGranted();
             if (!isAllowed) {
               // TODO: Mostrar alerta personalizado antes aqui
-              isAllowed = await AwesomeNotifications().requestPermissionToSendNotifications();
+              isAllowed = await scheduler.requestPermission();
 
             }
 
@@ -331,10 +332,11 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
         onChanged: (bool newValue) async {
           // Valida permissao do usuario para mostrar notificacoes
           if (newValue == true) {
-            bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+            final scheduler = ref.read(notificationSchedulerProvider);
+            bool isAllowed = await scheduler.isPermissionGranted();
             
             if (!isAllowed) {
-              isAllowed = await AwesomeNotifications().requestPermissionToSendNotifications();
+              isAllowed = await scheduler.requestPermission();
             }
             
             if (!isAllowed) {
