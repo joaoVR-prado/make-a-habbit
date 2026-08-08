@@ -14,7 +14,7 @@ class ReportsPage extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -29,8 +29,9 @@ class ReportsPage extends ConsumerWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                // crossAxisSpacing: 8,
+                // mainAxisSpacing: 8,
+                childAspectRatio: 1,
                 children: [
                   _buildStatCard(context, 'Taxa de Sucesso', '${stats.generalSuccessRate.toStringAsFixed(1)}%', Icons.bolt),
                   _buildStatCard(context, 'Recorde de Ofensiva', '${stats.bestStreakGeral} dias', Icons.local_fire_department),
@@ -57,14 +58,19 @@ class ReportsPage extends ConsumerWidget {
           children: [
             Icon(icon, size: 32, color: AppColors.positiveActionDialogTextColor),
             const SizedBox(height: 8),
-            Text(value, style: Theme.of(context).textTheme.headlineMedium),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(value, style: Theme.of(context).textTheme.headlineMedium)
+            ),
             const SizedBox(height: 4),
-            Text(title, style: Theme.of(context).textTheme.labelSmall, textAlign: TextAlign.center),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(title, style: Theme.of(context).textTheme.labelSmall, textAlign: TextAlign.center)
+            ),
           ],
         ),
       ),
     );
   }
-
 
 }
