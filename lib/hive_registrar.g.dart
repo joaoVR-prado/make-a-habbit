@@ -4,6 +4,7 @@
 
 import 'package:hive_ce/hive.dart';
 import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
+import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
@@ -13,6 +14,8 @@ import 'package:make_a_habbit/data/models/notifications/notification_config_mode
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(ConcludedHabitsModelAdapter());
+    registerAdapter(YesNoCompletionValueAdapter());
+    registerAdapter(QuantityCompletionValueAdapter());
     registerAdapter(HabitConclusionTypeAdapter());
     registerAdapter(HabitFrequencyAdapter());
     registerAdapter(HabitFrequencyTypeAdapter());
@@ -24,6 +27,8 @@ extension HiveRegistrar on HiveInterface {
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(ConcludedHabitsModelAdapter());
+    registerAdapter(YesNoCompletionValueAdapter());
+    registerAdapter(QuantityCompletionValueAdapter());
     registerAdapter(HabitConclusionTypeAdapter());
     registerAdapter(HabitFrequencyAdapter());
     registerAdapter(HabitFrequencyTypeAdapter());

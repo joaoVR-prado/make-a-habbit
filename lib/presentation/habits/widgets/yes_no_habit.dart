@@ -83,10 +83,10 @@ class _YesNoHabit extends ConsumerState<YesNoHabit> {
                   return; 
                 }
 
-                ref.read(concludedHabitsControllerProvider.notifier).saveOrUpdateConclusion(
+                ref.read(concludedHabitsControllerProvider.notifier).saveYesNoConclusion(
                   habitId: widget.habit.id, 
                   date: selectedDate, 
-                  value: _isConcluded,
+                  completed: _isConcluded!,
                 );
 
                 if (context.mounted){
