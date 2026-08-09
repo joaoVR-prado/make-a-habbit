@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
+import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_horizontal_divider.dart';
@@ -37,7 +38,10 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
       i.conclusionDate.day == selectedDate.day
     ).firstOrNull;
 
-    final doneQuantity = dailyHabitConclusion?.conclusionValue ?? 0;
+    final doneQuantity = switch (dailyHabitConclusion?.conclusionValue) {
+      QuantityCompletionValue(:final value) => value,
+      _ => 0,
+    };
     _qtdController = TextEditingController(text: doneQuantity.toString());
 
   }
@@ -63,7 +67,10 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
     ).firstOrNull;
 
     // Pega a quantidade ja feita
-    final doneQuantity = dailyHabitConclusion?.conclusionValue ?? 0;
+    final doneQuantity = switch (dailyHabitConclusion?.conclusionValue) {
+      QuantityCompletionValue(:final value) => value,
+      _ => 0,
+    };
 
     return Column(
       children: [
@@ -163,10 +170,10 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
               onPressed: (){
                 // final selectedDate = ref.read(selectedDateProvider);
                 final concludedQtd = int.tryParse(_qtdController.text) ?? 1;
-                ref.read(concludedHabitsControllerProvider.notifier).saveOrUpdateConclusion(
+                ref.read(concludedHabitsControllerProvider.notifier).saveQuantityConclusion(
                   habitId: widget.habit.id, 
                   date: selectedDate, 
-                  value: concludedQtd
+                  quantity: concludedQtd
                 );
 
                 if (context.mounted){

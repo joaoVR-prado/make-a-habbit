@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
+import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
@@ -80,12 +81,12 @@ void main() {
       final target = ConcludedHabitsModel(
         habitId: habit.id,
         conclusionDate: DateTime(2026, 8, 8),
-        conclusionValue: true,
+        conclusionValue: const YesNoCompletionValue(true),
       );
       final other = ConcludedHabitsModel(
         habitId: 'habito2',
         conclusionDate: DateTime(2026, 8, 8),
-        conclusionValue: true,
+        conclusionValue: const YesNoCompletionValue(true),
       );
       when(() => box.keys).thenReturn(['target', 'other']);
       when(() => box.get('target')).thenReturn(target);
@@ -104,7 +105,7 @@ void main() {
       final conclusion = ConcludedHabitsModel(
         habitId: habit.id,
         conclusionDate: DateTime(2026, 8, 8, 19, 30),
-        conclusionValue: true,
+        conclusionValue: const YesNoCompletionValue(true),
       );
       when(
         () => box.put('habito_2026-8-8', conclusion),

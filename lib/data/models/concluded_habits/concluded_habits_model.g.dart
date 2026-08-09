@@ -19,7 +19,7 @@ class ConcludedHabitsModelAdapter extends TypeAdapter<ConcludedHabitsModel> {
     return ConcludedHabitsModel(
       habitId: fields[0] as String,
       conclusionDate: fields[1] as DateTime,
-      conclusionValue: fields[2] as dynamic,
+      conclusionValue: fields[2] as CompletionValue,
       note: fields[3] as String?,
     );
   }

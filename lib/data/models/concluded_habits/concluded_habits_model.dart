@@ -1,4 +1,5 @@
 import 'package:hive_ce/hive.dart';
+import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
 
 part 'concluded_habits_model.g.dart';
 
@@ -11,7 +12,7 @@ class ConcludedHabitsModel extends HiveObject {
   final DateTime conclusionDate;
 
   @HiveField(2)
-  final dynamic conclusionValue;
+  final CompletionValue conclusionValue;
 
   @HiveField(3)
   final String? note;

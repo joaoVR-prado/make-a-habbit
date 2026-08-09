@@ -1,4 +1,5 @@
 import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
+import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/models/reports/habit_stats_model.dart';
@@ -104,10 +105,16 @@ class HabitStatsCalculator {
   ) {
     if (conclusion == null) return false;
     if (habit.conclusionType == HabitConclusionType.goalQuantity) {
-      final value = conclusion.conclusionValue;
-      return value is num && value >= (habit.goalQuantity ?? 1);
+      return switch (conclusion.conclusionValue) {
+        QuantityCompletionValue(:final value) =>
+          value >= (habit.goalQuantity ?? 1),
+        _ => false,
+      };
     }
-    return conclusion.conclusionValue == true;
+    return switch (conclusion.conclusionValue) {
+      YesNoCompletionValue(:final value) => value,
+      _ => false,
+    };
   }
 
   DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
+import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
@@ -108,18 +109,21 @@ final dailyHabitsDisplayProvider = Provider.autoDispose<List<HabitDisplayModel>>
     HabitStatus habitStatus = HabitStatus.pending;
 
     if (habit.conclusionType == HabitConclusionType.goalQuantity) {
-      final doneQuantity = dailyConclusion?.conclusionValue ?? 0;
+      final doneQuantity = switch (dailyConclusion?.conclusionValue) {
+        QuantityCompletionValue(:final value) => value,
+        _ => 0,
+      };
       final targetQuantity = habit.goalQuantity ?? 1;
       if (doneQuantity >= targetQuantity) {
         habitStatus = HabitStatus.done;
       }
     } else {
       if (dailyConclusion != null) {
-        if (dailyConclusion.conclusionValue == true) {
-          habitStatus = HabitStatus.done;
-        } else if (dailyConclusion.conclusionValue == false) {
-          habitStatus = HabitStatus.incomplete;
-        }
+        habitStatus = switch (dailyConclusion.conclusionValue) {
+          YesNoCompletionValue(value: true) => HabitStatus.done,
+          YesNoCompletionValue(value: false) => HabitStatus.incomplete,
+          _ => HabitStatus.pending,
+        };
       }
     }
 
