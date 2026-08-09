@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:make_a_habbit/controllers/habits/concluded_habits_controller.dart';
-import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
 import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
+import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/domain/repositories/conclusion_repository.dart';
 import 'package:mocktail/mocktail.dart';
@@ -16,6 +15,7 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(_FakeConclusion());
+    
   });
 
   setUp(() {
