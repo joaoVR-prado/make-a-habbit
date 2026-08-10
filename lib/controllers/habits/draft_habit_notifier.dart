@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
+import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
@@ -75,7 +76,7 @@ class DraftHabitNotifier extends Notifier<DraftHabitState> {
   @override
   DraftHabitState build() {
     return DraftHabitState(
-      startDate: DateTime.now(),
+      startDate: ref.watch(clockProvider).now(),
     );
   }
 
@@ -156,7 +157,7 @@ class DraftHabitNotifier extends Notifier<DraftHabitState> {
 
   // Limpador de drafts
   void clear() {
-    state = DraftHabitState(startDate: DateTime.now());
+    state = DraftHabitState(startDate: ref.read(clockProvider).now());
 
   }
   // Para Edicao de habitos
@@ -165,9 +166,9 @@ class DraftHabitNotifier extends Notifier<DraftHabitState> {
     List<int> monthly = [];
     
     if (habit.frequency.type == HabitFrequencyType.weekly) {
-      weekly = habit.frequency.selectedDays ?? [];
+      weekly = habit.frequency.selectedDays;
     } else if (habit.frequency.type == HabitFrequencyType.monthly) {
-      monthly = habit.frequency.selectedDays ?? [];
+      monthly = habit.frequency.selectedDays;
     }
 
     state = DraftHabitState(

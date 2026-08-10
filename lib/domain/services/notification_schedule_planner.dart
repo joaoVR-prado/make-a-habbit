@@ -1,3 +1,4 @@
+import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 
@@ -46,7 +47,7 @@ class PlannedNotification {
 class NotificationSchedulePlanner {
   const NotificationSchedulePlanner();
 
-  static const lastDayOfMonth = 32;
+  static const lastDayOfMonth = MonthlyHabitFrequency.lastDayOfMonth;
   static const _lastDayHorizon = 12;
 
   int baseIdForHabit(String habitId) {
@@ -117,7 +118,7 @@ class NotificationSchedulePlanner {
         ];
       case HabitFrequencyType.weekly:
         return [
-          for (final weekday in habit.frequency.selectedDays ?? const <int>[])
+          for (final weekday in habit.frequency.selectedDays)
             reminder(
               baseId + weekday,
               RepeatingCalendarSchedule(
@@ -128,7 +129,7 @@ class NotificationSchedulePlanner {
             ),
         ];
       case HabitFrequencyType.monthly:
-        final days = habit.frequency.selectedDays ?? const <int>[];
+        final days = habit.frequency.selectedDays;
         final result = <PlannedNotification>[
           for (final day in days)
             if (day >= 1 && day <= 31)

@@ -15,7 +15,7 @@ void main() {
     iconCode: 0,
     name: 'Beber água',
     conclusionType: HabitConclusionType.yesNo,
-    frequency: HabitFrequency(type: HabitFrequencyType.daily),
+    frequency: HabitFrequency.fromType(type: HabitFrequencyType.daily),
     startDate: DateTime(2026, 8, 8),
   );
 

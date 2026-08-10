@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
 import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
@@ -72,8 +73,19 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     }
   }
 
-  void _saveDraft() async{
+  Future<void> _saveDraft() async{
     final draftState = ref.read(draftHabitProvider);
+    final category = draftState.category;
+    final conclusionType = draftState.conclusionType;
+    final frequencyType = draftState.frequencyType;
+    final startDate = draftState.startDate;
+    if (category == null ||
+        conclusionType == null ||
+        frequencyType == null ||
+        startDate == null) {
+      _showValidationError('Preencha todos os campos obrigatórios.');
+      return;
+    }
 
     // Verifica se é edição de hábito
     var uuid = Uuid();
@@ -82,52 +94,63 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     // OPERAÇÔES DO HIVE //
     // Ve o tipo de frequencia para salavr os dias escolhidos
     List<int>? selectedDays;
-    if (draftState.frequencyType == HabitFrequencyType.weekly) {
+    if (frequencyType == HabitFrequencyType.weekly) {
       selectedDays = draftState.weeklyDays;
-    } else if (draftState.frequencyType == HabitFrequencyType.monthly) {
+    } else if (frequencyType == HabitFrequencyType.monthly) {
       selectedDays = draftState.monthlyDays;
     }
 
-    final habitFrequency = HabitFrequency(
-      type: draftState.frequencyType!,
-      selectedDays: selectedDays,
-
-    );
+    late final HabitFrequency habitFrequency;
+    try {
+      habitFrequency = HabitFrequency.fromType(
+        type: frequencyType,
+        selectedDays: selectedDays,
+      );
+    } on ArgumentError catch (error) {
+      _showValidationError(error.message?.toString() ?? 'Frequência inválida.');
+      return;
+    }
 
     int? goalQuantity;
-    if (draftState.conclusionType == HabitConclusionType.goalQuantity) {
+    if (conclusionType == HabitConclusionType.goalQuantity) {
       goalQuantity = int.tryParse(draftState.goalQuantity);
     }
 
     DateTime? notificationDateTime;
     if (draftState.reminderTime != null) {
-      final now = DateTime.now();
+      final reminderTime = draftState.reminderTime!;
+      final now = ref.read(clockProvider).now();
       notificationDateTime = DateTime(
         now.year, 
         now.month, 
         now.day, 
-        draftState.reminderTime!.hour, 
-        draftState.reminderTime!.minute
+        reminderTime.hour,
+        reminderTime.minute,
       );
     }
 
     final id = existingId ?? uuid.v4();
     final notificationId = const NotificationSchedulePlanner().baseIdForHabit(id);
     
-    final newHabit = HabitModel(
-      id: id,
-      iconCode: draftState.category!.code, //selectedCategory!.code,
-      name:draftState.name.trim(),
-      description: draftState.description,
-      conclusionType: draftState.conclusionType!,
-      goalQuantity: goalQuantity,
-      frequency: habitFrequency,
-      startDate: draftState.startDate!,
-      endDate: draftState.endDate,
-      notificationId: notificationId,
-      notificationTime: notificationDateTime,
-
-    );
+    late final HabitModel newHabit;
+    try {
+      newHabit = HabitModel(
+        id: id,
+        iconCode: category.code,
+        name: draftState.name,
+        description: draftState.description,
+        conclusionType: conclusionType,
+        goalQuantity: goalQuantity,
+        frequency: habitFrequency,
+        startDate: startDate,
+        endDate: draftState.endDate,
+        notificationId: notificationId,
+        notificationTime: notificationDateTime,
+      );
+    } on ArgumentError catch (error) {
+      _showValidationError(error.message?.toString() ?? 'Hábito inválido.');
+      return;
+    }
 
     final newNotification = NotificationConfigModel(
       isReminderEnabled: draftState.reminderTime != null,
@@ -151,7 +174,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
         reminderEnabled: draftState.reminderTime != null,
         streakEnabled: draftState.isStreakEnabled,
         currentStreak: 0,
-        now: DateTime.now(),
+        now: ref.read(clockProvider).now(),
       );
     } catch (_) {
       notificationSchedulingFailed = true;
@@ -177,6 +200,13 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
     }
 
+  }
+
+  void _showValidationError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override

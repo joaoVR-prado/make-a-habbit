@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
+import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
@@ -83,7 +84,7 @@ final habitControllerProvider = NotifierProvider<HabitController, List<HabitMode
 });
 
 final selectedDateProvider = StateProvider<DateTime>((ref){
-  final now = DateTime.now();
+  final now = ref.watch(clockProvider).now();
   return DateTime(now.year, now.month, now.day);
 
 });
