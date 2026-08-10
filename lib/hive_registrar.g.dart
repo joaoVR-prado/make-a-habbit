@@ -17,7 +17,9 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(YesNoCompletionValueAdapter());
     registerAdapter(QuantityCompletionValueAdapter());
     registerAdapter(HabitConclusionTypeAdapter());
-    registerAdapter(HabitFrequencyAdapter());
+    registerAdapter(DailyHabitFrequencyAdapter());
+    registerAdapter(WeeklyHabitFrequencyAdapter());
+    registerAdapter(MonthlyHabitFrequencyAdapter());
     registerAdapter(HabitFrequencyTypeAdapter());
     registerAdapter(HabitModelAdapter());
     registerAdapter(NotificationConfigModelAdapter());
@@ -30,7 +32,9 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(YesNoCompletionValueAdapter());
     registerAdapter(QuantityCompletionValueAdapter());
     registerAdapter(HabitConclusionTypeAdapter());
-    registerAdapter(HabitFrequencyAdapter());
+    registerAdapter(DailyHabitFrequencyAdapter());
+    registerAdapter(WeeklyHabitFrequencyAdapter());
+    registerAdapter(MonthlyHabitFrequencyAdapter());
     registerAdapter(HabitFrequencyTypeAdapter());
     registerAdapter(HabitModelAdapter());
     registerAdapter(NotificationConfigModelAdapter());

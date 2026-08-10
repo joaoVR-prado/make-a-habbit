@@ -55,7 +55,7 @@ void main(){
               name: 'Diminuir o café para 2 xícaras ao dia, todos os dias', 
               conclusionType: HabitConclusionType.goalQuantity,
               goalQuantity: 2, 
-              frequency: HabitFrequency(
+              frequency: HabitFrequency.fromType(
                   type: HabitFrequencyType.daily,
                   selectedDays: [1, 2, 3, 4, 5, 6, 7]
               ), 
@@ -96,7 +96,7 @@ void main(){
               name: 'Diminuir o café para 2 xícaras ao dia, todos os dias', 
               conclusionType: HabitConclusionType.goalQuantity,
               goalQuantity: 2, 
-              frequency: HabitFrequency(
+              frequency: HabitFrequency.fromType(
                   type: HabitFrequencyType.daily,
                   selectedDays: [1, 2, 3, 4, 5, 6, 7]
               ), 
@@ -133,7 +133,7 @@ void main(){
               name: 'Diminuir o café para 2 xícaras ao dia, todos os dias', 
               conclusionType: HabitConclusionType.goalQuantity,
               goalQuantity: 2, 
-              frequency: HabitFrequency(
+              frequency: HabitFrequency.fromType(
                   type: HabitFrequencyType.daily,
                   selectedDays: [1, 2, 3, 4, 5, 6, 7]
               ), 
@@ -149,7 +149,7 @@ void main(){
               name: 'Diminuir o café para 4 xícaras ao dia, todos os dias exceto final de semana', 
               conclusionType: HabitConclusionType.goalQuantity,
               goalQuantity: 4, 
-              frequency: HabitFrequency(
+              frequency: HabitFrequency.fromType(
                   type: HabitFrequencyType.weekly,
                   selectedDays: [1, 2, 3, 4, 5]
               ), 
@@ -199,7 +199,7 @@ void main(){
               name: 'Diminuir o café para 2 xícaras ao dia, todos os dias', 
               conclusionType: HabitConclusionType.goalQuantity,
               goalQuantity: 2, 
-              frequency: HabitFrequency(
+              frequency: HabitFrequency.fromType(
                   type: HabitFrequencyType.daily,
                   selectedDays: [1, 2, 3, 4, 5, 6, 7]
               ), 
@@ -211,7 +211,7 @@ void main(){
               iconCode: 1, 
               name: 'Fumar cigarro', 
               conclusionType: HabitConclusionType.yesNo,
-              frequency: HabitFrequency(
+              frequency: HabitFrequency.fromType(
                   type: HabitFrequencyType.daily,
                   selectedDays: [1, 2, 3, 4, 5, 6, 7]
               ), 
@@ -253,7 +253,7 @@ void main(){
             name: 'Diminuir o café para 2 xícaras ao dia, todos os dias', 
             conclusionType: HabitConclusionType.goalQuantity,
             goalQuantity: 2, 
-            frequency: HabitFrequency(
+            frequency: HabitFrequency.fromType(
                 type: HabitFrequencyType.daily,
                 selectedDays: [1, 2, 3, 4, 5, 6, 7]
             ), 
@@ -276,11 +276,11 @@ void main(){
               name: 'Diminuir o café para 2 xícaras ao dia, todos os dias', 
               conclusionType: HabitConclusionType.goalQuantity,
               goalQuantity: 2, 
-              frequency: HabitFrequency(
+              frequency: HabitFrequency.fromType(
                   type: HabitFrequencyType.daily,
                   selectedDays: [1, 2, 3, 4, 5, 6, 7]
               ), 
-              startDate: today,
+              startDate: yesterday.subtract(const Duration(days: 1)),
               endDate: yesterday
           );
 
@@ -299,7 +299,7 @@ void main(){
               name: 'Diminuir o café para 2 xícaras ao dia, todos os dias', 
               conclusionType: HabitConclusionType.goalQuantity,
               goalQuantity: 2, 
-              frequency: HabitFrequency(
+              frequency: HabitFrequency.fromType(
                   type: HabitFrequencyType.daily,
                   selectedDays: [1, 2, 3, 4, 5, 6, 7]
               ), 
@@ -323,7 +323,7 @@ void main(){
               name: 'Ler um livro nos dias de descanso', 
               conclusionType: HabitConclusionType.goalQuantity,
               goalQuantity: 2, 
-              frequency: HabitFrequency(
+              frequency: HabitFrequency.fromType(
                   type: HabitFrequencyType.weekly,
                   selectedDays: [1, 4, 6, 7]
               ), 
@@ -348,7 +348,7 @@ void main(){
               iconCode: 0, 
               name: 'Fazer trilha', 
               conclusionType: HabitConclusionType.yesNo,
-              frequency: HabitFrequency(
+              frequency: HabitFrequency.fromType(
                   type: HabitFrequencyType.monthly,
                   selectedDays: [1, 15, 30]
               ), 
@@ -442,7 +442,7 @@ void main(){
                 name: 'Ler 10 páginas do Senhor dos Anéis', 
                 conclusionType: HabitConclusionType.goalQuantity,
                 goalQuantity: 10, 
-                frequency: HabitFrequency(
+                frequency: HabitFrequency.fromType(
                     type: HabitFrequencyType.daily,
                     selectedDays: []
                 ), 

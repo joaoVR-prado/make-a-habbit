@@ -18,7 +18,7 @@ void main() {
       iconCode: 0,
       name: 'Beber água',
       conclusionType: HabitConclusionType.yesNo,
-      frequency: HabitFrequency(type: frequencia, selectedDays: dias),
+      frequency: HabitFrequency.fromType(type: frequencia, selectedDays: dias),
       startDate: DateTime(2026, 1, 1),
       notificationId: planner.baseIdForHabit(id),
       notificationTime: DateTime(2026, 1, 1, 9, 30),

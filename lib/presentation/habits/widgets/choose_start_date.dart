@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
+import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_create_habit_title.dart';
@@ -21,7 +22,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
     final startDate = draftState.startDate!;
     String textStartDate = '';
 
-    final today = DateTime.now();
+    final today = ref.watch(clockProvider).now();
     final tomorrow = today.add(const Duration(days: 1));
 
     if (startDate.year == today.year && startDate.month == today.month && startDate.day == today.day) {
@@ -41,7 +42,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
     String textEndDate = 'Opcional';
 
     if(isSelectedEnd){
-      final today = DateTime.now();
+      final today = ref.watch(clockProvider).now();
       final tomorrow = today.add(const Duration(days: 1));
 
       final isToday =
@@ -87,14 +88,14 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
           selectedDate: textStartDate, 
           isSelected: true, 
           onTap: () async{
-            final now = DateTime.now();
+            final now = ref.read(clockProvider).now();
             final todayOnly = DateTime(now.year, now.month, now.day);
             final todayOrSelectedDate = startDate;
             final DateTime? selectedDate = await showDatePicker(
               context: context, 
               initialDate: todayOrSelectedDate,
               firstDate: todayOnly,
-              lastDate: DateTime(DateTime.now().year + 1),
+              lastDate: DateTime(ref.read(clockProvider).now().year + 1),
               builder: (context, child) {
                 return Theme(
                   data: Theme.of(context).copyWith(
@@ -129,7 +130,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate>{
                 context: context, 
                 initialDate: initialDate,
                 firstDate: firstDateAllowed,
-                lastDate: DateTime(DateTime.now().year + 3),
+                lastDate: DateTime(ref.read(clockProvider).now().year + 3),
                 builder: (context, child) {
                   return Theme(
                     data: Theme.of(context).copyWith(

@@ -2,34 +2,24 @@
 
 part of 'habit_frequency.dart';
 
-// **************************************************************************
-// TypeAdapterGenerator
-// **************************************************************************
-
-class HabitFrequencyAdapter extends TypeAdapter<HabitFrequency> {
+class DailyHabitFrequencyAdapter extends TypeAdapter<DailyHabitFrequency> {
   @override
-  final typeId = 2;
+  final typeId = 13;
 
   @override
-  HabitFrequency read(BinaryReader reader) {
+  DailyHabitFrequency read(BinaryReader reader) {
     final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return HabitFrequency(
-      type: fields[0] as HabitFrequencyType,
-      selectedDays: (fields[1] as List?)?.cast<int>(),
-    );
+    for (int i = 0; i < numOfFields; i++) {
+      reader
+        ..readByte()
+        ..read();
+    }
+    return const DailyHabitFrequency();
   }
 
   @override
-  void write(BinaryWriter writer, HabitFrequency obj) {
-    writer
-      ..writeByte(2)
-      ..writeByte(0)
-      ..write(obj.type)
-      ..writeByte(1)
-      ..write(obj.selectedDays);
+  void write(BinaryWriter writer, DailyHabitFrequency obj) {
+    writer.writeByte(0);
   }
 
   @override
@@ -38,7 +28,71 @@ class HabitFrequencyAdapter extends TypeAdapter<HabitFrequency> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HabitFrequencyAdapter &&
+      other is DailyHabitFrequencyAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class WeeklyHabitFrequencyAdapter extends TypeAdapter<WeeklyHabitFrequency> {
+  @override
+  final typeId = 14;
+
+  @override
+  WeeklyHabitFrequency read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return WeeklyHabitFrequency((fields[0] as List).cast<int>());
+  }
+
+  @override
+  void write(BinaryWriter writer, WeeklyHabitFrequency obj) {
+    writer
+      ..writeByte(1)
+      ..writeByte(0)
+      ..write(obj.weekdays);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WeeklyHabitFrequencyAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class MonthlyHabitFrequencyAdapter extends TypeAdapter<MonthlyHabitFrequency> {
+  @override
+  final typeId = 15;
+
+  @override
+  MonthlyHabitFrequency read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return MonthlyHabitFrequency((fields[0] as List).cast<int>());
+  }
+
+  @override
+  void write(BinaryWriter writer, MonthlyHabitFrequency obj) {
+    writer
+      ..writeByte(1)
+      ..writeByte(0)
+      ..write(obj.days);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MonthlyHabitFrequencyAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

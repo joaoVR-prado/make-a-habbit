@@ -23,7 +23,9 @@ void main() async {
 
   // Adapters
   Hive.registerAdapter(HabitConclusionTypeAdapter());
-  Hive.registerAdapter(HabitFrequencyAdapter());
+  Hive.registerAdapter(DailyHabitFrequencyAdapter());
+  Hive.registerAdapter(WeeklyHabitFrequencyAdapter());
+  Hive.registerAdapter(MonthlyHabitFrequencyAdapter());
   Hive.registerAdapter(HabitFrequencyTypeAdapter());
   Hive.registerAdapter(NotificationConfigModelAdapter());
   Hive.registerAdapter(HabitModelAdapter());

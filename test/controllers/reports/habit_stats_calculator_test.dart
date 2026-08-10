@@ -25,7 +25,7 @@ void main() {
       name: 'Hábito com metas a serem batidas!',
       conclusionType: type,
       goalQuantity: goal,
-      frequency: HabitFrequency(
+      frequency: HabitFrequency.fromType(
         type: frequencyType,
         selectedDays: selectedDays,
       ),
