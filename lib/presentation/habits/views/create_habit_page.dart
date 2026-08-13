@@ -9,8 +9,8 @@ import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
-import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
 import 'package:make_a_habbit/domain/services/notification_schedule_planner.dart';
+import 'package:make_a_habbit/domain/use_cases/habit_operation_result.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_conclusion_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_frequency_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_habit_category.dart';
@@ -159,33 +159,20 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
     );
 
-    if (existingId == null) {
-      await ref.read(habitControllerProvider.notifier).addHabit(newHabit, newNotification);
-
-    } else {
-      await ref.read(habitControllerProvider.notifier).updateHabit(newHabit, newNotification);
-
-    }
-
-    var notificationSchedulingFailed = false;
-    try {
-      await ref.read(notificationSchedulerProvider).replaceSchedules(
-        habit: newHabit,
-        reminderEnabled: draftState.reminderTime != null,
-        streakEnabled: draftState.isStreakEnabled,
-        currentStreak: 0,
-        now: ref.read(clockProvider).now(),
-      );
-    } catch (_) {
-      notificationSchedulingFailed = true;
-    }
+    final result = existingId == null
+        ? await ref
+            .read(habitControllerProvider.notifier)
+            .addHabit(newHabit, newNotification)
+        : await ref
+            .read(habitControllerProvider.notifier)
+            .updateHabit(newHabit, newNotification);
 
     if(mounted){
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            notificationSchedulingFailed
-                ? 'Hábito salvo, mas não foi possível agendar o lembrete.'
+            result.hasPartialFailures
+                ? _partialFailureMessage(result)
                 : existingId == null
                     ? 'Hábito criado com sucesso!'
                     : 'Hábito atualizado com sucesso!',
@@ -200,6 +187,14 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
     }
 
+  }
+
+  String _partialFailureMessage(HabitOperationResult result) {
+    final failures = result.failures;
+    if (failures.contains(HabitOperationFailure.notificationConfig)) {
+      return 'Hábito salvo, mas as preferências de notificação não foram salvas.';
+    }
+    return 'Hábito salvo, mas não foi possível agendar o lembrete.';
   }
 
   void _showValidationError(String message) {

@@ -164,6 +164,7 @@ void main(){
           );
 
           when(() => mockRepository.update(editedNewHabit)).thenAnswer((_) async {});
+          when(() => mockRepository.getById(editedNewHabit.id)).thenReturn(newHabit);
           when(() => mockNotifications.save(newHabit.id, newNotification)).thenAnswer((_) async {});
 
           final controller = providerContainer.read(habitControllerProvider.notifier);
