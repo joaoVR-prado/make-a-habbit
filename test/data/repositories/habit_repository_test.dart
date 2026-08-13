@@ -122,6 +122,9 @@ void main(){
           when(() => mockNotifications.delete(newHabit.id)).thenAnswer((_) async {});
           when(() => mockRepository.delete(newHabit.id)).thenAnswer((_) async {});
 
+          providerContainer.invalidate(habitControllerProvider);
+          await providerContainer.read(habitControllerProvider.future);
+
           final controller = providerContainer.read(habitControllerProvider.notifier);
           expect(providerContainer.read(habitControllerProvider).requireValue.length, 1);
 
@@ -181,6 +184,9 @@ void main(){
           when(() => mockRepository.getById(editedNewHabit.id)).thenReturn(newHabit);
           when(() => mockNotifications.save(newHabit.id, newNotification)).thenAnswer((_) async {});
 
+          providerContainer.invalidate(habitControllerProvider);
+          await providerContainer.read(habitControllerProvider.future);
+
           final controller = providerContainer.read(habitControllerProvider.notifier);
           // Verificamos se o estado da lista ainda é o antigo
           expect(providerContainer.read(habitControllerProvider).requireValue.first.name, 'Diminuir o café para 2 xícaras ao dia, todos os dias');
@@ -237,6 +243,9 @@ void main(){
           when(() => mockConclusions.clear()).thenAnswer((_) async {});
           when(() => mockNotifications.clear()).thenAnswer((_) async {});
           when(() => mockRepository.clear()).thenAnswer((_) async {});
+
+          providerContainer.invalidate(habitControllerProvider);
+          await providerContainer.read(habitControllerProvider.future);
 
           final controller = providerContainer.read(habitControllerProvider.notifier);
           expect(providerContainer.read(habitControllerProvider).requireValue.length, 2);

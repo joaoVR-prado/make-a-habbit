@@ -13,4 +13,5 @@ final concludedHabitsRepositoryProvider = Provider<ConclusionRepository>((ref) {
 final concludedHabitsControllerProvider =
     AsyncNotifierProvider<ConcludedHabitsController, List<ConcludedHabitsModel>>(
       ConcludedHabitsController.new,
+      retry: (_, _) => null,
     );

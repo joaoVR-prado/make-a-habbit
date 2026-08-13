@@ -118,8 +118,7 @@ class HabitController extends AsyncNotifier<List<HabitModel>> {
 
 final habitControllerProvider = AsyncNotifierProvider<HabitController, List<HabitModel>>((){
   return HabitController();
-  
-});
+}, retry: (_, _) => null);
 
 final selectedDateProvider = StateProvider<DateTime>((ref){
   final now = ref.watch(clockProvider).now();
