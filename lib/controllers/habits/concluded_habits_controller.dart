@@ -1,90 +1,105 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
 import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 
-class ConcludedHabitsController extends Notifier<List<ConcludedHabitsModel>>  {
-  @override
-  List<ConcludedHabitsModel> build(){
-    final repository = ref.read(concludedHabitsRepositoryProvider);
-    return repository.getAll();
+class ConcludedHabitsController
+    extends AsyncNotifier<List<ConcludedHabitsModel>> {
+  bool _isOperating = false;
 
+  @override
+  Future<List<ConcludedHabitsModel>> build() async {
+    return ref.read(concludedHabitsRepositoryProvider).getAll();
+  }
+
+  Future<void> retry() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () async => ref.read(concludedHabitsRepositoryProvider).getAll(),
+    );
   }
 
   Future<void> saveYesNoConclusion({
     required String habitId,
     required DateTime date,
     required bool completed,
-  }) {
-    return _saveConclusion(
-      habitId: habitId,
-      date: date,
-      value: YesNoCompletionValue(completed),
-    );
-  }
+  }) => _saveConclusion(
+    habitId: habitId,
+    date: date,
+    value: YesNoCompletionValue(completed),
+  );
 
   Future<void> saveQuantityConclusion({
     required String habitId,
     required DateTime date,
     required int quantity,
-  }) {
-    return _saveConclusion(
-      habitId: habitId,
-      date: date,
-      value: QuantityCompletionValue(quantity),
-    );
-  }
+  }) => _saveConclusion(
+    habitId: habitId,
+    date: date,
+    value: QuantityCompletionValue(quantity),
+  );
 
   Future<void> _saveConclusion({
     required String habitId,
     required DateTime date,
     required CompletionValue value,
-  }) async{
-    final repository = ref.read(concludedHabitsRepositoryProvider);
+  }) async {
+    await _runExclusive((current) async {
+      final formattedDate = DateTime(date.year, date.month, date.day);
+      final conclusion = ConcludedHabitsModel(
+        habitId: habitId,
+        conclusionDate: formattedDate,
+        conclusionValue: value,
+      );
+      await ref.read(concludedHabitsRepositoryProvider).save(conclusion);
+      final index = current.indexWhere(
+        (item) =>
+            item.habitId == habitId && item.conclusionDate == formattedDate,
+      );
+      return index < 0
+          ? [...current, conclusion]
+          : [
+              for (var i = 0; i < current.length; i++)
+                if (i == index) conclusion else current[i],
+            ];
+    });
+  }
 
-    final formattedDate = DateTime(date.year, date.month, date.day);
+  Future<void> removeConclusion(String habitId, DateTime date) async {
+    await _runExclusive((current) async {
+      final formattedDate = DateTime(date.year, date.month, date.day);
+      await ref
+          .read(concludedHabitsRepositoryProvider)
+          .delete(habitId, formattedDate);
+      return current
+          .where(
+            (item) =>
+                !(item.habitId == habitId &&
+                    item.conclusionDate == formattedDate),
+          )
+          .toList(growable: false);
+    });
+  }
 
-    final newConclusion = ConcludedHabitsModel(
-      habitId: habitId, 
-      conclusionDate: formattedDate, 
-      conclusionValue: value
-    );
-
-    await repository.save(newConclusion);
-
-    final existingIndex = state.indexWhere((i) =>
-      i.habitId == habitId &&
-      i.conclusionDate.year == formattedDate.year &&
-      i.conclusionDate.month == formattedDate.month &&
-      i.conclusionDate.day == formattedDate.day 
-    );
-
-    if(existingIndex >= 0){
-      state = [
-        for(int i =0; i < state.length; i++)
-          if (i == existingIndex) newConclusion else state[i]
-      ];
-
-    } else{
-      state = [...state, newConclusion];
-
+  Future<void> _runExclusive(
+    Future<List<ConcludedHabitsModel>> Function(List<ConcludedHabitsModel>)
+    operation,
+  ) async {
+    if (_isOperating) {
+      throw StateError('Já existe uma operação de conclusão em andamento.');
     }
-
+    _isOperating = true;
+    try {
+      final current = await future;
+      state = const AsyncLoading();
+      state = AsyncData(await operation(current));
+    } catch (error, stackTrace) {
+      state = AsyncError<List<ConcludedHabitsModel>>(error, stackTrace);
+      rethrow;
+    } finally {
+      _isOperating = false;
+    }
   }
-
-  Future<void> removeConclusion(String habitId, DateTime date) async{
-    final repository = ref.read(concludedHabitsRepositoryProvider);
-    final formattedDate = DateTime(date.year, date.month, date.day);
-
-    await repository.delete(habitId, formattedDate);
-
-    state = state.where((c) => 
-      !(c.habitId == habitId && 
-        c.conclusionDate.year == formattedDate.year &&
-        c.conclusionDate.month == formattedDate.month &&
-        c.conclusionDate.day == formattedDate.day)
-    ).toList();
-
-  }
-
 }

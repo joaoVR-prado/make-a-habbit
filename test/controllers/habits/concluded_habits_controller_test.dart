@@ -18,7 +18,7 @@ void main() {
     
   });
 
-  setUp(() {
+  setUp(() async {
     repository = _MockConclusionRepository();
     when(() => repository.getAll()).thenReturn([]);
     container = ProviderContainer(
@@ -27,6 +27,7 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
+    await container.read(concludedHabitsControllerProvider.future);
   });
 
   group('Registro tipado de conclusões', () {
@@ -36,12 +37,12 @@ void main() {
       await container
           .read(concludedHabitsControllerProvider.notifier)
           .saveYesNoConclusion(
-            habitId: 'habit-1',
+            habitId: 'habito',
             date: DateTime(2026, 8, 8, 15),
             completed: true,
           );
 
-      final saved = container.read(concludedHabitsControllerProvider).single;
+      final saved = container.read(concludedHabitsControllerProvider).requireValue.single;
       expect(saved.conclusionDate, DateTime(2026, 8, 8));
       expect(saved.conclusionValue, isA<YesNoCompletionValue>());
       expect((saved.conclusionValue as YesNoCompletionValue).value, isTrue);
@@ -58,7 +59,7 @@ void main() {
             quantity: 4,
           );
 
-      final saved = container.read(concludedHabitsControllerProvider).single;
+      final saved = container.read(concludedHabitsControllerProvider).requireValue.single;
       expect(saved.conclusionValue, isA<QuantityCompletionValue>());
       expect((saved.conclusionValue as QuantityCompletionValue).value, 4);
     });

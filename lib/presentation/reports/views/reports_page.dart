@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
+import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/habit_stats_provider.dart';
 import 'package:make_a_habbit/presentation/reports/widgets/weekly_graphic_card.dart';
 
@@ -11,7 +13,23 @@ class ReportsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref){
     final stats = ref.watch(habitStatsProvider);
 
-    return Scaffold(
+    return stats.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, _) => Center(
+        child: FilledButton(
+          onPressed: () async {
+            try {
+              await Future.wait([
+                ref.read(habitControllerProvider.notifier).retry(),
+                ref.read(concludedHabitsControllerProvider.notifier).retry(),
+              ]);
+            } catch (_) {
+            }
+          },
+          child: const Text('Tentar novamente'),
+        ),
+      ),
+      data: (stats) => Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -40,6 +58,7 @@ class ReportsPage extends ConsumerWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

@@ -24,12 +24,13 @@ class GoalQtdTextField extends ConsumerStatefulWidget {
 class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
   // final TextEditingController _qtdController = TextEditingController(text: '0');
   late TextEditingController _qtdController;
+  bool _isSaving = false;
   @override
   void initState(){
     super.initState();
 
     final selectedDate = ref.read(selectedDateProvider);
-    final getAllConclusions = ref.read(concludedHabitsControllerProvider);
+    final getAllConclusions = ref.read(concludedHabitsControllerProvider).value ?? const [];
 
     final dailyHabitConclusion = getAllConclusions.where((i) => 
       i.habitId == widget.habit.id &&
@@ -56,7 +57,8 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
   @override
   Widget build(BuildContext context) {
     final selectedDate = ref.watch(selectedDateProvider);
-    final getAllConlusions = ref.watch(concludedHabitsControllerProvider);
+    final conclusions = ref.watch(concludedHabitsControllerProvider);
+    final getAllConlusions = conclusions.value ?? const [];
 
     // Busca a conclusao do habito
     final dailyHabitConclusion = getAllConlusions.where((i) => 
@@ -120,7 +122,6 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
                 )
               )
             ),
-          
           ),
         ),
         Padding(
@@ -152,9 +153,8 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
             children: [
             // Cancelar
             TextButton(
-              onPressed: (){
+              onPressed: _isSaving ? null : () async {
                 Navigator.pop(context);
-                
               },
               child: Text(
                 'CANCELAR',
@@ -167,14 +167,21 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
             CommonVerticalDivider(),
             // Concluir
             TextButton(
-              onPressed: (){
-                // final selectedDate = ref.read(selectedDateProvider);
+              onPressed: () async {
                 final concludedQtd = int.tryParse(_qtdController.text) ?? 1;
-                ref.read(concludedHabitsControllerProvider.notifier).saveQuantityConclusion(
-                  habitId: widget.habit.id, 
-                  date: selectedDate, 
-                  quantity: concludedQtd
-                );
+                setState(() => _isSaving = true);
+                try {
+                  await ref
+                    .read(concludedHabitsControllerProvider.notifier)
+                    .saveQuantityConclusion(
+                      habitId: widget.habit.id,
+                      date: selectedDate,
+                      quantity: concludedQtd,
+                    );
+                } catch (_) {
+                  if (mounted) setState(() => _isSaving = false);
+                  return;
+                }
 
                 if (context.mounted){
                   Navigator.pop(context);// Sai da modal de conclusao

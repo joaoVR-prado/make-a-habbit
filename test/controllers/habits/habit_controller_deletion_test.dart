@@ -10,15 +10,27 @@ import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
+import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
 import 'package:make_a_habbit/domain/repositories/conclusion_repository.dart';
 import 'package:make_a_habbit/domain/repositories/habit_repository.dart';
 import 'package:make_a_habbit/domain/repositories/notification_config_repository.dart';
+import 'package:make_a_habbit/domain/services/notification_scheduler.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockHabitRepository extends Mock implements HabitRepository {}
 class _MockConclusionRepository extends Mock implements ConclusionRepository {}
 class _MockNotificationConfigRepository extends Mock
     implements NotificationConfigRepository {}
+class _NoopNotificationScheduler implements NotificationScheduler {
+  @override
+  Future<void> cancelForHabit(String habitId) async {}
+  @override
+  Future<bool> isPermissionGranted() async => true;
+  @override
+  Future<bool> requestPermission() async => true;
+  @override
+  Future<void> replaceSchedules({required HabitModel habit, required bool reminderEnabled, required bool streakEnabled, required DateTime now, int currentStreak = 0}) async {}
+}
 
 void main() {
   late _MockHabitRepository repository;
@@ -27,7 +39,7 @@ void main() {
   late ProviderContainer container;
   late HabitModel habit;
 
-  setUp(() {
+  setUp(() async {
     habit = HabitModel(
       id: 'habito',
       iconCode: 0,
@@ -45,9 +57,11 @@ void main() {
         habitRepositoryProvider.overrideWithValue(repository),
         concludedHabitsRepositoryProvider.overrideWithValue(conclusions),
         notificationConfigRepositoryProvider.overrideWithValue(notifications),
+        notificationSchedulerProvider.overrideWithValue(_NoopNotificationScheduler()),
       ],
     );
     addTearDown(container.dispose);
+    await container.read(habitControllerProvider.future);
   });
 
   group('TESTES DE ESTADO DA EXCLUSÃO DE UM HÁBITO', () {
@@ -63,10 +77,11 @@ void main() {
         .read(habitControllerProvider.notifier)
         .deleteHabit(habit.id);
 
-      expect(container.read(habitControllerProvider), contains(habit));
+      await Future<void>.delayed(Duration.zero);
+      expect(container.read(habitControllerProvider), isA<AsyncLoading>());
     deletion.complete();
     await future;
-    expect(container.read(habitControllerProvider), isEmpty);
+    expect(container.read(habitControllerProvider).requireValue, isEmpty);
     verify(() => conclusions.deleteByHabit(habit.id)).called(1);
     verify(() => notifications.delete(habit.id)).called(1);
     verify(() => repository.delete(habit.id)).called(1);
@@ -84,11 +99,8 @@ void main() {
         throwsException,
       );
 
-      expect(container.read(habitControllerProvider), contains(habit));
+      expect(container.read(habitControllerProvider), isA<AsyncError>());
     });
-
-
   });
-
 
 }
