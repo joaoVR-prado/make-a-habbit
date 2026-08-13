@@ -5,6 +5,7 @@ import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
+import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/presentation/habits/views/create_habit_page.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit_dialog.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
@@ -81,7 +82,8 @@ class _HomePageState extends ConsumerState<HomePage>{
                   icon: const Icon(Icons.search, size: 32),
                   color: AppColors.homePageIconColor,
                   onPressed: () async {
-                    final allHabits = ref.read(habitControllerProvider);
+                    final allHabits = ref.read(habitControllerProvider).value;
+                    if (allHabits == null) return;
 
                     final result = await showSearch(
                       context: context, 
@@ -125,7 +127,28 @@ class _HomePageState extends ConsumerState<HomePage>{
             ),
           ),
           body: currentTab == 0 
-          ? _buildHabits(isToday: isToday, displayHabits: displayHabits)
+          ? displayHabits.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, _) => Center(
+                child: FilledButton(
+                  onPressed: () async {
+                    try {
+                      await Future.wait([
+                        ref.read(habitControllerProvider.notifier).retry(),
+                        ref
+                            .read(concludedHabitsControllerProvider.notifier)
+                            .retry(),
+                      ]);
+                    } catch (_) {
+                      // Os providers preservam o AsyncError para nova tentativa.
+                    }
+                  },
+                  child: const Text('Tentar novamente'),
+                ),
+              ),
+              data: (items) =>
+                  _buildHabits(isToday: isToday, displayHabits: items),
+            )
           : const ReportsPage(),
           //: Center(child: Text('Tela de Relatórios em construção!')),
           bottomNavigationBar: BottomAppBar(

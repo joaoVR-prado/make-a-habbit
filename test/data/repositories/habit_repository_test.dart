@@ -10,14 +10,26 @@ import 'package:make_a_habbit/data/models/notifications/notification_config_mode
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
+import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
 import 'package:make_a_habbit/domain/repositories/conclusion_repository.dart';
 import 'package:make_a_habbit/domain/repositories/habit_repository.dart';
 import 'package:make_a_habbit/domain/repositories/notification_config_repository.dart';
+import 'package:make_a_habbit/domain/services/notification_scheduler.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockHabitRepository extends Mock implements HabitRepository{}
 class MockConclusionRepository extends Mock implements ConclusionRepository{}
 class MockNotificationConfigRepository extends Mock implements NotificationConfigRepository{}
+class NoopNotificationScheduler implements NotificationScheduler {
+  @override
+  Future<void> cancelForHabit(String habitId) async {}
+  @override
+  Future<bool> isPermissionGranted() async => true;
+  @override
+  Future<bool> requestPermission() async => true;
+  @override
+  Future<void> replaceSchedules({required HabitModel habit, required bool reminderEnabled, required bool streakEnabled, required DateTime now, int currentStreak = 0}) async {}
+}
 
 void main(){
     late MockHabitRepository mockRepository;
@@ -25,7 +37,7 @@ void main(){
     late MockNotificationConfigRepository mockNotifications;
     late ProviderContainer providerContainer;
 
-    setUp((){
+    setUp(() async {
         mockRepository = MockHabitRepository();
         mockConclusions = MockConclusionRepository();
         mockNotifications = MockNotificationConfigRepository();
@@ -34,11 +46,13 @@ void main(){
             overrides: [
                 habitRepositoryProvider.overrideWithValue(mockRepository),
                 concludedHabitsRepositoryProvider.overrideWithValue(mockConclusions),
-                notificationConfigRepositoryProvider.overrideWithValue(mockNotifications)
+                notificationConfigRepositoryProvider.overrideWithValue(mockNotifications),
+                notificationSchedulerProvider.overrideWithValue(NoopNotificationScheduler()),
             ]
         );
 
         when(() => mockRepository.getAll()).thenReturn([]);
+        await providerContainer.read(habitControllerProvider.future);
 
     });
 
@@ -76,7 +90,7 @@ void main(){
           await controller.addHabit(newHabit, newNotification);
 
           // Valida se o estado mudou
-          final currentList = providerContainer.read(habitControllerProvider);
+          final currentList = providerContainer.read(habitControllerProvider).requireValue;
           expect(currentList.length, 1, reason: 'A lista de hábitos agora deve conter 1 tem (novo hábito)');
           expect(currentList.first.name, newHabit.name, reason: 'O nome do hábito que acabou de ser salvo deve estar correto');
           expect(currentList.first.conclusionType, newHabit.conclusionType, reason: 'O tipo de conclusao do hábito que acabou de ser salvo deve estar correto');
@@ -108,14 +122,17 @@ void main(){
           when(() => mockNotifications.delete(newHabit.id)).thenAnswer((_) async {});
           when(() => mockRepository.delete(newHabit.id)).thenAnswer((_) async {});
 
+          providerContainer.invalidate(habitControllerProvider);
+          await providerContainer.read(habitControllerProvider.future);
+
           final controller = providerContainer.read(habitControllerProvider.notifier);
-          expect(providerContainer.read(habitControllerProvider).length, 1);
+          expect(providerContainer.read(habitControllerProvider).requireValue.length, 1);
 
           // Deleta o Hábito
           await controller.deleteHabit(newHabit.id);
 
           // Valida se o estado mudou
-          final currentList = providerContainer.read(habitControllerProvider);
+          final currentList = providerContainer.read(habitControllerProvider).requireValue;
           expect(currentList.length, 0, reason: "A lista deve estar vazia após deletar o hábito");
 
           // Verifica se o repositório foi chamado
@@ -167,14 +184,17 @@ void main(){
           when(() => mockRepository.getById(editedNewHabit.id)).thenReturn(newHabit);
           when(() => mockNotifications.save(newHabit.id, newNotification)).thenAnswer((_) async {});
 
+          providerContainer.invalidate(habitControllerProvider);
+          await providerContainer.read(habitControllerProvider.future);
+
           final controller = providerContainer.read(habitControllerProvider.notifier);
           // Verificamos se o estado da lista ainda é o antigo
-          expect(providerContainer.read(habitControllerProvider).first.name, 'Diminuir o café para 2 xícaras ao dia, todos os dias');
+          expect(providerContainer.read(habitControllerProvider).requireValue.first.name, 'Diminuir o café para 2 xícaras ao dia, todos os dias');
           
           // Edita o hábito
           await controller.updateHabit(editedNewHabit, newNotification);
 
-          final currentList = providerContainer.read(habitControllerProvider);
+          final currentList = providerContainer.read(habitControllerProvider).requireValue;
           final habitInCurrentList = currentList.first;
 
           // Verificamos os campos alterados
@@ -224,14 +244,17 @@ void main(){
           when(() => mockNotifications.clear()).thenAnswer((_) async {});
           when(() => mockRepository.clear()).thenAnswer((_) async {});
 
+          providerContainer.invalidate(habitControllerProvider);
+          await providerContainer.read(habitControllerProvider.future);
+
           final controller = providerContainer.read(habitControllerProvider.notifier);
-          expect(providerContainer.read(habitControllerProvider).length, 2);
+          expect(providerContainer.read(habitControllerProvider).requireValue.length, 2);
 
           // Apaga todos os hábitos
           await controller.clearAllData();
 
           // Valida se o estado mudou
-          final currentList = providerContainer.read(habitControllerProvider);
+          final currentList = providerContainer.read(habitControllerProvider).requireValue;
           expect(currentList.length, 0, reason: "A lista deve estar vazia após deletar todos os hábitos");
 
           // Verifica se o repositório foi chamado

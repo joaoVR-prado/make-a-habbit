@@ -12,78 +12,113 @@ import 'package:make_a_habbit/data/providers/habit_use_case_providers.dart';
 import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
 import 'package:make_a_habbit/domain/use_cases/habit_operation_result.dart';
 
-class HabitController extends Notifier<List<HabitModel>> {
+class HabitController extends AsyncNotifier<List<HabitModel>> {
+  bool _isOperating = false;
+
   @override
-  List<HabitModel> build(){
-    final repository = ref.read(habitRepositoryProvider);
+  Future<List<HabitModel>> build() async {
+    return ref.read(habitRepositoryProvider).getAll();
+  }
 
-    return repository.getAll();
-
+  Future<void> retry() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () async => ref.read(habitRepositoryProvider).getAll(),
+    );
   }
 
   Future<HabitOperationResult> addHabit(
     HabitModel habit,
     NotificationConfigModel notification,
   ) async {
-    final result = await ref.read(saveHabitProvider)(
-      habit: habit,
-      notification: notification,
-    );
-
-    state = [...state, habit];
-    return result;
+    return _runExclusive((current) async {
+      final result = await ref.read(saveHabitProvider)(
+        habit: habit,
+        notification: notification,
+      );
+      return (result, [...current, habit]);
+    });
   }
 
   Future<HabitOperationResult> updateHabit(
     HabitModel habit,
     NotificationConfigModel notification,
   ) async {
-    final result = await ref.read(saveHabitProvider)(
-      habit: habit,
-      notification: notification,
-    );
-
-    state = [
-      for(final i in state)
-        if(i.id == habit.id) habit else i
- 
-    ];
-    return result;
+    return _runExclusive((current) async {
+      final result = await ref.read(saveHabitProvider)(
+        habit: habit,
+        notification: notification,
+      );
+      return (
+        result,
+        [for (final item in current) if (item.id == habit.id) habit else item],
+      );
+    });
   }
 
   Future<HabitOperationResult> deleteHabit(String id) async {
-    final result = await ref.read(deleteHabitProvider)(id);
-    state = state.where((i) => i.id !=id).toList();
-    ref.invalidate(concludedHabitsControllerProvider);
-    return result;
+    return _runExclusive((current) async {
+      final result = await ref.read(deleteHabitProvider)(id);
+      ref.invalidate(concludedHabitsControllerProvider);
+      return (result, current.where((item) => item.id != id).toList());
+    });
   }
 
   Future<void> clearAllData() async {
-    final repository = ref.read(habitRepositoryProvider);
-    final notifications = ref.read(notificationConfigRepositoryProvider);
-    final conclusions = ref.read(concludedHabitsRepositoryProvider);
-
-    await conclusions.clear();
-    await notifications.clear();
-    await repository.clear();
-    state = [];
-    ref.invalidate(concludedHabitsControllerProvider);
-
+    if (_isOperating) {
+      throw StateError('Já existe uma operação de hábito em andamento.');
+    }
+    _isOperating = true;
+    try {
+      await future;
+      state = const AsyncLoading();
+      await ref.read(concludedHabitsRepositoryProvider).clear();
+      await ref.read(notificationConfigRepositoryProvider).clear();
+      await ref.read(habitRepositoryProvider).clear();
+      state = const AsyncData([]);
+      ref.invalidate(concludedHabitsControllerProvider);
+    } catch (error, stackTrace) {
+      state = AsyncError<List<HabitModel>>(error, stackTrace);
+      rethrow;
+    } finally {
+      _isOperating = false;
+    }
   }
 
   List<HabitModel> getHabitsForDate(DateTime date){
-    final allHabits = state;
+    final allHabits = state.value ?? const <HabitModel>[];
 
     return allHabits.where((habit) => habit.isHabitActiveOn(date)).toList();
 
   }
 
+  Future<HabitOperationResult> _runExclusive(
+    Future<(HabitOperationResult, List<HabitModel>)> Function(List<HabitModel>)
+    operation,
+  ) async {
+    if (_isOperating) {
+      throw StateError('Já existe uma operação de hábito em andamento.');
+    }
+    _isOperating = true;
+    try {
+      final current = await future;
+      state = const AsyncLoading();
+      final (result, updated) = await operation(current);
+      state = AsyncData(updated);
+      return result;
+    } catch (error, stackTrace) {
+      state = AsyncError<List<HabitModel>>(error, stackTrace);
+      rethrow;
+    } finally {
+      _isOperating = false;
+    }
+  }
+
 }
 
-final habitControllerProvider = NotifierProvider<HabitController, List<HabitModel>>((){
+final habitControllerProvider = AsyncNotifierProvider<HabitController, List<HabitModel>>((){
   return HabitController();
-  
-});
+}, retry: (_, _) => null);
 
 final selectedDateProvider = StateProvider<DateTime>((ref){
   final now = ref.watch(clockProvider).now();
@@ -93,15 +128,24 @@ final selectedDateProvider = StateProvider<DateTime>((ref){
 
 
 // Listagem dos habitos
-final dailyHabitsDisplayProvider = Provider.autoDispose<List<HabitDisplayModel>>((ref){
+final dailyHabitsDisplayProvider = Provider.autoDispose<AsyncValue<List<HabitDisplayModel>>>((ref){
 
   // Verificacoes sobre a conclusao do habito
   final selectedDate = ref.watch(selectedDateProvider);
-  final allHabits = ref.watch(habitControllerProvider);
-  final allConclusions = ref.watch(concludedHabitsControllerProvider);
+  final habits = ref.watch(habitControllerProvider);
+  final conclusions = ref.watch(concludedHabitsControllerProvider);
+  if (habits case AsyncError(:final error, :final stackTrace)) {
+    return AsyncError(error, stackTrace);
+  }
+  if (conclusions case AsyncError(:final error, :final stackTrace)) {
+    return AsyncError(error, stackTrace);
+  }
+  final allHabits = habits.value;
+  final allConclusions = conclusions.value;
+  if (allHabits == null || allConclusions == null) return const AsyncLoading();
   final activeHabitsForDate = allHabits.where((h) => h.isHabitActiveOn(selectedDate)).toList();
 
-  return activeHabitsForDate.map((habit) {
+  return AsyncData(activeHabitsForDate.map((habit) {
     final dailyConclusion = allConclusions.where((c) => 
       c.habitId == habit.id &&
       c.conclusionDate.year == selectedDate.year &&
@@ -132,7 +176,7 @@ final dailyHabitsDisplayProvider = Provider.autoDispose<List<HabitDisplayModel>>
 
     // Retorna os habitos filtrados para a UI
     return HabitDisplayModel(habit: habit, status: habitStatus);
-  }).toList();
+  }).toList());
 });
 
 // Classe para a UI

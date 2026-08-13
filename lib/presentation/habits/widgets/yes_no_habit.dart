@@ -21,6 +21,7 @@ class YesNoHabit extends ConsumerStatefulWidget {
 
 class _YesNoHabit extends ConsumerState<YesNoHabit> {
   bool? _isConcluded;
+  bool _isSaving = false;
   @override
   Widget build(BuildContext context) {
     final selectedDate = ref.watch(selectedDateProvider);
@@ -63,7 +64,7 @@ class _YesNoHabit extends ConsumerState<YesNoHabit> {
             children: [
             // Cancelar
             TextButton(
-              onPressed: (){
+              onPressed: _isSaving ? null : () async {
                 Navigator.pop(context);
                 
               },
@@ -78,16 +79,24 @@ class _YesNoHabit extends ConsumerState<YesNoHabit> {
             CommonVerticalDivider(),
             // Concluir
             TextButton(
-              onPressed: (){
+              onPressed: () async {
                 if (_isConcluded == null) {
                   return; 
                 }
 
-                ref.read(concludedHabitsControllerProvider.notifier).saveYesNoConclusion(
-                  habitId: widget.habit.id, 
-                  date: selectedDate, 
-                  completed: _isConcluded!,
-                );
+                setState(() => _isSaving = true);
+                try {
+                  await ref
+                    .read(concludedHabitsControllerProvider.notifier)
+                    .saveYesNoConclusion(
+                      habitId: widget.habit.id,
+                      date: selectedDate,
+                      completed: _isConcluded!,
+                    );
+                } catch (_) {
+                  if (mounted) setState(() => _isSaving = false);
+                  return;
+                }
 
                 if (context.mounted){
                   Navigator.pop(context); // Sai da modal de conclusao
