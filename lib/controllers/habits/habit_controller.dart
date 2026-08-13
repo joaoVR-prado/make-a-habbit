@@ -8,7 +8,9 @@ import 'package:make_a_habbit/data/models/habits/habit_type.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
+import 'package:make_a_habbit/data/providers/habit_use_case_providers.dart';
 import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
+import 'package:make_a_habbit/domain/use_cases/habit_operation_result.dart';
 
 class HabitController extends Notifier<List<HabitModel>> {
   @override
@@ -19,41 +21,41 @@ class HabitController extends Notifier<List<HabitModel>> {
 
   }
 
-  Future<void> addHabit(HabitModel habit, NotificationConfigModel notification) async {
-    final repository = ref.read(habitRepositoryProvider);
-    final notifications = ref.read(notificationConfigRepositoryProvider);
-    await repository.add(habit);
-    await notifications.save(habit.id, notification);
+  Future<HabitOperationResult> addHabit(
+    HabitModel habit,
+    NotificationConfigModel notification,
+  ) async {
+    final result = await ref.read(saveHabitProvider)(
+      habit: habit,
+      notification: notification,
+    );
 
     state = [...state, habit];
-
+    return result;
   }
 
-  Future<void> updateHabit(HabitModel habit, NotificationConfigModel notification) async {
-    final repository = ref.read(habitRepositoryProvider);
-    final notifications = ref.read(notificationConfigRepositoryProvider);
-    await repository.update(habit);
-    await notifications.save(habit.id, notification);
+  Future<HabitOperationResult> updateHabit(
+    HabitModel habit,
+    NotificationConfigModel notification,
+  ) async {
+    final result = await ref.read(saveHabitProvider)(
+      habit: habit,
+      notification: notification,
+    );
 
     state = [
       for(final i in state)
         if(i.id == habit.id) habit else i
  
     ];
-
+    return result;
   }
 
-  Future<void> deleteHabit(String id) async {
-    final repository = ref.read(habitRepositoryProvider);
-    final notifications = ref.read(notificationConfigRepositoryProvider);
-    final conclusions = ref.read(concludedHabitsRepositoryProvider);
-
-    await conclusions.deleteByHabit(id);
-    await notifications.delete(id);
-    await repository.delete(id);
+  Future<HabitOperationResult> deleteHabit(String id) async {
+    final result = await ref.read(deleteHabitProvider)(id);
     state = state.where((i) => i.id !=id).toList();
     ref.invalidate(concludedHabitsControllerProvider);
-
+    return result;
   }
 
   Future<void> clearAllData() async {

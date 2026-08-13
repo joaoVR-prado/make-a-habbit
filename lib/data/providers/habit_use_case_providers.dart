@@ -1,0 +1,26 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:make_a_habbit/core/providers/clock_provider.dart';
+import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
+import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
+import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
+import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
+import 'package:make_a_habbit/domain/use_cases/delete_habit.dart';
+import 'package:make_a_habbit/domain/use_cases/save_habit.dart';
+
+final saveHabitProvider = Provider<SaveHabit>((ref) {
+  return SaveHabit(
+    habits: ref.watch(habitRepositoryProvider),
+    notificationConfigs: ref.watch(notificationConfigRepositoryProvider),
+    notificationScheduler: ref.watch(notificationSchedulerProvider),
+    clock: ref.watch(clockProvider),
+  );
+});
+
+final deleteHabitProvider = Provider<DeleteHabit>((ref) {
+  return DeleteHabit(
+    habits: ref.watch(habitRepositoryProvider),
+    conclusions: ref.watch(concludedHabitsRepositoryProvider),
+    notificationConfigs: ref.watch(notificationConfigRepositoryProvider),
+    notificationScheduler: ref.watch(notificationSchedulerProvider),
+  );
+});

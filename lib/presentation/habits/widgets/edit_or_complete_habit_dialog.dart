@@ -7,7 +7,6 @@ import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/data/models/habits/habit_model.dart';
 import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
 import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
-import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_horizontal_divider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_vertical_divider.dart';
@@ -124,15 +123,19 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
     );
   }
 
-  Future<void> _deleteHabit(WidgetRef ref) async {
+  Future<String?> _deleteHabit(WidgetRef ref) async {
     final callback = deleteHabit;
     if (callback != null) {
       await callback(ref);
-      return;
+      return null;
     }
 
-    await ref.read(notificationSchedulerProvider).cancelForHabit(habit.id);
-    await ref.read(habitControllerProvider.notifier).deleteHabit(habit.id);
+    final result = await ref
+        .read(habitControllerProvider.notifier)
+        .deleteHabit(habit.id);
+    return result.hasPartialFailures
+        ? 'Hábito excluído, mas alguns dados relacionados não puderam ser limpos.'
+        : null;
   }
 
   void _startHabitEdition(
@@ -151,7 +154,7 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
 class _DeleteHabitConfirmationDialog extends StatefulWidget {
   const _DeleteHabitConfirmationDialog({required this.onConfirm});
 
-  final Future<void> Function() onConfirm;
+  final Future<String?> Function() onConfirm;
 
   @override
   State<_DeleteHabitConfirmationDialog> createState() =>
@@ -171,7 +174,7 @@ class _DeleteHabitConfirmationDialogState
     });
 
     try {
-      await widget.onConfirm();
+      final partialFailureMessage = await widget.onConfirm();
       if (!mounted) return;
 
       final messenger = ScaffoldMessenger.of(context);
@@ -181,7 +184,7 @@ class _DeleteHabitConfirmationDialogState
       messenger.showSnackBar(
         SnackBar(
           content: Text(
-            'Hábito excluído com sucesso!',
+            partialFailureMessage ?? 'Hábito excluído com sucesso!',
             style: successTextStyle,
           ),
           backgroundColor: AppColors.calendarMainColor,
