@@ -37,6 +37,33 @@ class DraftHabitState {
     this.category, 
   });
 
+  factory DraftHabitState.forEdit(
+    HabitModel habit,
+    NotificationConfigModel? config,
+  ) {
+    return DraftHabitState(
+      existingId: habit.id,
+      name: habit.name,
+      conclusionType: habit.conclusionType,
+      goalQuantity: habit.goalQuantity?.toString() ?? '',
+      description: habit.description ?? '',
+      category: HabitIcon.fromCode(habit.iconCode),
+      frequencyType: habit.frequency.type,
+      weeklyDays: habit.frequency.type == HabitFrequencyType.weekly
+          ? habit.frequency.selectedDays
+          : const [],
+      monthlyDays: habit.frequency.type == HabitFrequencyType.monthly
+          ? habit.frequency.selectedDays
+          : const [],
+      startDate: habit.startDate,
+      endDate: habit.endDate,
+      reminderTime: habit.notificationTime == null
+          ? null
+          : TimeOfDay.fromDateTime(habit.notificationTime!),
+      isStreakEnabled: config?.isStreakEnabled ?? false,
+    );
+  }
+
   DraftHabitState copyWith({
     String? name,
     String? description,
@@ -75,9 +102,8 @@ class DraftHabitState {
 class DraftHabitNotifier extends Notifier<DraftHabitState> {
   @override
   DraftHabitState build() {
-    return DraftHabitState(
-      startDate: ref.watch(clockProvider).now(),
-    );
+    return ref.watch(draftHabitInitialStateProvider) ??
+        DraftHabitState(startDate: ref.watch(clockProvider).now());
   }
 
   void updateId(String id) {
@@ -160,39 +186,15 @@ class DraftHabitNotifier extends Notifier<DraftHabitState> {
     state = DraftHabitState(startDate: ref.read(clockProvider).now());
 
   }
-  // Para Edicao de habitos
-  void loadForEdit(HabitModel habit, NotificationConfigModel? config) {
-    List<int> weekly = [];
-    List<int> monthly = [];
-    
-    if (habit.frequency.type == HabitFrequencyType.weekly) {
-      weekly = habit.frequency.selectedDays;
-    } else if (habit.frequency.type == HabitFrequencyType.monthly) {
-      monthly = habit.frequency.selectedDays;
-    }
-
-    state = DraftHabitState(
-      existingId: habit.id,
-      name: habit.name,
-      conclusionType: habit.conclusionType,
-      goalQuantity: habit.goalQuantity?.toString() ?? '',
-      description: habit.description ?? '',
-      category: HabitIcon.fromCode(habit.iconCode),
-      frequencyType: habit.frequency.type,
-      weeklyDays: weekly,
-      monthlyDays: monthly,
-      startDate: habit.startDate,
-      endDate: habit.endDate,
-      reminderTime: habit.notificationTime != null 
-          ? TimeOfDay.fromDateTime(habit.notificationTime!) 
-          : null,
-      
-      isStreakEnabled: config?.isStreakEnabled ?? false,
-    );
-  }
 }
 
-final draftHabitProvider = NotifierProvider<DraftHabitNotifier, DraftHabitState>(() {
-  return DraftHabitNotifier();
+final draftHabitInitialStateProvider = Provider<DraftHabitState?>(
+  (ref) => null,
+  dependencies: const [],
+);
 
-});
+final draftHabitProvider =
+    NotifierProvider.autoDispose<DraftHabitNotifier, DraftHabitState>(
+      DraftHabitNotifier.new,
+      dependencies: [draftHabitInitialStateProvider, clockProvider],
+    );
