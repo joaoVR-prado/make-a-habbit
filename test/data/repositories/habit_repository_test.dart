@@ -458,7 +458,7 @@ void main(){
 
         });
 
-        test('O método loadForEdit() deve preencher o rascunho inteiro com os dados do Hábito', (){
+        test('O estado inicial de edição deve preencher o rascunho com os dados do hábito', (){
             // Criamos um Hábito
             final habitToEdit = HabitModel(
                 id: '999', 
@@ -482,13 +482,7 @@ void main(){
 
             );
 
-            final notifier = container.read(draftHabitProvider.notifier);
-            
-            // Carregamos o hábito e sua configuração de notificação
-            notifier.loadForEdit(habitToEdit, config);
-
-            // Lemos o estado
-            final loadedState = container.read(draftHabitProvider);
+            final loadedState = DraftHabitState.forEdit(habitToEdit, config);
 
             expect(loadedState.existingId, '999');
             expect(loadedState.name, 'Ler 10 páginas do Senhor dos Anéis');

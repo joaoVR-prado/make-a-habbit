@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
@@ -10,7 +9,7 @@ import 'package:make_a_habbit/data/providers/notification_config_repository_prov
 import 'package:make_a_habbit/presentation/common/widgets/common_horizontal_divider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_vertical_divider.dart';
-import 'package:make_a_habbit/presentation/habits/views/create_habit_page.dart';
+import 'package:make_a_habbit/presentation/habits/routes/habit_draft_route.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/complete_habit.dart';
 
 class EditOrCompleteHabitDialog extends ConsumerWidget {
@@ -143,10 +142,9 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
     WidgetRef ref,
     NotificationConfigModel? config,
   ) {
-    ref.read(draftHabitProvider.notifier).loadForEdit(habit, config);
     Navigator.of(context).pop();
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const CreateHabitPage()),
+      HabitDraftRoute.edit(habit: habit, notificationConfig: config),
     );
   }
 }
