@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_status.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_icon_container.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit_dialog.dart';
 

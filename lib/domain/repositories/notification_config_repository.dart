@@ -1,4 +1,4 @@
-import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
+import 'package:make_a_habbit/domain/entities/notifications/notification_config_model.dart';
 
 abstract interface class NotificationConfigRepository {
   NotificationConfigModel? get(String habitId);

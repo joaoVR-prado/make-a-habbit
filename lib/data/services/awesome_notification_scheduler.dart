@@ -1,5 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 import 'package:make_a_habbit/domain/services/notification_schedule_planner.dart';
 import 'package:make_a_habbit/domain/services/notification_scheduler.dart';
 

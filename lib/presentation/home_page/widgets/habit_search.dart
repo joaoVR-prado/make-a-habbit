@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 
 class HabitSearch extends SearchDelegate{
   final List<HabitModel> habits;

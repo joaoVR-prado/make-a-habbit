@@ -1,4 +1,4 @@
-import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
+import 'package:make_a_habbit/domain/entities/conclusions/concluded_habits_model.dart';
 
 abstract interface class ConclusionRepository {
   List<ConcludedHabitsModel> getAll();

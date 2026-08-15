@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
+import 'package:make_a_habbit/domain/entities/conclusions/completion_value.dart';
 
 void main() {
   group('Valores de conclusão', () {
