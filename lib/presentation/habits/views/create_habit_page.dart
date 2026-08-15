@@ -19,7 +19,13 @@ import 'package:make_a_habbit/presentation/habits/widgets/choose_start_date.dart
 import 'package:uuid/uuid.dart';
 
 class CreateHabitPage extends ConsumerStatefulWidget {
-  const CreateHabitPage({super.key});
+  const CreateHabitPage({super.key, this.saveHabit});
+
+  final Future<HabitOperationResult> Function(
+    HabitModel habit,
+    NotificationConfigModel notification,
+    bool isEditing,
+  )? saveHabit;
 
   @override
   ConsumerState<CreateHabitPage> createState() => _CreateHabitPageStage();
@@ -30,6 +36,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
   late final PageController _pageController;
   int _currentPage = 0;
   final int _totalPages = 5;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -45,16 +52,24 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
   }
 
-  void _nextPage() {
+  Future<void> _nextPage() async {
     if(_currentPage < _totalPages - 1){
-      _pageController.nextPage(
+      await _pageController.nextPage(
         duration: const Duration(
           milliseconds: 300
         ), 
         curve: Curves.easeInOut
       );
     } else{
-      _saveDraft();
+      if (_isSaving) return;
+      setState(() => _isSaving = true);
+      try {
+        await _saveDraft();
+      } catch (_) {
+        _showPersistenceError();
+      } finally {
+        if (mounted) setState(() => _isSaving = false);
+      }
 
     }
   }
@@ -159,13 +174,16 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
     );
 
-    final result = existingId == null
-        ? await ref
-            .read(habitControllerProvider.notifier)
-            .addHabit(newHabit, newNotification)
-        : await ref
-            .read(habitControllerProvider.notifier)
-            .updateHabit(newHabit, newNotification);
+    final saveHabit = widget.saveHabit;
+    final result = saveHabit != null
+        ? await saveHabit(newHabit, newNotification, existingId != null)
+        : existingId == null
+            ? await ref
+                .read(habitControllerProvider.notifier)
+                .addHabit(newHabit, newNotification)
+            : await ref
+                .read(habitControllerProvider.notifier)
+                .updateHabit(newHabit, newNotification);
 
     if(mounted){
       ScaffoldMessenger.of(context).showSnackBar(
@@ -201,6 +219,18 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
+    );
+  }
+
+  void _showPersistenceError() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Não foi possível salvar o hábito. Tente novamente.',
+          key: Key('save_habit_error'),
+        ),
+      ),
     );
   }
 
@@ -276,7 +306,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           TextButton(
-            onPressed: _previousPage, 
+            onPressed: _isSaving ? null : _previousPage,
             child: Text(
               _currentPage == 0 ? 'CANCELAR' : 'ANTERIOR',
               style: Theme.of(context).textTheme.labelMedium,
@@ -311,11 +341,16 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
             maintainAnimation: true,
             maintainState: true,
             child: TextButton(
-              onPressed: _nextPage,
-              child: Text(
-                _currentPage == _totalPages -1 ? 'FINALIZAR' : 'PRÓXIMA',
-                style: Theme.of(context).textTheme.labelMedium,
-              )
+              onPressed: _isSaving ? null : _nextPage,
+              child: _isSaving
+                  ? const SizedBox.square(
+                      dimension: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(
+                      _currentPage == _totalPages -1 ? 'FINALIZAR' : 'PRÓXIMA',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
             ),
           )
         ],
