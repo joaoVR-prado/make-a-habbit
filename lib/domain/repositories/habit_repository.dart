@@ -1,4 +1,4 @@
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 
 abstract interface class HabitRepository {
   List<HabitModel> getAll();

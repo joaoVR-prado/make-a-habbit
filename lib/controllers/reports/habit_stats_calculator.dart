@@ -1,7 +1,7 @@
-import 'package:make_a_habbit/data/models/concluded_habits/concluded_habits_model.dart';
-import 'package:make_a_habbit/data/models/concluded_habits/completion_value.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
-import 'package:make_a_habbit/data/models/habits/habit_type.dart';
+import 'package:make_a_habbit/domain/entities/conclusions/concluded_habits_model.dart';
+import 'package:make_a_habbit/domain/entities/conclusions/completion_value.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_type.dart';
 import 'package:make_a_habbit/data/models/reports/habit_stats_model.dart';
 
 class HabitStatsCalculator {

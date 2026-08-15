@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
-import 'package:make_a_habbit/data/models/habits/habit_type.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_frequency.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_frequency_type.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_type.dart';
 
 HabitModel _habit(String id, String name) => HabitModel(
   id: id,

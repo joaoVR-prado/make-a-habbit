@@ -19,7 +19,7 @@
 | **Internacionalização** | `flutter_localizations` (locale **pt-BR**) |
 | **Testes** | `flutter_test`, `mocktail` |
 | **Qualidade** | `flutter_lints` |
-| **Geração de código** | `build_runner`, `hive_ce_generator` (modelos Hive) |
+| **Persistência** | DTOs Hive com adapters explícitos na infraestrutura |
 
 ---
 
@@ -49,12 +49,6 @@ cd make_a_habbit
 flutter pub get
 ```
 
-Se alterar anotações Hive ou modelos com `part '*.g.dart'`, regenere os adapters:
-
-```bash
-dart run build_runner build --delete-conflicting-outputs
-```
-
 Execute o app em modo debug (escolha o dispositivo quando solicitado):
 
 ```bash
@@ -74,7 +68,6 @@ flutter run
 | Build APK (release) | `flutter build apk` |
 | Build App Bundle (Play Store) | `flutter build appbundle` |
 | Build iOS | `flutter build ios` (macOS) |
-| Regenerar código (Hive, etc.) | `dart run build_runner build --delete-conflicting-outputs` |
 
 ---
 
@@ -86,9 +79,13 @@ lib/
 ├── core/                     # Tema, cores, enums compartilhados
 ├── controllers/              # Controllers Riverpod (hábitos, conclusões, notificações)
 ├── data/
-│   ├── models/               # Modelos Hive (hábitos, frequência, conclusões, notificações)
+│   ├── dtos/                 # DTOs e adapters exclusivos da persistência Hive
 │   ├── providers/            # Providers dos repositórios
 │   └── repositories/         # Acesso às boxes Hive
+├── domain/
+│   ├── entities/             # Entidades e regras de negócio sem Flutter ou Hive
+│   ├── repositories/         # Contratos de persistência
+│   └── use_cases/            # Coordenação das operações de domínio
 └── presentation/             # Telas e widgets (home, criação/edição de hábitos, comuns)
 test/                         # Testes (ex.: repositório de hábitos)
 ```

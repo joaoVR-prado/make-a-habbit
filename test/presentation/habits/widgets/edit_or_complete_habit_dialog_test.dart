@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
-import 'package:make_a_habbit/data/models/habits/habit_type.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_frequency.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_frequency_type.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit_dialog.dart';
 
 void main() {

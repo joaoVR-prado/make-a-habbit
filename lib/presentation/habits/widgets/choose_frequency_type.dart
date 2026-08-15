@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_create_habit_title.dart';
 
 class ChooseFrequencyType extends ConsumerStatefulWidget {

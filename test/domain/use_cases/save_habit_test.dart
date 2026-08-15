@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
-import 'package:make_a_habbit/data/models/habits/habit_type.dart';
-import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_frequency.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_frequency_type.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_type.dart';
+import 'package:make_a_habbit/domain/entities/notifications/notification_config_model.dart';
 import 'package:make_a_habbit/domain/repositories/habit_repository.dart';
 import 'package:make_a_habbit/domain/repositories/notification_config_repository.dart';
 import 'package:make_a_habbit/domain/services/clock.dart';

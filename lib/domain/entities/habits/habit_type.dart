@@ -1,0 +1,1 @@
+enum HabitConclusionType { yesNo, goalQuantity }

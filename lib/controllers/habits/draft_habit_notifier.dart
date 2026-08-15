@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/core/providers/clock_provider.dart';
-import 'package:make_a_habbit/data/models/habits/habit_frequency_type.dart';
-import 'package:make_a_habbit/data/models/habits/habit_model.dart';
-import 'package:make_a_habbit/data/models/habits/habit_type.dart';
-import 'package:make_a_habbit/data/models/notifications/notification_config_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_frequency_type.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_type.dart';
+import 'package:make_a_habbit/domain/entities/notifications/notification_config_model.dart';
 class DraftHabitState {
   final String name;
   final String description;
