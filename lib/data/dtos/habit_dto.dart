@@ -9,9 +9,9 @@ final class HabitDto {
     required this.id,
     required this.iconCode,
     required this.name,
-    required this.conclusionTypeIndex,
+    required this.conclusionTypeName,
     required this.goalQuantity,
-    required this.frequencyTypeIndex,
+    required this.frequencyTypeName,
     required this.selectedDays,
     required this.startDate,
     required this.endDate,
@@ -24,9 +24,9 @@ final class HabitDto {
     id: habit.id,
     iconCode: habit.iconCode,
     name: habit.name,
-    conclusionTypeIndex: habit.conclusionType.index,
+    conclusionTypeName: habit.conclusionType.name,
     goalQuantity: habit.goalQuantity,
-    frequencyTypeIndex: habit.frequency.type.index,
+    frequencyTypeName: habit.frequency.type.name,
     selectedDays: List.unmodifiable(habit.frequency.selectedDays),
     startDate: habit.startDate,
     endDate: habit.endDate,
@@ -38,9 +38,9 @@ final class HabitDto {
   final String id;
   final int iconCode;
   final String name;
-  final int conclusionTypeIndex;
+  final String conclusionTypeName;
   final int? goalQuantity;
-  final int frequencyTypeIndex;
+  final String frequencyTypeName;
   final List<int> selectedDays;
   final DateTime startDate;
   final DateTime? endDate;
@@ -52,10 +52,18 @@ final class HabitDto {
     id: id,
     iconCode: iconCode,
     name: name,
-    conclusionType: HabitConclusionType.values[conclusionTypeIndex],
+    conclusionType: _enumFromName(
+      conclusionTypeName,
+      HabitConclusionType.values,
+      'conclusionType',
+    ),
     goalQuantity: goalQuantity,
     frequency: HabitFrequency.fromType(
-      type: HabitFrequencyType.values[frequencyTypeIndex],
+      type: _enumFromName(
+        frequencyTypeName,
+        HabitFrequencyType.values,
+        'frequencyType',
+      ),
       selectedDays: selectedDays,
     ),
     startDate: startDate,
@@ -73,15 +81,24 @@ final class HabitDtoAdapter extends TypeAdapter<HabitDto> {
   HabitDto read(BinaryReader reader) {
     final count = reader.readByte();
     final fields = <int, Object?>{
-      for (var index = 0; index < count; index++) reader.readByte(): reader.read(),
+      for (var index = 0; index < count; index++)
+        reader.readByte(): reader.read(),
     };
     return HabitDto(
       id: fields[0] as String,
       iconCode: (fields[1] as num).toInt(),
       name: fields[2] as String,
-      conclusionTypeIndex: (fields[3] as num).toInt(),
+      conclusionTypeName: _readEnumName(
+        fields[3],
+        HabitConclusionType.values,
+        'conclusionType',
+      ),
       goalQuantity: (fields[4] as num?)?.toInt(),
-      frequencyTypeIndex: (fields[5] as num).toInt(),
+      frequencyTypeName: _readEnumName(
+        fields[5],
+        HabitFrequencyType.values,
+        'frequencyType',
+      ),
       selectedDays: (fields[6] as List).cast<int>(),
       startDate: fields[7] as DateTime,
       endDate: fields[8] as DateTime?,
@@ -90,17 +107,54 @@ final class HabitDtoAdapter extends TypeAdapter<HabitDto> {
       notificationTime: fields[11] as DateTime?,
     );
   }
+
   @override
   void write(BinaryWriter writer, HabitDto obj) {
     final values = <Object?>[
-      obj.id, obj.iconCode, obj.name, obj.conclusionTypeIndex,
-      obj.goalQuantity, obj.frequencyTypeIndex, obj.selectedDays,
-      obj.startDate, obj.endDate, obj.description, obj.notificationId,
+      obj.id,
+      obj.iconCode,
+      obj.name,
+      obj.conclusionTypeName,
+      obj.goalQuantity,
+      obj.frequencyTypeName,
+      obj.selectedDays,
+      obj.startDate,
+      obj.endDate,
+      obj.description,
+      obj.notificationId,
       obj.notificationTime,
     ];
     writer.writeByte(values.length);
     for (var index = 0; index < values.length; index++) {
-      writer..writeByte(index)..write(values[index]);
+      writer
+        ..writeByte(index)
+        ..write(values[index]);
     }
   }
+}
+
+T _enumFromName<T extends Enum>(String name, List<T> values, String fieldName) {
+  for (final value in values) {
+    if (value.name == name) return value;
+  }
+  throw FormatException(
+    'Valor inválido para $fieldName no hábito persistido: $name.',
+  );
+}
+
+String _readEnumName<T extends Enum>(
+  Object? persistedValue,
+  List<T> values,
+  String fieldName,
+) {
+  if (persistedValue is String) return persistedValue;
+  if (persistedValue is num) {
+    final legacyIndex = persistedValue.toInt();
+    if (legacyIndex >= 0 && legacyIndex < values.length) {
+      return values[legacyIndex].name;
+    }
+  }
+  throw FormatException(
+    'Valor inválido para $fieldName no hábito persistido: $persistedValue.',
+  );
 }

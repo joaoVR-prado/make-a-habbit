@@ -31,14 +31,25 @@ final class ConclusionDto {
   final int? quantityValue;
   final String? note;
 
-  ConcludedHabitsModel toDomain() => ConcludedHabitsModel(
-    habitId: habitId,
-    conclusionDate: conclusionDate,
-    conclusionValue: isYesNo
-        ? YesNoCompletionValue(yesNoValue!)
-        : QuantityCompletionValue(quantityValue!),
-    note: note,
-  );
+  ConcludedHabitsModel toDomain() {
+    final conclusionValue = switch ((isYesNo, yesNoValue, quantityValue)) {
+      (true, final bool value, _) => YesNoCompletionValue(value),
+      (false, _, final int value) => QuantityCompletionValue(value),
+      (true, null, _) => throw const FormatException(
+        'Conclusão do tipo sim ou não sem valor persistido.',
+      ),
+      (false, _, null) => throw const FormatException(
+        'Conclusão quantitativa sem valor persistido.',
+      ),
+    };
+
+    return ConcludedHabitsModel(
+      habitId: habitId,
+      conclusionDate: conclusionDate,
+      conclusionValue: conclusionValue,
+      note: note,
+    );
+  }
 }
 
 final class ConclusionDtoAdapter extends TypeAdapter<ConclusionDto> {
@@ -48,7 +59,8 @@ final class ConclusionDtoAdapter extends TypeAdapter<ConclusionDto> {
   ConclusionDto read(BinaryReader reader) {
     final count = reader.readByte();
     final fields = <int, Object?>{
-      for (var index = 0; index < count; index++) reader.readByte(): reader.read(),
+      for (var index = 0; index < count; index++)
+        reader.readByte(): reader.read(),
     };
     return ConclusionDto(
       habitId: fields[0] as String,
@@ -59,6 +71,7 @@ final class ConclusionDtoAdapter extends TypeAdapter<ConclusionDto> {
       note: fields[5] as String?,
     );
   }
+
   @override
   void write(BinaryWriter writer, ConclusionDto obj) {
     final values = <Object?>[
@@ -71,7 +84,9 @@ final class ConclusionDtoAdapter extends TypeAdapter<ConclusionDto> {
     ];
     writer.writeByte(values.length);
     for (var index = 0; index < values.length; index++) {
-      writer..writeByte(index)..write(values[index]);
+      writer
+        ..writeByte(index)
+        ..write(values[index]);
     }
   }
 }

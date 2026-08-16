@@ -44,13 +44,70 @@ void main() {
         expect(restored.conclusionType, original.conclusionType);
         expect(restored.goalQuantity, original.goalQuantity);
         expect(restored.frequency.type, original.frequency.type);
-        expect(restored.frequency.selectedDays, original.frequency.selectedDays);
+        expect(
+          restored.frequency.selectedDays,
+          original.frequency.selectedDays,
+        );
         expect(restored.startDate, original.startDate);
         expect(restored.endDate, original.endDate);
         expect(restored.notificationId, original.notificationId);
         expect(restored.notificationTime, original.notificationTime);
       });
     }
+
+    test('Salva os tipos do hábito usando nomes estáveis.', () {
+      final habit = HabitModel(
+        id: 'habito',
+        iconCode: 2,
+        name: 'Ler um livro',
+        conclusionType: HabitConclusionType.yesNo,
+        frequency: const DailyHabitFrequency(),
+        startDate: DateTime(2026, 8, 16),
+      );
+
+      final dto = HabitDto.fromDomain(habit);
+
+      expect(dto.conclusionTypeName, HabitConclusionType.yesNo.name);
+      expect(dto.frequencyTypeName, HabitFrequencyType.daily.name);
+    });
+
+    test('Rejeita um tipo de conclusão persistido desconhecido.', () {
+      final dto = HabitDto(
+        id: 'habito',
+        iconCode: 2,
+        name: 'Ler um livro',
+        conclusionTypeName: 'tipo-inexistente',
+        goalQuantity: null,
+        frequencyTypeName: HabitFrequencyType.daily.name,
+        selectedDays: const [],
+        startDate: DateTime(2026, 8, 16),
+        endDate: null,
+        description: null,
+        notificationId: null,
+        notificationTime: null,
+      );
+
+      expect(dto.toDomain, throwsA(isA<FormatException>()));
+    });
+
+    test('Rejeita um tipo de frequência persistido desconhecido.', () {
+      final dto = HabitDto(
+        id: 'habito',
+        iconCode: 2,
+        name: 'Ler um livro',
+        conclusionTypeName: HabitConclusionType.yesNo.name,
+        goalQuantity: null,
+        frequencyTypeName: 'frequencia-inexistente',
+        selectedDays: const [],
+        startDate: DateTime(2026, 8, 16),
+        endDate: null,
+        description: null,
+        notificationId: null,
+        notificationTime: null,
+      );
+
+      expect(dto.toDomain, throwsA(isA<FormatException>()));
+    });
   });
 
   group('MAPEAMENTO ENTRE CONCLUSÕES E DTO DO HIVE', () {
@@ -80,6 +137,32 @@ void main() {
       final restored = ConclusionDto.fromDomain(original).toDomain();
 
       expect((restored.conclusionValue as QuantityCompletionValue).value, 7);
+    });
+
+    test('Rejeita uma conclusão sim ou não sem valor persistido.', () {
+      final dto = ConclusionDto(
+        habitId: 'habito',
+        conclusionDate: DateTime(2026, 8, 16),
+        isYesNo: true,
+        yesNoValue: null,
+        quantityValue: null,
+        note: null,
+      );
+
+      expect(dto.toDomain, throwsA(isA<FormatException>()));
+    });
+
+    test('Rejeita uma conclusão quantitativa sem valor persistido.', () {
+      final dto = ConclusionDto(
+        habitId: 'habito',
+        conclusionDate: DateTime(2026, 8, 16),
+        isYesNo: false,
+        yesNoValue: null,
+        quantityValue: null,
+        note: null,
+      );
+
+      expect(dto.toDomain, throwsA(isA<FormatException>()));
     });
   });
 
