@@ -171,7 +171,6 @@ class HabitStatsCalculator {
         if (completedDates.contains(cursor)) {
           streak++;
         } else if (cursor == today) {
-          // O dia atual ainda pode ser concluído e não quebra a sequência.
         } else {
           break;
         }

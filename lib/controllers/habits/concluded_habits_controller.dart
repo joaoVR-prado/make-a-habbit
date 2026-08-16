@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/completion_value.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/concluded_habits_model.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
+import 'package:make_a_habbit/core/providers/clock_provider.dart';
 
 class ConcludedHabitsController
     extends AsyncNotifier<List<ConcludedHabitsModel>> {
@@ -46,8 +47,17 @@ class ConcludedHabitsController
     required DateTime date,
     required CompletionValue value,
   }) async {
+    final formattedDate = DateTime(date.year, date.month, date.day);
+    final now = ref.read(clockProvider).now();
+    final today = DateTime(now.year, now.month, now.day);
+    if (formattedDate.isAfter(today)) {
+      throw ArgumentError.value(
+        date,
+        'date',
+        'Não é possível concluir um hábito em uma data futura.',
+      );
+    }
     await _runExclusive((current) async {
-      final formattedDate = DateTime(date.year, date.month, date.day);
       final conclusion = ConcludedHabitsModel(
         habitId: habitId,
         conclusionDate: formattedDate,
