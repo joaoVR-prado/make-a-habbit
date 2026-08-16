@@ -1,22 +1,22 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 
-class WeeklyGraphicCard extends StatelessWidget {
+class WeeklyGraphicCard extends ConsumerWidget {
   final Map<DateTime, int> weeklyData;
 
-  const WeeklyGraphicCard({
-    super.key,
-    required this.weeklyData
-  });
+  const WeeklyGraphicCard({super.key, required this.weeklyData});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final today = ref.watch(clockProvider).now();
     return Card(
       color: AppColors.cardBackgrounColor,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(12)
+        borderRadius: BorderRadiusGeometry.circular(12),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -39,15 +39,16 @@ class WeeklyGraphicCard extends StatelessWidget {
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        getTitlesWidget: _bottomTitles,
-                        reservedSize: 28
+                        getTitlesWidget: (value, meta) =>
+                            _bottomTitles(value, meta, today),
+                        reservedSize: 28,
                       ),
                     ),
                     leftTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false)
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                     topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                     rightTitles: const AxisTitles(
                       sideTitles: SideTitles(showTitles: false),
@@ -55,27 +56,22 @@ class WeeklyGraphicCard extends StatelessWidget {
                   ),
                   gridData: const FlGridData(show: false),
                   borderData: FlBorderData(show: false),
-                  barGroups: _generateBars(),
+                  barGroups: _generateBars(today),
                 ),
               ),
-            )
+            ),
           ],
         ),
-
       ),
-
     );
-    
   }
 
   // Geras as barras do gráfico
-List<BarChartGroupData> _generateBars() {
-    final today = DateTime.now();
-    
+  List<BarChartGroupData> _generateBars(DateTime today) {
     return List.generate(7, (index) {
       final date = today.subtract(Duration(days: 6 - index));
       final dateKey = DateTime(date.year, date.month, date.day);
-      
+
       final completedAmount = weeklyData[dateKey] ?? 0;
 
       return BarChartGroupData(
@@ -92,11 +88,10 @@ List<BarChartGroupData> _generateBars() {
     });
   }
 
-  // Desenha os dias da semana 
-  Widget _bottomTitles(double value, TitleMeta meta) {
-    final today = DateTime.now();
+  // Desenha os dias da semana
+  Widget _bottomTitles(double value, TitleMeta meta, DateTime today) {
     final date = today.subtract(Duration(days: 6 - value.toInt()));
-    
+
     const days = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
     final dayString = days[date.weekday % 7];
 
@@ -112,5 +107,4 @@ List<BarChartGroupData> _generateBars() {
       ),
     );
   }
-
 }
