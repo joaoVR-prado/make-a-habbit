@@ -4,7 +4,9 @@ import 'package:make_a_habbit/data/providers/concluded_habits_repository_provide
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
+import 'package:make_a_habbit/domain/use_cases/clear_habit_data.dart';
 import 'package:make_a_habbit/domain/use_cases/delete_habit.dart';
+import 'package:make_a_habbit/domain/use_cases/ensure_notification_permission.dart';
 import 'package:make_a_habbit/domain/use_cases/save_habit.dart';
 
 final saveHabitProvider = Provider<SaveHabit>((ref) {
@@ -24,3 +26,19 @@ final deleteHabitProvider = Provider<DeleteHabit>((ref) {
     notificationScheduler: ref.watch(notificationSchedulerProvider),
   );
 });
+
+final clearHabitDataProvider = Provider<ClearHabitData>((ref) {
+  return ClearHabitData(
+    habits: ref.watch(habitRepositoryProvider),
+    conclusions: ref.watch(concludedHabitsRepositoryProvider),
+    notificationConfigs: ref.watch(notificationConfigRepositoryProvider),
+    notificationScheduler: ref.watch(notificationSchedulerProvider),
+  );
+});
+
+final ensureNotificationPermissionProvider =
+    Provider<EnsureNotificationPermission>((ref) {
+      return EnsureNotificationPermission(
+        notificationScheduler: ref.watch(notificationSchedulerProvider),
+      );
+    });

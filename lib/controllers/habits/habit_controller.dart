@@ -9,7 +9,6 @@ import 'package:make_a_habbit/domain/entities/notifications/notification_config_
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:make_a_habbit/data/providers/habit_use_case_providers.dart';
-import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
 import 'package:make_a_habbit/domain/use_cases/habit_operation_result.dart';
 
 class HabitController extends AsyncNotifier<List<HabitModel>> {
@@ -74,19 +73,18 @@ class HabitController extends AsyncNotifier<List<HabitModel>> {
     });
   }
 
-  Future<void> clearAllData() async {
+  Future<HabitOperationResult> clearAllData() async {
     if (_isOperating) {
       throw StateError('Já existe uma operação de hábito em andamento.');
     }
     _isOperating = true;
     try {
-      await future;
       state = const AsyncLoading();
-      await ref.read(concludedHabitsRepositoryProvider).clear();
-      await ref.read(notificationConfigRepositoryProvider).clear();
-      await ref.read(habitRepositoryProvider).clear();
+      final result = await ref.read(clearHabitDataProvider)();
+      _lastSuccessfulData = const [];
       state = const AsyncData([]);
       ref.invalidate(concludedHabitsControllerProvider);
+      return result;
     } catch (error, stackTrace) {
       state = AsyncError<List<HabitModel>>(error, stackTrace);
       rethrow;
