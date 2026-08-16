@@ -3,56 +3,52 @@ import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 
-class HabitSearch extends SearchDelegate{
+class HabitSearch extends SearchDelegate<HabitModel?> {
   final List<HabitModel> habits;
 
   HabitSearch({required this.habits})
     : super(searchFieldLabel: 'Buscar hábito...');
 
   @override
-  List<Widget>? buildActions(BuildContext context){
+  List<Widget>? buildActions(BuildContext context) {
     return [
-      if(query.isNotEmpty)
+      if (query.isNotEmpty)
         IconButton(
-          onPressed: (){
+          onPressed: () {
             query = '';
             showSuggestions(context);
-          }, 
+          },
           icon: const Icon(Icons.clear, size: 32),
           color: AppColors.homePageIconColor,
-        )
-
+        ),
     ];
-
   }
 
   @override
-  Widget? buildLeading(BuildContext context){
+  Widget? buildLeading(BuildContext context) {
     return IconButton(
-      onPressed: (){
+      onPressed: () {
         close(context, null);
-      }, 
+      },
       icon: const Icon(Icons.arrow_back, size: 32),
       color: AppColors.homePageIconColor,
     );
-
   }
 
   @override
-  Widget buildResults(BuildContext context){
+  Widget buildResults(BuildContext context) {
     return buildSuggestions(context);
-
   }
 
-  @override 
-  Widget buildSuggestions(BuildContext context){
-    final filteredHabits = habits.where((habit){
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final filteredHabits = habits.where((habit) {
       return habit.name.toLowerCase().contains(query.toLowerCase());
     }).toList();
 
     return ListView.builder(
       itemCount: filteredHabits.length,
-      itemBuilder: (context, index){
+      itemBuilder: (context, index) {
         final habit = filteredHabits[index];
         final habitIcon = HabitIcon.fromCode(habit.iconCode);
         return Padding(
@@ -62,17 +58,13 @@ class HabitSearch extends SearchDelegate{
               habit.name,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            leading: Icon(
-              habitIcon.iconData,
-              color: habitIcon.color,
-            ),
-            onTap: (){
+            leading: Icon(habitIcon.iconData, color: habitIcon.color),
+            onTap: () {
               close(context, habit);
-              
             },
           ),
         );
-      }
+      },
     );
   }
 
@@ -81,12 +73,9 @@ class HabitSearch extends SearchDelegate{
     final theme = Theme.of(context);
     return theme.copyWith(
       inputDecorationTheme: InputDecorationTheme(
-        hintStyle: TextStyle(
-          color: Colors.white
-        ),
+        hintStyle: TextStyle(color: Colors.white),
       ),
       // ...
     );
   }
-
 }

@@ -11,6 +11,8 @@ import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit
 import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habits_list_tile.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/horizontal_calendar.dart';
+import 'package:make_a_habbit/presentation/reports/providers/reports_view_provider.dart';
+import 'package:make_a_habbit/presentation/reports/widgets/habit_reports_list.dart';
 
 import '../../reports/views/reports_page.dart';
 
@@ -28,6 +30,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final selectedDate = ref.watch(selectedDateProvider);
     final currentTab = ref.watch(homeTabProvider);
+    final reportsView = ref.watch(reportsViewProvider);
     final displayHabits = ref.watch(dailyHabitsDisplayProvider);
 
     final today = ref.watch(clockProvider).now();
@@ -40,83 +43,111 @@ class _HomePageState extends ConsumerState<HomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       appBar: AppBar(
         // TODO: Trocar icones/funcoes ao mudar de pagina
-        leading: IconButton(
-          icon: const Icon(Icons.calendar_month, size: 38),
-          color: AppColors.homePageIconColor,
-          onPressed: () async {
-            final currentDate = ref.read(selectedDateProvider);
+        leading: currentTab == 0
+            ? IconButton(
+                icon: const Icon(Icons.calendar_month, size: 38),
+                color: AppColors.homePageIconColor,
+                onPressed: () async {
+                  final currentDate = ref.read(selectedDateProvider);
 
-            final DateTime? selectedDate = await showDatePicker(
-              context: context,
-              initialDate: currentDate,
-              firstDate: DateTime(today.year - 1), // Ano passado
-              lastDate: DateTime(today.year + 1), // Vai até ano que vem
+                  final DateTime? selectedDate = await showDatePicker(
+                    context: context,
+                    initialDate: currentDate,
+                    firstDate: DateTime(today.year - 1), // Ano passado
+                    lastDate: DateTime(today.year + 1), // Vai até ano que vem
 
-              builder: (context, child) {
-                return Theme(
-                  data: Theme.of(context).copyWith(
-                    colorScheme: const ColorScheme.light(
-                      primary: AppColors.homePageIconColor,
-                      onPrimary: Colors.white,
-                      onSurface: Colors.black,
-                    ),
-                  ),
-                  child: child!,
-                );
-              },
-            );
-            if (selectedDate != null && selectedDate != currentDate) {
-              ref.read(selectedDateProvider.notifier).state = selectedDate;
-            }
-          },
-        ),
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: const ColorScheme.light(
+                            primary: AppColors.homePageIconColor,
+                            onPrimary: Colors.white,
+                            onSurface: Colors.black,
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
+                  );
+                  if (selectedDate != null && selectedDate != currentDate) {
+                    ref.read(selectedDateProvider.notifier).state =
+                        selectedDate;
+                  }
+                },
+              )
+            : null,
         title: Text(
-          '${_getDayName(selectedDate.weekday)} - ${_getMonthName(selectedDate.month)}. ${selectedDate.day} - ${selectedDate.year}',
+          currentTab == 0
+              ? '${_getDayName(selectedDate.weekday)} - ${_getMonthName(selectedDate.month)}. ${selectedDate.day} - ${selectedDate.year}'
+              : 'Relatórios',
           style: Theme.of(context).textTheme.labelMedium,
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: IconButton(
-              icon: const Icon(Icons.search, size: 32),
-              color: AppColors.homePageIconColor,
-              onPressed: () async {
-                final allHabits = ref.read(habitControllerProvider).value;
-                if (allHabits == null) return;
+          if (currentTab == 0)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: IconButton(
+                icon: const Icon(Icons.search, size: 32),
+                color: AppColors.homePageIconColor,
+                onPressed: () async {
+                  final allHabits = ref.read(habitControllerProvider).value;
+                  if (allHabits == null) return;
 
-                final result = await showSearch(
-                  context: context,
-                  delegate: HabitSearch(habits: allHabits),
-                );
-                if (result != null) {
-                  final referenceDate = ref.read(clockProvider).now();
-                  final targetDate = _getClosestValidDateForHabit(
-                    result,
-                    referenceDate,
+                  final result = await showSearch(
+                    context: context,
+                    delegate: HabitSearch(habits: allHabits),
                   );
-
-                  ref.read(selectedDateProvider.notifier).state = targetDate;
-
-                  if (context.mounted) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext dialogContext) {
-                        return EditOrCompleteHabitDialog(habit: result);
-                      },
+                  if (result != null) {
+                    final referenceDate = ref.read(clockProvider).now();
+                    final targetDate = _getClosestValidDateForHabit(
+                      result,
+                      referenceDate,
                     );
+
+                    ref.read(selectedDateProvider.notifier).state = targetDate;
+
+                    if (context.mounted) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext dialogContext) {
+                          return EditOrCompleteHabitDialog(habit: result);
+                        },
+                      );
+                    }
                   }
-                }
-              },
+                },
+              ),
+            )
+          else if (reportsView == ReportsView.habits)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: IconButton(
+                key: const Key('search-habit-reports'),
+                icon: const Icon(Icons.search, size: 32),
+                color: AppColors.homePageIconColor,
+                onPressed: () async {
+                  final allHabits = ref.read(habitControllerProvider).value;
+                  if (allHabits == null) return;
+                  final result = await showSearch<HabitModel?>(
+                    context: context,
+                    delegate: HabitSearch(habits: allHabits),
+                  );
+                  if (result != null && context.mounted) {
+                    await openHabitDetailReport(context, result);
+                  }
+                },
+              ),
             ),
-          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.of(context).push(HabitDraftRoute.create());
-        },
-        child: Icon(Icons.add, color: Colors.white),
-      ),
+      floatingActionButton: currentTab == 0
+          ? FloatingActionButton(
+              onPressed: () async {
+                await Navigator.of(context).push(HabitDraftRoute.create());
+              },
+              child: Icon(Icons.add, color: Colors.white),
+            )
+          : null,
       body: currentTab == 0
           ? displayHabits.when(
               loading: () => const Center(child: CircularProgressIndicator()),
