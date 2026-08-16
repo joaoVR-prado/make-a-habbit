@@ -3,6 +3,7 @@ import 'package:make_a_habbit/domain/entities/conclusions/completion_value.dart'
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_type.dart';
 import 'package:make_a_habbit/data/models/reports/habit_stats_model.dart';
+import 'package:make_a_habbit/data/models/reports/habit_detail_stats_model.dart';
 
 class HabitStatsCalculator {
   const HabitStatsCalculator();
@@ -15,7 +16,8 @@ class HabitStatsCalculator {
     final today = _dateOnly(now);
     final conclusionsByHabitAndDate = <String, ConcludedHabitsModel>{
       for (final conclusion in conclusions)
-        _conclusionKey(conclusion.habitId, conclusion.conclusionDate): conclusion,
+        _conclusionKey(conclusion.habitId, conclusion.conclusionDate):
+            conclusion,
     };
 
     final weeklyData = <DateTime, int>{};
@@ -57,52 +59,129 @@ class HabitStatsCalculator {
     );
   }
 
+  HabitDetailStatsModel calculateForHabit({
+    required HabitModel habit,
+    required List<ConcludedHabitsModel> conclusions,
+    required DateTime now,
+  }) {
+    final today = _dateOnly(now);
+    final conclusionsByDate = <DateTime, ConcludedHabitsModel>{
+      for (final conclusion in conclusions)
+        if (conclusion.habitId == habit.id)
+          _dateOnly(conclusion.conclusionDate): conclusion,
+    };
+    final completedDates = conclusionsByDate.entries
+        .where(
+          (entry) =>
+              habit.isHabitActiveOn(entry.key) &&
+              _isCompleted(habit, entry.value),
+        )
+        .map((entry) => entry.key)
+        .toSet();
+    final incompleteDates = conclusionsByDate.entries
+        .where(
+          (entry) =>
+              habit.isHabitActiveOn(entry.key) &&
+              !_isCompleted(habit, entry.value),
+        )
+        .map((entry) => entry.key)
+        .toSet();
+
+    var scheduledDays = 0;
+    var completedDays = 0;
+    for (var daysAgo = 0; daysAgo < 30; daysAgo++) {
+      final date = today.subtract(Duration(days: daysAgo));
+      if (!habit.isHabitActiveOn(date)) continue;
+      scheduledDays++;
+      if (completedDates.contains(date)) completedDays++;
+    }
+
+    return HabitDetailStatsModel(
+      successRate: scheduledDays == 0 ? 0 : completedDays / scheduledDays * 100,
+      currentStreak: _currentStreak(habit, completedDates, today),
+      bestStreak: _bestStreakForHabit(habit, completedDates),
+      totalCompletions: completedDates.length,
+      habit: habit,
+      now: today,
+      completedDates: completedDates,
+      incompleteDates: incompleteDates,
+    );
+  }
+
   int _bestStreak(
     List<HabitModel> habits,
     List<ConcludedHabitsModel> conclusions,
   ) {
     var bestOverall = 0;
     for (final habit in habits) {
-      final completedDates = conclusions
-          .where(
-            (conclusion) =>
-                conclusion.habitId == habit.id &&
-                habit.isHabitActiveOn(conclusion.conclusionDate) &&
-                _isCompleted(habit, conclusion),
-          )
-          .map((conclusion) => _dateOnly(conclusion.conclusionDate))
-          .toSet()
-          .toList()
-        ..sort();
+      final completedDates =
+          conclusions
+              .where(
+                (conclusion) =>
+                    conclusion.habitId == habit.id &&
+                    habit.isHabitActiveOn(conclusion.conclusionDate) &&
+                    _isCompleted(habit, conclusion),
+              )
+              .map((conclusion) => _dateOnly(conclusion.conclusionDate))
+              .toSet()
+              .toList()
+            ..sort();
 
-      var current = 0;
-      var bestForHabit = 0;
-      DateTime? previous;
-      for (final date in completedDates) {
-        if (previous == null) {
-          current = 1;
-        } else {
-          final gap = date.difference(previous).inDays;
-          final missedActiveDay = Iterable<int>.generate(
-            gap - 1,
-            (index) => index + 1,
-          )
-              .map((offset) => previous!.add(Duration(days: offset)))
-              .any(habit.isHabitActiveOn);
-          current = missedActiveDay ? 1 : current + 1;
-        }
-        if (current > bestForHabit) bestForHabit = current;
-        previous = date;
-      }
+      final bestForHabit = _bestStreakForHabit(habit, completedDates.toSet());
       if (bestForHabit > bestOverall) bestOverall = bestForHabit;
     }
     return bestOverall;
   }
 
-  bool _isCompleted(
+  int _bestStreakForHabit(HabitModel habit, Set<DateTime> completedDates) {
+    final dates = completedDates.toList()..sort();
+    var current = 0;
+    var best = 0;
+    DateTime? previous;
+    for (final date in dates) {
+      if (previous == null) {
+        current = 1;
+      } else {
+        final gap = date.difference(previous).inDays;
+        final missedActiveDay =
+            Iterable<int>.generate(gap - 1, (index) => index + 1)
+                .map((offset) => previous!.add(Duration(days: offset)))
+                .any(habit.isHabitActiveOn);
+        current = missedActiveDay ? 1 : current + 1;
+      }
+      if (current > best) best = current;
+      previous = date;
+    }
+    return best;
+  }
+
+  int _currentStreak(
     HabitModel habit,
-    ConcludedHabitsModel? conclusion,
+    Set<DateTime> completedDates,
+    DateTime today,
   ) {
+    if (_dateOnly(habit.startDate).isAfter(today)) return 0;
+    var cursor = habit.endDate != null && habit.endDate!.isBefore(today)
+        ? _dateOnly(habit.endDate!)
+        : today;
+    var streak = 0;
+
+    while (!cursor.isBefore(_dateOnly(habit.startDate))) {
+      if (habit.isHabitActiveOn(cursor)) {
+        if (completedDates.contains(cursor)) {
+          streak++;
+        } else if (cursor == today) {
+          // O dia atual ainda pode ser concluído e não quebra a sequência.
+        } else {
+          break;
+        }
+      }
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    return streak;
+  }
+
+  bool _isCompleted(HabitModel habit, ConcludedHabitsModel? conclusion) {
     if (conclusion == null) return false;
     if (habit.conclusionType == HabitConclusionType.goalQuantity) {
       return switch (conclusion.conclusionValue) {
@@ -117,7 +196,8 @@ class HabitStatsCalculator {
     };
   }
 
-  DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
+  DateTime _dateOnly(DateTime date) =>
+      DateTime(date.year, date.month, date.day);
 
   String _conclusionKey(String habitId, DateTime date) {
     final normalized = _dateOnly(date);

@@ -1,93 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
-import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
-import 'package:make_a_habbit/data/providers/habit_stats_provider.dart';
-import 'package:make_a_habbit/presentation/reports/widgets/weekly_graphic_card.dart';
+import 'package:make_a_habbit/presentation/reports/providers/reports_view_provider.dart';
+import 'package:make_a_habbit/presentation/reports/widgets/general_report_view.dart';
+import 'package:make_a_habbit/presentation/reports/widgets/habit_reports_list.dart';
 
 class ReportsPage extends ConsumerWidget {
   const ReportsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref){
-    final stats = ref.watch(habitStatsProvider);
-
-    return stats.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, _) => Center(
-        child: FilledButton(
-          onPressed: () async {
-            try {
-              await Future.wait([
-                ref.read(habitControllerProvider.notifier).retry(),
-                ref.read(concludedHabitsControllerProvider.notifier).retry(),
-              ]);
-            } catch (_) {
-            }
-          },
-          child: const Text('Tentar novamente'),
-        ),
-      ),
-      data: (stats) => Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              Text('Seu Progresso Geral: ', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 10),
-              
-              WeeklyGraphicCard(weeklyData: stats.weeklyCompletionHistory), 
-              const SizedBox(height: 10),
-              
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                childAspectRatio: 1,
-                children: [
-                  _buildStatCard(context, 'Taxa de Sucesso', '${stats.generalSuccessRate.toStringAsFixed(1)}%', Icons.bolt),
-                  _buildStatCard(context, 'Recorde de Ofensiva', '${stats.bestStreakGeral} dias', Icons.local_fire_department),
-                  _buildStatCard(context, 'Total de Hábitos', '${stats.totalHabits}', Icons.assignment),
-                  _buildStatCard(context, 'Concluídos Hoje', '${stats.completedToday}', Icons.check_circle),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedView = ref.watch(reportsViewProvider);
+    return SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Padding(
+          //   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          //   child: Text(
+          //     'Seu progresso',
+          //     style: Theme.of(context).textTheme.titleLarge,
+          //   ),
+          // ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<ReportsView>(
+                style: SegmentedButton.styleFrom(
+                  selectedBackgroundColor: AppColors.positiveActionDialogTextColor,
+                  selectedForegroundColor: Colors.white
+                ),
+                key: const Key('reports-segmented-control'),
+                segments: [
+                  ButtonSegment(
+                    value: ReportsView.general,
+                    label: Text(
+                      'Geral',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    icon: Icon(
+                      Icons.dashboard_outlined,
+                      color: Colors.white,
+                    ),
+                  ),
+                  ButtonSegment(
+                    value: ReportsView.habits,
+                    label: Text(
+                      'Hábitos',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    icon: Icon(
+                      Icons.checklist,
+                      color: Colors.white,
+                    ),
+                  ),
                 ],
+                selected: {selectedView},
+                onSelectionChanged: (selection) {
+                  ref.read(reportsViewProvider.notifier).state =
+                      selection.first;
+                },
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon) {
-    return Card(
-      color: AppColors.cardBackgrounColor,
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 32, color: AppColors.positiveActionDialogTextColor),
-            const SizedBox(height: 8),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(value, style: Theme.of(context).textTheme.headlineMedium)
-            ),
-            const SizedBox(height: 4),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(title, style: Theme.of(context).textTheme.labelSmall, textAlign: TextAlign.center)
-            ),
-          ],
-        ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: switch (selectedView) {
+              ReportsView.general => const GeneralReportView(),
+              ReportsView.habits => const HabitReportsList(),
+            },
+          ),
+        ],
       ),
     );
   }
-
 }
