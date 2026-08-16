@@ -4,10 +4,18 @@ import 'package:make_a_habbit/domain/entities/conclusions/completion_value.dart'
 import 'package:make_a_habbit/domain/entities/conclusions/concluded_habits_model.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/domain/repositories/conclusion_repository.dart';
+import 'package:make_a_habbit/core/providers/clock_provider.dart';
+import 'package:make_a_habbit/domain/services/clock.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockConclusionRepository extends Mock implements ConclusionRepository {}
+
 class _FakeConclusion extends Fake implements ConcludedHabitsModel {}
+
+class _FixedClock implements Clock {
+  @override
+  DateTime now() => DateTime(2026, 8, 16, 12);
+}
 
 void main() {
   late _MockConclusionRepository repository;
@@ -15,7 +23,6 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(_FakeConclusion());
-    
   });
 
   setUp(() async {
@@ -24,6 +31,7 @@ void main() {
     container = ProviderContainer(
       overrides: [
         concludedHabitsRepositoryProvider.overrideWithValue(repository),
+        clockProvider.overrideWithValue(_FixedClock()),
       ],
     );
     addTearDown(container.dispose);
@@ -42,7 +50,10 @@ void main() {
             completed: true,
           );
 
-      final saved = container.read(concludedHabitsControllerProvider).requireValue.single;
+      final saved = container
+          .read(concludedHabitsControllerProvider)
+          .requireValue
+          .single;
       expect(saved.conclusionDate, DateTime(2026, 8, 8));
       expect(saved.conclusionValue, isA<YesNoCompletionValue>());
       expect((saved.conclusionValue as YesNoCompletionValue).value, isTrue);
@@ -59,7 +70,10 @@ void main() {
             quantity: 4,
           );
 
-      final saved = container.read(concludedHabitsControllerProvider).requireValue.single;
+      final saved = container
+          .read(concludedHabitsControllerProvider)
+          .requireValue
+          .single;
       expect(saved.conclusionValue, isA<QuantityCompletionValue>());
       expect((saved.conclusionValue as QuantityCompletionValue).value, 4);
     });
@@ -76,6 +90,25 @@ void main() {
         throwsA(isA<ArgumentError>()),
       );
       verifyNever(() => repository.save(any()));
+    });
+
+    test('não permite registrar uma conclusão em uma data futura', () async {
+      await expectLater(
+        container
+            .read(concludedHabitsControllerProvider.notifier)
+            .saveYesNoConclusion(
+              habitId: 'habito',
+              date: DateTime(2026, 8, 17),
+              completed: true,
+            ),
+        throwsA(isA<ArgumentError>()),
+      );
+
+      verifyNever(() => repository.save(any()));
+      expect(
+        container.read(concludedHabitsControllerProvider),
+        isA<AsyncData<List<ConcludedHabitsModel>>>(),
+      );
     });
   });
 }

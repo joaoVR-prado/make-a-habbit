@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/core/utils/enums/habit_icon.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
@@ -24,6 +25,15 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedDate = ref.watch(selectedDateProvider);
+    final now = ref.watch(clockProvider).now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedDay = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
+    final isFutureDate = selectedDay.isAfter(today);
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       titlePadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -47,10 +57,12 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
         ],
       ),
       content: Text(
-        'Deseja editar ou concluir esse hábito?',
-        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-          color: AppColors.dialogTextColor,
-        ),
+        isFutureDate
+            ? 'Não é possível concluir um hábito em uma data futura.'
+            : 'Deseja editar ou concluir esse hábito?',
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium!.copyWith(color: AppColors.dialogTextColor),
       ),
       actionsPadding: EdgeInsets.zero,
       actions: [
@@ -79,16 +91,20 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
                 ),
                 const CommonVerticalDivider(),
                 TextButton(
-                  onPressed: () {
-                    showDialog<void>(
-                      context: context,
-                      builder: (_) => CompleteHabit(habit: habit),
-                    );
-                  },
+                  onPressed: isFutureDate
+                      ? null
+                      : () {
+                          showDialog<void>(
+                            context: context,
+                            builder: (_) => CompleteHabit(habit: habit),
+                          );
+                        },
                   child: Text(
                     'CONCLUIR',
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: AppColors.positiveActionDialogTextColor,
+                      color: isFutureDate
+                          ? Colors.grey
+                          : AppColors.positiveActionDialogTextColor,
                     ),
                   ),
                 ),
@@ -143,9 +159,9 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
     NotificationConfigModel? config,
   ) {
     Navigator.of(context).pop();
-    Navigator.of(context).push(
-      HabitDraftRoute.edit(habit: habit, notificationConfig: config),
-    );
+    Navigator.of(
+      context,
+    ).push(HabitDraftRoute.edit(habit: habit, notificationConfig: config));
   }
 }
 
@@ -208,18 +224,18 @@ class _DeleteHabitConfirmationDialogState
         children: [
           Text(
             'Deseja realmente excluir esse hábito?',
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-              color: AppColors.dialogTextColor,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium!.copyWith(color: AppColors.dialogTextColor),
           ),
           if (_errorMessage != null) ...[
             const SizedBox(height: 12),
             Text(
               _errorMessage!,
               key: const Key('delete_habit_error'),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.red,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.red),
             ),
           ],
         ],
@@ -242,16 +258,16 @@ class _DeleteHabitConfirmationDialogState
             TextButton(
               onPressed: _isDeleting ? null : _confirmDeletion,
               child: _isDeleting
-                ? const SizedBox.square(
-                    dimension: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(
-                    'Confirmar',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: AppColors.positiveActionDialogTextColor,
+                  ? const SizedBox.square(
+                      dimension: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(
+                      'Confirmar',
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: AppColors.positiveActionDialogTextColor,
+                      ),
                     ),
-                  ),
             ),
           ],
         ),
