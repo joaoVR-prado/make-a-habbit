@@ -14,17 +14,24 @@ import 'package:make_a_habbit/domain/use_cases/habit_operation_result.dart';
 
 class HabitController extends AsyncNotifier<List<HabitModel>> {
   bool _isOperating = false;
+  List<HabitModel>? _lastSuccessfulData;
 
   @override
   Future<List<HabitModel>> build() async {
-    return ref.read(habitRepositoryProvider).getAll();
+    final habits = ref.read(habitRepositoryProvider).getAll();
+    _lastSuccessfulData = habits;
+    return habits;
   }
 
   Future<void> retry() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
+    final result = await AsyncValue.guard(
       () async => ref.read(habitRepositoryProvider).getAll(),
     );
+    if (result case AsyncData(:final value)) {
+      _lastSuccessfulData = value;
+    }
+    state = result;
   }
 
   Future<HabitOperationResult> addHabit(
@@ -51,7 +58,10 @@ class HabitController extends AsyncNotifier<List<HabitModel>> {
       );
       return (
         result,
-        [for (final item in current) if (item.id == habit.id) habit else item],
+        [
+          for (final item in current)
+            if (item.id == habit.id) habit else item,
+        ],
       );
     });
   }
@@ -85,11 +95,10 @@ class HabitController extends AsyncNotifier<List<HabitModel>> {
     }
   }
 
-  List<HabitModel> getHabitsForDate(DateTime date){
+  List<HabitModel> getHabitsForDate(DateTime date) {
     final allHabits = state.value ?? const <HabitModel>[];
 
     return allHabits.where((habit) => habit.isHabitActiveOn(date)).toList();
-
   }
 
   Future<HabitOperationResult> _runExclusive(
@@ -101,9 +110,10 @@ class HabitController extends AsyncNotifier<List<HabitModel>> {
     }
     _isOperating = true;
     try {
-      final current = await future;
+      final current = state.value ?? _lastSuccessfulData ?? await future;
       state = const AsyncLoading();
       final (result, updated) = await operation(current);
+      _lastSuccessfulData = updated;
       state = AsyncData(updated);
       return result;
     } catch (error, stackTrace) {
@@ -113,81 +123,83 @@ class HabitController extends AsyncNotifier<List<HabitModel>> {
       _isOperating = false;
     }
   }
-
 }
 
-final habitControllerProvider = AsyncNotifierProvider<HabitController, List<HabitModel>>((){
-  return HabitController();
-}, retry: (_, _) => null);
+final habitControllerProvider =
+    AsyncNotifierProvider<HabitController, List<HabitModel>>(() {
+      return HabitController();
+    }, retry: (_, _) => null);
 
-final selectedDateProvider = StateProvider<DateTime>((ref){
+final selectedDateProvider = StateProvider<DateTime>((ref) {
   final now = ref.watch(clockProvider).now();
   return DateTime(now.year, now.month, now.day);
-
 });
-
 
 // Listagem dos habitos
-final dailyHabitsDisplayProvider = Provider.autoDispose<AsyncValue<List<HabitDisplayModel>>>((ref){
-
-  // Verificacoes sobre a conclusao do habito
-  final selectedDate = ref.watch(selectedDateProvider);
-  final habits = ref.watch(habitControllerProvider);
-  final conclusions = ref.watch(concludedHabitsControllerProvider);
-  if (habits case AsyncError(:final error, :final stackTrace)) {
-    return AsyncError(error, stackTrace);
-  }
-  if (conclusions case AsyncError(:final error, :final stackTrace)) {
-    return AsyncError(error, stackTrace);
-  }
-  final allHabits = habits.value;
-  final allConclusions = conclusions.value;
-  if (allHabits == null || allConclusions == null) return const AsyncLoading();
-  final activeHabitsForDate = allHabits.where((h) => h.isHabitActiveOn(selectedDate)).toList();
-
-  return AsyncData(activeHabitsForDate.map((habit) {
-    final dailyConclusion = allConclusions.where((c) => 
-      c.habitId == habit.id &&
-      c.conclusionDate.year == selectedDate.year &&
-      c.conclusionDate.month == selectedDate.month &&
-      c.conclusionDate.day == selectedDate.day
-    ).firstOrNull;
-
-    HabitStatus habitStatus = HabitStatus.pending;
-
-    if (habit.conclusionType == HabitConclusionType.goalQuantity) {
-      final doneQuantity = switch (dailyConclusion?.conclusionValue) {
-        QuantityCompletionValue(:final value) => value,
-        _ => 0,
-      };
-      final targetQuantity = habit.goalQuantity ?? 1;
-      if (doneQuantity >= targetQuantity) {
-        habitStatus = HabitStatus.done;
+final dailyHabitsDisplayProvider =
+    Provider.autoDispose<AsyncValue<List<HabitDisplayModel>>>((ref) {
+      // Verificacoes sobre a conclusao do habito
+      final selectedDate = ref.watch(selectedDateProvider);
+      final habits = ref.watch(habitControllerProvider);
+      final conclusions = ref.watch(concludedHabitsControllerProvider);
+      if (habits case AsyncError(:final error, :final stackTrace)) {
+        return AsyncError(error, stackTrace);
       }
-    } else {
-      if (dailyConclusion != null) {
-        habitStatus = switch (dailyConclusion.conclusionValue) {
-          YesNoCompletionValue(value: true) => HabitStatus.done,
-          YesNoCompletionValue(value: false) => HabitStatus.incomplete,
-          _ => HabitStatus.pending,
-        };
+      if (conclusions case AsyncError(:final error, :final stackTrace)) {
+        return AsyncError(error, stackTrace);
       }
-    }
+      final allHabits = habits.value;
+      final allConclusions = conclusions.value;
+      if (allHabits == null || allConclusions == null) {
+        return const AsyncLoading();
+      }
+      final activeHabitsForDate = allHabits
+          .where((h) => h.isHabitActiveOn(selectedDate))
+          .toList();
 
-    // Retorna os habitos filtrados para a UI
-    return HabitDisplayModel(habit: habit, status: habitStatus);
-  }).toList());
-});
+      return AsyncData(
+        activeHabitsForDate.map((habit) {
+          final dailyConclusion = allConclusions
+              .where(
+                (c) =>
+                    c.habitId == habit.id &&
+                    c.conclusionDate.year == selectedDate.year &&
+                    c.conclusionDate.month == selectedDate.month &&
+                    c.conclusionDate.day == selectedDate.day,
+              )
+              .firstOrNull;
+
+          HabitStatus habitStatus = HabitStatus.pending;
+
+          if (habit.conclusionType == HabitConclusionType.goalQuantity) {
+            final doneQuantity = switch (dailyConclusion?.conclusionValue) {
+              QuantityCompletionValue(:final value) => value,
+              _ => 0,
+            };
+            final targetQuantity = habit.goalQuantity ?? 1;
+            if (doneQuantity >= targetQuantity) {
+              habitStatus = HabitStatus.done;
+            }
+          } else {
+            if (dailyConclusion != null) {
+              habitStatus = switch (dailyConclusion.conclusionValue) {
+                YesNoCompletionValue(value: true) => HabitStatus.done,
+                YesNoCompletionValue(value: false) => HabitStatus.incomplete,
+                _ => HabitStatus.pending,
+              };
+            }
+          }
+
+          // Retorna os habitos filtrados para a UI
+          return HabitDisplayModel(habit: habit, status: habitStatus);
+        }).toList(),
+      );
+    });
 
 // Classe para a UI
-class HabitDisplayModel{
+class HabitDisplayModel {
   final HabitModel habit;
   final HabitStatus status;
 
-  HabitDisplayModel({
-    required this.habit,
-    required this.status,
-
-  });
-
+  HabitDisplayModel({required this.habit, required this.status});
 }
