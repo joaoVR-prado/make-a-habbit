@@ -3,6 +3,7 @@ import 'package:make_a_habbit/domain/entities/habits/habit_frequency.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_type.dart';
+import 'package:make_a_habbit/data/dtos/persisted_field_reader.dart';
 
 final class HabitDto {
   const HabitDto({
@@ -85,26 +86,30 @@ final class HabitDtoAdapter extends TypeAdapter<HabitDto> {
         reader.readByte(): reader.read(),
     };
     return HabitDto(
-      id: fields[0] as String,
-      iconCode: (fields[1] as num).toInt(),
-      name: fields[2] as String,
+      id: readRequiredField<String>(fields, 0, 'habit.id'),
+      iconCode: readRequiredIntField(fields, 1, 'habit.iconCode'),
+      name: readRequiredField<String>(fields, 2, 'habit.name'),
       conclusionTypeName: _readEnumName(
         fields[3],
         HabitConclusionType.values,
         'conclusionType',
       ),
-      goalQuantity: (fields[4] as num?)?.toInt(),
+      goalQuantity: readOptionalIntField(fields, 4, 'habit.goalQuantity'),
       frequencyTypeName: _readEnumName(
         fields[5],
         HabitFrequencyType.values,
         'frequencyType',
       ),
-      selectedDays: (fields[6] as List).cast<int>(),
-      startDate: fields[7] as DateTime,
-      endDate: fields[8] as DateTime?,
-      description: fields[9] as String?,
-      notificationId: (fields[10] as num?)?.toInt(),
-      notificationTime: fields[11] as DateTime?,
+      selectedDays: readRequiredListField<int>(fields, 6, 'habit.selectedDays'),
+      startDate: readRequiredField<DateTime>(fields, 7, 'habit.startDate'),
+      endDate: readOptionalField<DateTime>(fields, 8, 'habit.endDate'),
+      description: readOptionalField<String>(fields, 9, 'habit.description'),
+      notificationId: readOptionalIntField(fields, 10, 'habit.notificationId'),
+      notificationTime: readOptionalField<DateTime>(
+        fields,
+        11,
+        'habit.notificationTime',
+      ),
     );
   }
 

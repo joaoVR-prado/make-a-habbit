@@ -56,16 +56,18 @@ void main() {
       final result = await clearHabitData();
 
       expect(result.hasPartialFailures, isFalse);
-      verify(() => scheduler.cancelForHabit('primeiro')).called(1);
-      verify(() => scheduler.cancelForHabit('segundo')).called(1);
-      verifyInOrder([habits.clear, conclusions.clear, notifications.clear]);
+      verifyInOrder([
+        () => scheduler.cancelForHabit('primeiro'),
+        () => scheduler.cancelForHabit('segundo'),
+        habits.clear,
+        conclusions.clear,
+        notifications.clear,
+      ]);
     });
 
     test('Continua a limpeza quando serviços auxiliares falham.', () async {
       when(habits.getAll).thenReturn(savedHabits);
-      when(
-        () => scheduler.cancelForHabit('primeiro'),
-      ).thenThrow(Exception('agendamento'));
+      when(() => scheduler.cancelForHabit('primeiro')).thenAnswer((_) async {});
       when(() => scheduler.cancelForHabit('segundo')).thenAnswer((_) async {});
       when(conclusions.clear).thenThrow(Exception('conclusões'));
       when(notifications.clear).thenThrow(Exception('configurações'));
@@ -73,7 +75,13 @@ void main() {
 
       final result = await clearHabitData();
 
-      expect(result.failures, containsAll(HabitOperationFailure.values));
+      expect(
+        result.failures,
+        containsAll([
+          HabitOperationFailure.conclusions,
+          HabitOperationFailure.notificationConfig,
+        ]),
+      );
       verify(habits.clear).called(1);
     });
 
@@ -86,6 +94,23 @@ void main() {
         when(habits.clear).thenThrow(Exception('armazenamento'));
 
         await expectLater(clearHabitData(), throwsException);
+        verifyNever(() => scheduler.cancelForHabit(any()));
+        verifyNever(conclusions.clear);
+        verifyNever(notifications.clear);
+      },
+    );
+
+    test(
+      'Não apaga os hábitos quando uma agenda não pode ser cancelada',
+      () async {
+        when(habits.getAll).thenReturn(savedHabits);
+        when(
+          () => scheduler.cancelForHabit('primeiro'),
+        ).thenThrow(Exception('agendamento'));
+
+        await expectLater(clearHabitData(), throwsException);
+
+        verifyNever(habits.clear);
         verifyNever(conclusions.clear);
         verifyNever(notifications.clear);
       },

@@ -24,15 +24,11 @@ final class ClearHabitData {
     final failures = <HabitOperationFailure>{};
     final habitIds = _habits.getAll().map((habit) => habit.id).toSet();
 
-    await _habits.clear();
-
     for (final habitId in habitIds) {
-      try {
-        await _notificationScheduler.cancelForHabit(habitId);
-      } catch (_) {
-        failures.add(HabitOperationFailure.notificationSchedule);
-      }
+      await _notificationScheduler.cancelForHabit(habitId);
     }
+
+    await _habits.clear();
 
     try {
       await _conclusions.clear();

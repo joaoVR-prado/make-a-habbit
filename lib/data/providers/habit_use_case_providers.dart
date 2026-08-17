@@ -9,6 +9,7 @@ import 'package:make_a_habbit/domain/use_cases/delete_habit.dart';
 import 'package:make_a_habbit/domain/use_cases/ensure_notification_permission.dart';
 import 'package:make_a_habbit/domain/use_cases/save_habit.dart';
 import 'package:make_a_habbit/domain/use_cases/record_habit_conclusion.dart';
+import 'package:make_a_habbit/domain/use_cases/reconcile_habit_notifications.dart';
 
 final saveHabitProvider = Provider<SaveHabit>((ref) {
   return SaveHabit(
@@ -49,5 +50,15 @@ final ensureNotificationPermissionProvider =
     Provider<EnsureNotificationPermission>((ref) {
       return EnsureNotificationPermission(
         notificationScheduler: ref.watch(notificationSchedulerProvider),
+      );
+    });
+
+final reconcileHabitNotificationsProvider =
+    Provider<ReconcileHabitNotifications>((ref) {
+      return ReconcileHabitNotifications(
+        habits: ref.watch(habitRepositoryProvider),
+        notificationConfigs: ref.watch(notificationConfigRepositoryProvider),
+        notificationScheduler: ref.watch(notificationSchedulerProvider),
+        clock: ref.watch(clockProvider),
       );
     });

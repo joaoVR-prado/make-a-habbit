@@ -128,6 +128,39 @@ void main() {
       expect(stats.currentStreak, 2);
       expect(stats.statusOn(DateTime(2026, 8, 1)), HabitDayStatus.inactive);
     });
+
+    test('Ignora conclusões futuras legadas nas métricas e no calendário.', () {
+      final habit = _dailyHabit(startDate: DateTime(2026, 8, 14));
+
+      final stats = calculator.calculateForHabit(
+        habit: habit,
+        conclusions: [
+          _conclusion(habit.id, DateTime(2026, 8, 15), true),
+          _conclusion(habit.id, DateTime(2026, 8, 17), true),
+        ],
+        now: today,
+      );
+
+      expect(stats.totalCompletions, 1);
+      expect(stats.bestStreak, 1);
+      expect(stats.statusOn(DateTime(2026, 8, 17)), HabitDayStatus.pending);
+    });
+
+    test('Mantém a sequência durante a virada do ano.', () {
+      final habit = _dailyHabit(startDate: DateTime(2025, 12, 30));
+
+      final stats = calculator.calculateForHabit(
+        habit: habit,
+        conclusions: [
+          _conclusion(habit.id, DateTime(2025, 12, 31), true),
+          _conclusion(habit.id, DateTime(2026, 1, 1), true),
+        ],
+        now: DateTime(2026, 1, 2),
+      );
+
+      expect(stats.currentStreak, 2);
+      expect(stats.bestStreak, 2);
+    });
   });
 }
 

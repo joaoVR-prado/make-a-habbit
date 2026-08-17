@@ -8,10 +8,14 @@ import 'package:make_a_habbit/domain/use_cases/habit_operation_result.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockHabitRepository extends Mock implements HabitRepository {}
+
 class _MockConclusionRepository extends Mock implements ConclusionRepository {}
+
 class _MockNotificationConfigRepository extends Mock
     implements NotificationConfigRepository {}
-class _MockNotificationScheduler extends Mock implements NotificationScheduler {}
+
+class _MockNotificationScheduler extends Mock
+    implements NotificationScheduler {}
 
 void main() {
   late _MockHabitRepository habits;
@@ -35,49 +39,61 @@ void main() {
   });
 
   group('CASOS DE USO PARA EXCLUIR HÁBITO', () {
-    test('Exclui o hábito antes de limpar os dados relacionados', () async {
-      when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
-      when(() => conclusions.deleteByHabit(habitId)).thenAnswer((_) async {});
-      when(() => configs.delete(habitId)).thenAnswer((_) async {});
-      when(() => habits.delete(habitId)).thenAnswer((_) async {});
+    test(
+      'Cancela a agenda antes de excluir o hábito e os dados relacionados',
+      () async {
+        when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
+        when(() => conclusions.deleteByHabit(habitId)).thenAnswer((_) async {});
+        when(() => configs.delete(habitId)).thenAnswer((_) async {});
+        when(() => habits.delete(habitId)).thenAnswer((_) async {});
 
-      final result = await deleteHabit(habitId);
+        final result = await deleteHabit(habitId);
 
-      expect(result.hasPartialFailures, isFalse);
-      verifyInOrder([
-        () => habits.delete(habitId),
-        () => scheduler.cancelForHabit(habitId),
-        () => conclusions.deleteByHabit(habitId),
-        () => configs.delete(habitId),
-      ]);
-    });
+        expect(result.hasPartialFailures, isFalse);
+        verifyInOrder([
+          () => scheduler.cancelForHabit(habitId),
+          () => habits.delete(habitId),
+          () => conclusions.deleteByHabit(habitId),
+          () => configs.delete(habitId),
+        ]);
+      },
+    );
 
     test('Continua a limpeza e informa todas as falhas parciais', () async {
-      when(() => scheduler.cancelForHabit(habitId)).thenThrow(Exception());
+      when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
       when(() => conclusions.deleteByHabit(habitId)).thenThrow(Exception());
       when(() => configs.delete(habitId)).thenThrow(Exception());
       when(() => habits.delete(habitId)).thenAnswer((_) async {});
 
       final result = await deleteHabit(habitId);
 
-      expect(result.failures, containsAll(HabitOperationFailure.values));
+      expect(
+        result.failures,
+        containsAll([
+          HabitOperationFailure.conclusions,
+          HabitOperationFailure.notificationConfig,
+        ]),
+      );
       verify(() => habits.delete(habitId)).called(1);
     });
 
-    test('Permite repetir a exclusão sem alterar a sequência de limpeza', () async {
-      when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
-      when(() => conclusions.deleteByHabit(habitId)).thenAnswer((_) async {});
-      when(() => configs.delete(habitId)).thenAnswer((_) async {});
-      when(() => habits.delete(habitId)).thenAnswer((_) async {});
+    test(
+      'Permite repetir a exclusão sem alterar a sequência de limpeza',
+      () async {
+        when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
+        when(() => conclusions.deleteByHabit(habitId)).thenAnswer((_) async {});
+        when(() => configs.delete(habitId)).thenAnswer((_) async {});
+        when(() => habits.delete(habitId)).thenAnswer((_) async {});
 
-      await deleteHabit(habitId);
-      await deleteHabit(habitId);
+        await deleteHabit(habitId);
+        await deleteHabit(habitId);
 
-      verify(() => scheduler.cancelForHabit(habitId)).called(2);
-      verify(() => conclusions.deleteByHabit(habitId)).called(2);
-      verify(() => configs.delete(habitId)).called(2);
-      verify(() => habits.delete(habitId)).called(2);
-    });
+        verify(() => scheduler.cancelForHabit(habitId)).called(2);
+        verify(() => conclusions.deleteByHabit(habitId)).called(2);
+        verify(() => configs.delete(habitId)).called(2);
+        verify(() => habits.delete(habitId)).called(2);
+      },
+    );
 
     test('Propaga a falha quando o hábito não pode ser excluído', () async {
       when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
@@ -86,9 +102,24 @@ void main() {
       when(() => habits.delete(habitId)).thenThrow(Exception('armazenamento'));
 
       await expectLater(deleteHabit(habitId), throwsException);
-      verifyNever(() => scheduler.cancelForHabit(habitId));
+      verify(() => scheduler.cancelForHabit(habitId)).called(1);
       verifyNever(() => conclusions.deleteByHabit(habitId));
       verifyNever(() => configs.delete(habitId));
     });
+
+    test(
+      'Não exclui o hábito quando a agenda não pode ser cancelada',
+      () async {
+        when(
+          () => scheduler.cancelForHabit(habitId),
+        ).thenThrow(Exception('agendamento'));
+
+        await expectLater(deleteHabit(habitId), throwsException);
+
+        verifyNever(() => habits.delete(habitId));
+        verifyNever(() => conclusions.deleteByHabit(habitId));
+        verifyNever(() => configs.delete(habitId));
+      },
+    );
   });
 }

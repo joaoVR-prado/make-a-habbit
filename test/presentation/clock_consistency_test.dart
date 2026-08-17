@@ -65,6 +65,7 @@ void main() {
       ).difference(startDate).inDays;
 
       expect(listView.controller!.initialScrollOffset, expectedDays * 70);
+      expect(listView.semanticChildCount, 731);
     });
 
     testWidgets('Monta o relatório semanal a partir da data informada.', (
@@ -88,6 +89,24 @@ void main() {
           .toList();
 
       expect(values, [1, 2, 3, 4, 5, 6, 7]);
+      expect(chart.data.maxY, 10);
+    });
+
+    testWidgets('Expande o gráfico quando há mais de dez conclusões.', (
+      tester,
+    ) async {
+      final fixedDate = DateTime(2026, 8, 16, 15, 30);
+
+      await _pumpWithClock(
+        tester,
+        fixedDate: fixedDate,
+        child: Scaffold(
+          body: WeeklyGraphicCard(weeklyData: {DateTime(2026, 8, 16): 14}),
+        ),
+      );
+
+      final chart = tester.widget<BarChart>(find.byType(BarChart));
+      expect(chart.data.maxY, 14);
     });
 
     testWidgets('Exibe no diálogo a data informada pelo relógio.', (

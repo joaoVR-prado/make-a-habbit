@@ -49,6 +49,7 @@ class NotificationSchedulePlanner {
 
   static const lastDayOfMonth = MonthlyHabitFrequency.lastDayOfMonth;
   static const _lastDayHorizon = 12;
+  static const _boundedScheduleHorizonDays = 60;
 
   int baseIdForHabit(String habitId) {
     var hash = 0x811c9dc5;
@@ -66,27 +67,184 @@ class NotificationSchedulePlanner {
     required DateTime now,
     int currentStreak = 0,
   }) {
+    final today = DateTime(now.year, now.month, now.day);
+    final startDate = DateTime(
+      habit.startDate.year,
+      habit.startDate.month,
+      habit.startDate.day,
+    );
+    if (startDate.isAfter(today)) return const [];
+    final endDate = habit.endDate == null
+        ? null
+        : DateTime(
+            habit.endDate!.year,
+            habit.endDate!.month,
+            habit.endDate!.day,
+          );
+    if (endDate != null && endDate.isBefore(today)) return const [];
+
     final baseId = habit.notificationId ?? baseIdForHabit(habit.id);
+    if (endDate != null) {
+      return _planBoundedSchedules(
+        habit: habit,
+        baseId: baseId,
+        reminderEnabled: reminderEnabled,
+        streakEnabled: streakEnabled,
+        currentStreak: currentStreak,
+        now: now,
+        endDate: endDate,
+      );
+    }
     final notifications = <PlannedNotification>[];
 
     if (reminderEnabled && habit.notificationTime != null) {
       notifications.addAll(_planReminders(habit, baseId, now));
     }
     if (streakEnabled) {
-      notifications.add(
-        PlannedNotification(
-          id: baseId + 1000,
-          title: 'Make a Habbit!',
-          body: currentStreak == 0
-              ? 'Vamos começar sua ofensiva de ${habit.name} hoje?'
-              : 'Você completou ${habit.name} por $currentStreak dias. Continue persistindo!',
-          category: PlannedNotificationCategory.streak,
-          schedule: const RepeatingCalendarSchedule(hour: 12, minute: 0),
-        ),
+      notifications.addAll(
+        _planStreakNotifications(habit, baseId, now, currentStreak),
       );
     }
 
     return notifications;
+  }
+
+  List<PlannedNotification> _planBoundedSchedules({
+    required HabitModel habit,
+    required int baseId,
+    required bool reminderEnabled,
+    required bool streakEnabled,
+    required int currentStreak,
+    required DateTime now,
+    required DateTime endDate,
+  }) {
+    final notifications = <PlannedNotification>[];
+    final today = DateTime(now.year, now.month, now.day);
+    final lastHorizonDay = DateTime(
+      today.year,
+      today.month,
+      today.day + _boundedScheduleHorizonDays - 1,
+    );
+    final lastDay = endDate.isBefore(lastHorizonDay) ? endDate : lastHorizonDay;
+    final reminderTime = habit.notificationTime;
+    final streakBody = currentStreak == 0
+        ? 'Vamos começar sua ofensiva de ${habit.name} hoje?'
+        : 'Você completou ${habit.name} por $currentStreak dias. Continue persistindo!';
+
+    for (var offset = 0; offset < _boundedScheduleHorizonDays; offset++) {
+      final date = DateTime(today.year, today.month, today.day + offset);
+      if (date.isAfter(lastDay)) break;
+      if (!habit.isHabitActiveOn(date)) continue;
+
+      if (reminderEnabled && reminderTime != null) {
+        final occurrence = DateTime(
+          date.year,
+          date.month,
+          date.day,
+          reminderTime.hour,
+          reminderTime.minute,
+        );
+        if (occurrence.isAfter(now)) {
+          notifications.add(
+            PlannedNotification(
+              id: baseId + offset,
+              title: 'Hora do seu hábito!',
+              body: 'Não se esqueça de completar o hábito ${habit.name}',
+              category: PlannedNotificationCategory.reminder,
+              schedule: ExactDateSchedule(occurrence),
+            ),
+          );
+        }
+      }
+
+      if (streakEnabled) {
+        final occurrence = DateTime(date.year, date.month, date.day, 12);
+        if (occurrence.isAfter(now)) {
+          notifications.add(
+            PlannedNotification(
+              id: baseId + 1000 + offset,
+              title: 'Make a Habbit!',
+              body: streakBody,
+              category: PlannedNotificationCategory.streak,
+              schedule: ExactDateSchedule(occurrence),
+            ),
+          );
+        }
+      }
+    }
+    return notifications;
+  }
+
+  List<PlannedNotification> _planStreakNotifications(
+    HabitModel habit,
+    int baseId,
+    DateTime now,
+    int currentStreak,
+  ) {
+    final body = currentStreak == 0
+        ? 'Vamos começar sua ofensiva de ${habit.name} hoje?'
+        : 'Você completou ${habit.name} por $currentStreak dias. Continue persistindo!';
+
+    PlannedNotification streak(int id, PlannedNotificationSchedule schedule) =>
+        PlannedNotification(
+          id: id,
+          title: 'Make a Habbit!',
+          body: body,
+          category: PlannedNotificationCategory.streak,
+          schedule: schedule,
+        );
+
+    return switch (habit.frequency.type) {
+      HabitFrequencyType.daily => [
+        streak(
+          baseId + 1000,
+          const RepeatingCalendarSchedule(hour: 12, minute: 0),
+        ),
+      ],
+      HabitFrequencyType.weekly => [
+        for (final weekday in habit.frequency.selectedDays)
+          streak(
+            baseId + 1000 + weekday,
+            RepeatingCalendarSchedule(weekday: weekday, hour: 12, minute: 0),
+          ),
+      ],
+      HabitFrequencyType.monthly => _planMonthlyStreaks(
+        habit,
+        baseId,
+        now,
+        streak,
+      ),
+    };
+  }
+
+  List<PlannedNotification> _planMonthlyStreaks(
+    HabitModel habit,
+    int baseId,
+    DateTime now,
+    PlannedNotification Function(int, PlannedNotificationSchedule) streak,
+  ) {
+    final result = <PlannedNotification>[
+      for (final day in habit.frequency.selectedDays)
+        if (day >= 1 && day <= 31)
+          streak(
+            baseId + 1000 + day,
+            RepeatingCalendarSchedule(day: day, hour: 12, minute: 0),
+          ),
+    ];
+    if (habit.frequency.selectedDays.contains(lastDayOfMonth)) {
+      final dates = _nextLastDays(
+        now,
+        DateTime(0, 1, 1, 12),
+        _lastDayHorizon,
+        habit: habit,
+      );
+      for (var index = 0; index < dates.length; index++) {
+        result.add(
+          streak(baseId + 1050 + index, ExactDateSchedule(dates[index])),
+        );
+      }
+    }
+    return result;
   }
 
   List<PlannedNotification> _planReminders(
@@ -143,13 +301,10 @@ class NotificationSchedulePlanner {
               ),
         ];
         if (days.contains(lastDayOfMonth)) {
-          final dates = _nextLastDays(now, time, _lastDayHorizon);
+          final dates = _nextLastDays(now, time, _lastDayHorizon, habit: habit);
           for (var index = 0; index < dates.length; index++) {
             result.add(
-              reminder(
-                baseId + 200 + index,
-                ExactDateSchedule(dates[index]),
-              ),
+              reminder(baseId + 200 + index, ExactDateSchedule(dates[index])),
             );
           }
         }
@@ -157,10 +312,15 @@ class NotificationSchedulePlanner {
     }
   }
 
-  List<DateTime> _nextLastDays(DateTime now, DateTime time, int count) {
+  List<DateTime> _nextLastDays(
+    DateTime now,
+    DateTime time,
+    int count, {
+    HabitModel? habit,
+  }) {
     final dates = <DateTime>[];
     var monthOffset = 0;
-    while (dates.length < count) {
+    while (dates.length < count && monthOffset < 120) {
       final monthStart = DateTime(now.year, now.month + monthOffset);
       final lastDay = DateTime(monthStart.year, monthStart.month + 1, 0);
       final occurrence = DateTime(
@@ -170,7 +330,19 @@ class NotificationSchedulePlanner {
         time.hour,
         time.minute,
       );
-      if (occurrence.isAfter(now)) dates.add(occurrence);
+      if (habit?.endDate case final endDate?) {
+        final occurrenceDay = DateTime(
+          occurrence.year,
+          occurrence.month,
+          occurrence.day,
+        );
+        final endDay = DateTime(endDate.year, endDate.month, endDate.day);
+        if (occurrenceDay.isAfter(endDay)) break;
+      }
+      if (occurrence.isAfter(now) &&
+          (habit == null || habit.isHabitActiveOn(occurrence))) {
+        dates.add(occurrence);
+      }
       monthOffset++;
     }
     return dates;
