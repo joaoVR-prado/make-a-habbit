@@ -8,6 +8,7 @@ import 'package:make_a_habbit/domain/use_cases/clear_habit_data.dart';
 import 'package:make_a_habbit/domain/use_cases/delete_habit.dart';
 import 'package:make_a_habbit/domain/use_cases/ensure_notification_permission.dart';
 import 'package:make_a_habbit/domain/use_cases/save_habit.dart';
+import 'package:make_a_habbit/domain/use_cases/record_habit_conclusion.dart';
 
 final saveHabitProvider = Provider<SaveHabit>((ref) {
   return SaveHabit(
@@ -33,6 +34,14 @@ final clearHabitDataProvider = Provider<ClearHabitData>((ref) {
     conclusions: ref.watch(concludedHabitsRepositoryProvider),
     notificationConfigs: ref.watch(notificationConfigRepositoryProvider),
     notificationScheduler: ref.watch(notificationSchedulerProvider),
+  );
+});
+
+final recordHabitConclusionProvider = Provider<RecordHabitConclusion>((ref) {
+  return RecordHabitConclusion(
+    habits: ref.watch(habitRepositoryProvider),
+    conclusions: ref.watch(concludedHabitsRepositoryProvider),
+    clock: ref.watch(clockProvider),
   );
 });
 

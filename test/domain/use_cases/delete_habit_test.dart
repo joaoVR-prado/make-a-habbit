@@ -35,7 +35,7 @@ void main() {
   });
 
   group('CASOS DE USO PARA EXCLUIR HÁBITO', () {
-    test('Limpa dados relacionados antes de excluir o hábito', () async {
+    test('Exclui o hábito antes de limpar os dados relacionados', () async {
       when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
       when(() => conclusions.deleteByHabit(habitId)).thenAnswer((_) async {});
       when(() => configs.delete(habitId)).thenAnswer((_) async {});
@@ -45,10 +45,10 @@ void main() {
 
       expect(result.hasPartialFailures, isFalse);
       verifyInOrder([
+        () => habits.delete(habitId),
         () => scheduler.cancelForHabit(habitId),
         () => conclusions.deleteByHabit(habitId),
         () => configs.delete(habitId),
-        () => habits.delete(habitId),
       ]);
     });
 
@@ -86,6 +86,9 @@ void main() {
       when(() => habits.delete(habitId)).thenThrow(Exception('armazenamento'));
 
       await expectLater(deleteHabit(habitId), throwsException);
+      verifyNever(() => scheduler.cancelForHabit(habitId));
+      verifyNever(() => conclusions.deleteByHabit(habitId));
+      verifyNever(() => configs.delete(habitId));
     });
   });
 }

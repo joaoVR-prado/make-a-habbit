@@ -24,6 +24,8 @@ final class ClearHabitData {
     final failures = <HabitOperationFailure>{};
     final habitIds = _habits.getAll().map((habit) => habit.id).toSet();
 
+    await _habits.clear();
+
     for (final habitId in habitIds) {
       try {
         await _notificationScheduler.cancelForHabit(habitId);
@@ -42,8 +44,6 @@ final class ClearHabitData {
     } catch (_) {
       failures.add(HabitOperationFailure.notificationConfig);
     }
-
-    await _habits.clear();
     return HabitOperationResult(failures: Set.unmodifiable(failures));
   }
 }

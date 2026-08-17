@@ -4,22 +4,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/completion_value.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/concluded_habits_model.dart';
 import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
-import 'package:make_a_habbit/core/providers/clock_provider.dart';
+import 'package:make_a_habbit/data/providers/habit_use_case_providers.dart';
 
 class ConcludedHabitsController
     extends AsyncNotifier<List<ConcludedHabitsModel>> {
   bool _isOperating = false;
+  List<ConcludedHabitsModel>? _lastSuccessfulData;
 
   @override
   Future<List<ConcludedHabitsModel>> build() async {
-    return ref.read(concludedHabitsRepositoryProvider).getAll();
+    final conclusions = ref.read(concludedHabitsRepositoryProvider).getAll();
+    _lastSuccessfulData = conclusions;
+    return conclusions;
   }
 
   Future<void> retry() async {
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
+    final result = await AsyncValue.guard(
       () async => ref.read(concludedHabitsRepositoryProvider).getAll(),
     );
+    if (result case AsyncData(:final value)) {
+      _lastSuccessfulData = value;
+    }
+    state = result;
   }
 
   Future<void> saveYesNoConclusion({
@@ -47,26 +54,16 @@ class ConcludedHabitsController
     required DateTime date,
     required CompletionValue value,
   }) async {
-    final formattedDate = DateTime(date.year, date.month, date.day);
-    final now = ref.read(clockProvider).now();
-    final today = DateTime(now.year, now.month, now.day);
-    if (formattedDate.isAfter(today)) {
-      throw ArgumentError.value(
-        date,
-        'date',
-        'Não é possível concluir um hábito em uma data futura.',
-      );
-    }
     await _runExclusive((current) async {
-      final conclusion = ConcludedHabitsModel(
+      final conclusion = await ref.read(recordHabitConclusionProvider)(
         habitId: habitId,
-        conclusionDate: formattedDate,
-        conclusionValue: value,
+        date: date,
+        value: value,
       );
-      await ref.read(concludedHabitsRepositoryProvider).save(conclusion);
       final index = current.indexWhere(
         (item) =>
-            item.habitId == habitId && item.conclusionDate == formattedDate,
+            item.habitId == habitId &&
+            item.conclusionDate == conclusion.conclusionDate,
       );
       return index < 0
           ? [...current, conclusion]
@@ -102,9 +99,14 @@ class ConcludedHabitsController
     }
     _isOperating = true;
     try {
-      final current = await future;
+      final current = state.value ?? _lastSuccessfulData ?? await future;
       state = const AsyncLoading();
-      state = AsyncData(await operation(current));
+      final updated = await operation(current);
+      _lastSuccessfulData = updated;
+      state = AsyncData(updated);
+    } on ArgumentError {
+      state = AsyncData(_lastSuccessfulData ?? const []);
+      rethrow;
     } catch (error, stackTrace) {
       state = AsyncError<List<ConcludedHabitsModel>>(error, stackTrace);
       rethrow;
