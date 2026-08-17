@@ -1,6 +1,7 @@
 import 'package:hive_ce/hive.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/completion_value.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/concluded_habits_model.dart';
+import 'package:make_a_habbit/data/dtos/persisted_field_reader.dart';
 
 final class ConclusionDto {
   const ConclusionDto({
@@ -63,12 +64,16 @@ final class ConclusionDtoAdapter extends TypeAdapter<ConclusionDto> {
         reader.readByte(): reader.read(),
     };
     return ConclusionDto(
-      habitId: fields[0] as String,
-      conclusionDate: fields[1] as DateTime,
-      isYesNo: fields[2] as bool,
-      yesNoValue: fields[3] as bool?,
-      quantityValue: (fields[4] as num?)?.toInt(),
-      note: fields[5] as String?,
+      habitId: readRequiredField<String>(fields, 0, 'conclusion.habitId'),
+      conclusionDate: readRequiredField<DateTime>(fields, 1, 'conclusion.date'),
+      isYesNo: readRequiredField<bool>(fields, 2, 'conclusion.isYesNo'),
+      yesNoValue: readOptionalField<bool>(fields, 3, 'conclusion.yesNoValue'),
+      quantityValue: readOptionalIntField(
+        fields,
+        4,
+        'conclusion.quantityValue',
+      ),
+      note: readOptionalField<String>(fields, 5, 'conclusion.note'),
     );
   }
 

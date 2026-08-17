@@ -12,6 +12,11 @@ class WeeklyGraphicCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final today = ref.watch(clockProvider).now();
+    final highestValue = weeklyData.values.fold<int>(
+      0,
+      (a, b) => a > b ? a : b,
+    );
+    final maxY = (highestValue < 10 ? 10 : highestValue).toDouble();
     return Card(
       color: AppColors.cardBackgrounColor,
       elevation: 0,
@@ -32,7 +37,7 @@ class WeeklyGraphicCard extends ConsumerWidget {
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
-                  maxY: 10,
+                  maxY: maxY,
                   barTouchData: BarTouchData(enabled: false),
                   titlesData: FlTitlesData(
                     show: true,

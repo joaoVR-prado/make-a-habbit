@@ -18,6 +18,7 @@ class _HorizontalCalendarState extends ConsumerState<HorizontalCalendar> {
   late final double _itemSize;
 
   late final DateTime _startDate;
+  late final DateTime _endDate;
   late final ScrollController _scrollController;
 
   @override
@@ -28,6 +29,7 @@ class _HorizontalCalendarState extends ConsumerState<HorizontalCalendar> {
 
     final now = ref.read(clockProvider).now();
     _startDate = DateTime(now.year - 1, 1, 1);
+    _endDate = DateTime(now.year + 1, 1, 1);
 
     // Calcula no calendario o dia de hoje (Do dia atual ate o ano anterior, no dia 1 do mes 1)
     final daysUntilToday = _daysBetween(_startDate, now);
@@ -40,9 +42,9 @@ class _HorizontalCalendarState extends ConsumerState<HorizontalCalendar> {
   }
 
   int _daysBetween(DateTime from, DateTime to) {
-    from = DateTime(from.year, from.month, from.day);
-    to = DateTime(to.year, to.month, to.day);
-    return (to.difference(from).inHours / 24).round();
+    final fromUtc = DateTime.utc(from.year, from.month, from.day);
+    final toUtc = DateTime.utc(to.year, to.month, to.day);
+    return toUtc.difference(fromUtc).inDays;
   }
 
   @override
@@ -83,10 +85,14 @@ class _HorizontalCalendarState extends ConsumerState<HorizontalCalendar> {
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
-        itemCount: 365 * 2, // Ana retroativo + ano atual
+        itemCount: _daysBetween(_startDate, _endDate) + 1,
         itemExtent: _itemSize,
         itemBuilder: (context, index) {
-          final date = _startDate.add(Duration(days: index));
+          final date = DateTime(
+            _startDate.year,
+            _startDate.month,
+            _startDate.day + index,
+          );
           final isSelected =
               date.day == selectedDate.day &&
               date.month == selectedDate.month &&

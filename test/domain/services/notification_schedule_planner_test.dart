@@ -12,6 +12,8 @@ void main() {
     required HabitFrequencyType frequencia,
     List<int>? dias,
     String id = 'habito',
+    DateTime? inicio,
+    DateTime? fim,
   }) {
     return HabitModel(
       id: id,
@@ -19,7 +21,8 @@ void main() {
       name: 'Beber água',
       conclusionType: HabitConclusionType.yesNo,
       frequency: HabitFrequency.fromType(type: frequencia, selectedDays: dias),
-      startDate: DateTime(2026, 1, 1),
+      startDate: inicio ?? DateTime(2026, 1, 1),
+      endDate: fim,
       notificationId: planner.baseIdForHabit(id),
       notificationTime: DateTime(2026, 1, 1, 9, 30),
     );
@@ -55,8 +58,9 @@ void main() {
 
       expect(planos, hasLength(2));
       expect(
-        planos
-          .map((plano) => (plano.schedule as RepeatingCalendarSchedule).weekday),
+        planos.map(
+          (plano) => (plano.schedule as RepeatingCalendarSchedule).weekday,
+        ),
         [DateTime.monday, DateTime.friday],
       );
       expect(planos.map((plano) => plano.id).toSet(), hasLength(2));
@@ -77,7 +81,9 @@ void main() {
 
       expect(planos, hasLength(3));
       expect(
-        planos.map((plano) => (plano.schedule as RepeatingCalendarSchedule).day),
+        planos.map(
+          (plano) => (plano.schedule as RepeatingCalendarSchedule).day,
+        ),
         [1, 15, 31],
       );
     });
@@ -153,6 +159,78 @@ void main() {
       final agenda = planos.single.schedule as RepeatingCalendarSchedule;
       expect(agenda.hour, 12);
       expect(agenda.minute, 0);
+    });
+
+    test('Agenda a ofensiva somente nos dias do hábito semanal.', () {
+      final planos = planner.plan(
+        habit: criarHabito(
+          frequencia: HabitFrequencyType.weekly,
+          dias: [DateTime.monday, DateTime.friday],
+        ),
+        reminderEnabled: false,
+        streakEnabled: true,
+        now: DateTime(2026, 8, 8),
+      );
+
+      expect(planos, hasLength(2));
+      expect(
+        planos.map(
+          (plano) => (plano.schedule as RepeatingCalendarSchedule).weekday,
+        ),
+        [DateTime.monday, DateTime.friday],
+      );
+    });
+
+    test('Não cria agendamentos para um hábito encerrado.', () {
+      final planos = planner.plan(
+        habit: criarHabito(
+          frequencia: HabitFrequencyType.daily,
+          fim: DateTime(2026, 8, 7),
+        ),
+        reminderEnabled: true,
+        streakEnabled: true,
+        now: DateTime(2026, 8, 8),
+      );
+
+      expect(planos, isEmpty);
+    });
+
+    test('Não cria agendamentos antes do início do hábito.', () {
+      final planos = planner.plan(
+        habit: criarHabito(
+          frequencia: HabitFrequencyType.daily,
+          inicio: DateTime(2026, 8, 9),
+        ),
+        reminderEnabled: true,
+        streakEnabled: true,
+        now: DateTime(2026, 8, 8),
+      );
+
+      expect(planos, isEmpty);
+    });
+
+    test('Não cria recorrências que ultrapassem o término do hábito.', () {
+      final fim = DateTime(2026, 8, 10);
+      final planos = planner.plan(
+        habit: criarHabito(frequencia: HabitFrequencyType.daily, fim: fim),
+        reminderEnabled: true,
+        streakEnabled: true,
+        now: DateTime(2026, 8, 8),
+      );
+
+      expect(planos, isNotEmpty);
+      expect(
+        planos.every((plano) => plano.schedule is ExactDateSchedule),
+        isTrue,
+      );
+      expect(
+        planos
+            .map((plano) => (plano.schedule as ExactDateSchedule).date)
+            .every(
+              (date) => !DateTime(date.year, date.month, date.day).isAfter(fim),
+            ),
+        isTrue,
+      );
     });
   });
 }
