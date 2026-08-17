@@ -58,7 +58,7 @@ void main() {
       expect(result.hasPartialFailures, isFalse);
       verify(() => scheduler.cancelForHabit('primeiro')).called(1);
       verify(() => scheduler.cancelForHabit('segundo')).called(1);
-      verifyInOrder([conclusions.clear, notifications.clear, habits.clear]);
+      verifyInOrder([habits.clear, conclusions.clear, notifications.clear]);
     });
 
     test('Continua a limpeza quando serviços auxiliares falham.', () async {
@@ -86,6 +86,8 @@ void main() {
         when(habits.clear).thenThrow(Exception('armazenamento'));
 
         await expectLater(clearHabitData(), throwsException);
+        verifyNever(conclusions.clear);
+        verifyNever(notifications.clear);
       },
     );
   });

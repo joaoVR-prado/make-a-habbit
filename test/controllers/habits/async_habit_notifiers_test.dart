@@ -8,6 +8,9 @@ import 'package:make_a_habbit/data/providers/concluded_habits_repository_provide
 import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
 import 'package:make_a_habbit/domain/repositories/conclusion_repository.dart';
 import 'package:make_a_habbit/domain/repositories/habit_repository.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_frequency.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
+import 'package:make_a_habbit/domain/entities/habits/habit_type.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockConclusionRepository extends Mock implements ConclusionRepository {}
@@ -96,12 +99,15 @@ void main() {
 
     test('Rejeita uma segunda gravação enquanto a primeira está em andamento.', () async {
       final repository = _MockConclusionRepository();
+      final habits = _MockHabitRepository();
       final pendingSave = Completer<void>();
       when(() => repository.getAll()).thenReturn([]);
       when(() => repository.save(any())).thenAnswer((_) => pendingSave.future);
+      when(() => habits.getById('habito')).thenReturn(_habit());
       final container = ProviderContainer(
         overrides: [
           concludedHabitsRepositoryProvider.overrideWithValue(repository),
+          habitRepositoryProvider.overrideWithValue(habits),
         ],
       );
       addTearDown(container.dispose);
@@ -129,3 +135,12 @@ void main() {
     });
   });
 }
+
+HabitModel _habit() => HabitModel(
+  id: 'habito',
+  iconCode: 1,
+  name: 'Hábito válido',
+  conclusionType: HabitConclusionType.yesNo,
+  frequency: const DailyHabitFrequency(),
+  startDate: DateTime(2020),
+);

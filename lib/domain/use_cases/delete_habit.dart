@@ -23,6 +23,8 @@ final class DeleteHabit {
   Future<HabitOperationResult> call(String habitId) async {
     final failures = <HabitOperationFailure>{};
 
+    await _habits.delete(habitId);
+
     try {
       await _notificationScheduler.cancelForHabit(habitId);
     } catch (_) {
@@ -38,8 +40,6 @@ final class DeleteHabit {
     } catch (_) {
       failures.add(HabitOperationFailure.notificationConfig);
     }
-
-    await _habits.delete(habitId);
     return HabitOperationResult(failures: Set.unmodifiable(failures));
   }
 }
