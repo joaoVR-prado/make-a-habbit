@@ -10,10 +10,9 @@ class ChooseConclusionType extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ChooseConclusionType> createState() => _ChooseConclusionType();
-
 }
 
-class _ChooseConclusionType extends ConsumerState<ChooseConclusionType>{
+class _ChooseConclusionType extends ConsumerState<ChooseConclusionType> {
   @override
   Widget build(BuildContext context) {
     //final selectedHabitType = ref.watch(draftConclusionTypeProvider);
@@ -22,23 +21,27 @@ class _ChooseConclusionType extends ConsumerState<ChooseConclusionType>{
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        CommonCreateHabitTitle(titleText: 'Escolha uma opção de avaliação \n do seu progresso:'),
-        _buildHabitTypeCard(
-          context: context, 
-          ref: ref, 
-          title: 'COM SIM OU NÃO', 
-          subtitle: 'Se você quer registrar se obteve sucesso ou não em sua atividade.', 
-          type: HabitConclusionType.yesNo, 
-          isSelected: selectedHabitType == HabitConclusionType.yesNo
+        CommonCreateHabitTitle(
+          titleText: 'Escolha uma opção de avaliação \n do seu progresso:',
         ),
         _buildHabitTypeCard(
-          context: context, 
-          ref: ref, 
-          title: 'COM UMA QUANTIDADE', 
-          subtitle: 'Se você quer estipular um número como meta ou limite para a atividade.', 
-          type: HabitConclusionType.goalQuantity, 
-          isSelected: selectedHabitType == HabitConclusionType.goalQuantity
-        )
+          context: context,
+          ref: ref,
+          title: 'COM SIM OU NÃO',
+          subtitle:
+              'Se você quer registrar se obteve sucesso ou não em sua atividade.',
+          type: HabitConclusionType.yesNo,
+          isSelected: selectedHabitType == HabitConclusionType.yesNo,
+        ),
+        _buildHabitTypeCard(
+          context: context,
+          ref: ref,
+          title: 'COM UMA QUANTIDADE',
+          subtitle:
+              'Se você quer estipular um número como meta ou limite para a atividade.',
+          type: HabitConclusionType.goalQuantity,
+          isSelected: selectedHabitType == HabitConclusionType.goalQuantity,
+        ),
       ],
     );
   }
@@ -50,24 +53,28 @@ class _ChooseConclusionType extends ConsumerState<ChooseConclusionType>{
     required String subtitle,
     required HabitConclusionType type,
     required bool isSelected,
-
-  }){
-    return  Column(
+  }) {
+    return Column(
       children: [
         SizedBox(
           width: double.infinity,
           child: Card(
             margin: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-            color: isSelected 
-              ? AppColors.homePageIconColor
-              : AppColors.cardBackgrounColor,
-            child: InkWell(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(6),
-              onTap: (){
+            ),
+            color: isSelected
+                ? AppColors.homePageIconColor
+                : AppColors.cardBackgrounColor,
+            child: InkWell(
+              key: ValueKey('conclusion_type_${type.name}'),
+              borderRadius: BorderRadius.circular(6),
+              onTap: () {
                 //ref.read(draftConclusionTypeProvider.notifier).state = type;
-                ref.read(draftHabitProvider.notifier).updateConclusionType(type);
+                ref
+                    .read(draftHabitProvider.notifier)
+                    .updateConclusionType(type);
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -84,13 +91,12 @@ class _ChooseConclusionType extends ConsumerState<ChooseConclusionType>{
           padding: EdgeInsets.only(bottom: 12),
           child: Text(
             subtitle,
-            style: Theme.of(context).textTheme.labelSmall!.copyWith(
-              fontSize: 10
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall!.copyWith(fontSize: 10),
           ),
         ),
       ],
-    );  
-
+    );
   }
 }

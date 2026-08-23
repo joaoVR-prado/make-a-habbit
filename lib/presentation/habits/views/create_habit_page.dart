@@ -25,14 +25,14 @@ class CreateHabitPage extends ConsumerStatefulWidget {
     HabitModel habit,
     NotificationConfigModel notification,
     bool isEditing,
-  )? saveHabit;
+  )?
+  saveHabit;
 
   @override
   ConsumerState<CreateHabitPage> createState() => _CreateHabitPageStage();
-
 }
 
-class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
+class _CreateHabitPageStage extends ConsumerState<CreateHabitPage> {
   late final PageController _pageController;
   int _currentPage = 0;
   final int _totalPages = 5;
@@ -42,25 +42,21 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
-
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
-
   }
 
   Future<void> _nextPage() async {
-    if(_currentPage < _totalPages - 1){
+    if (_currentPage < _totalPages - 1) {
       await _pageController.nextPage(
-        duration: const Duration(
-          milliseconds: 300
-        ), 
-        curve: Curves.easeInOut
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
       );
-    } else{
+    } else {
       if (_isSaving) return;
       setState(() => _isSaving = true);
       try {
@@ -70,25 +66,21 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
       } finally {
         if (mounted) setState(() => _isSaving = false);
       }
-
     }
   }
 
-  void _previousPage(){
-    if(_currentPage > 0){
+  void _previousPage() {
+    if (_currentPage > 0) {
       _pageController.previousPage(
-        duration: const Duration(
-          milliseconds: 300,
-        ), 
-        curve: Curves.easeInOut
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
       );
-    } else{
+    } else {
       Navigator.pop(context);
-
     }
   }
 
-  Future<void> _saveDraft() async{
+  Future<void> _saveDraft() async {
     final draftState = ref.read(draftHabitProvider);
     final category = draftState.category;
     final conclusionType = draftState.conclusionType;
@@ -136,17 +128,19 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
       final reminderTime = draftState.reminderTime!;
       final now = ref.read(clockProvider).now();
       notificationDateTime = DateTime(
-        now.year, 
-        now.month, 
-        now.day, 
+        now.year,
+        now.month,
+        now.day,
         reminderTime.hour,
         reminderTime.minute,
       );
     }
 
     final id = existingId ?? uuid.v4();
-    final notificationId = const NotificationSchedulePlanner().baseIdForHabit(id);
-    
+    final notificationId = const NotificationSchedulePlanner().baseIdForHabit(
+      id,
+    );
+
     late final HabitModel newHabit;
     try {
       newHabit = HabitModel(
@@ -170,41 +164,39 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
     final newNotification = NotificationConfigModel(
       isReminderEnabled: draftState.reminderTime != null,
       isStreakEnabled: draftState.isStreakEnabled,
-      customTimeNotification: notificationDateTime != null ? [notificationDateTime] : [],
-
+      customTimeNotification: notificationDateTime != null
+          ? [notificationDateTime]
+          : [],
     );
 
     final saveHabit = widget.saveHabit;
     final result = saveHabit != null
         ? await saveHabit(newHabit, newNotification, existingId != null)
         : existingId == null
-            ? await ref
-                .read(habitControllerProvider.notifier)
-                .addHabit(newHabit, newNotification)
-            : await ref
-                .read(habitControllerProvider.notifier)
-                .updateHabit(newHabit, newNotification);
+        ? await ref
+              .read(habitControllerProvider.notifier)
+              .addHabit(newHabit, newNotification)
+        : await ref
+              .read(habitControllerProvider.notifier)
+              .updateHabit(newHabit, newNotification);
 
-    if(mounted){
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             result.hasPartialFailures
                 ? _partialFailureMessage(result)
                 : existingId == null
-                    ? 'Hábito criado com sucesso!'
-                    : 'Hábito atualizado com sucesso!',
+                ? 'Hábito criado com sucesso!'
+                : 'Hábito atualizado com sucesso!',
             style: Theme.of(context).textTheme.labelMedium,
-            
           ),
           backgroundColor: AppColors.calendarMainColor,
           duration: Duration(seconds: 3),
         ),
       );
       Navigator.pop(context);
-
     }
-
   }
 
   String _partialFailureMessage(HabitOperationResult result) {
@@ -217,9 +209,9 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
 
   void _showValidationError(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _showPersistenceError() {
@@ -245,7 +237,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
               child: PageView(
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (index){
+                onPageChanged: (index) {
                   setState(() {
                     _currentPage = index;
                   });
@@ -262,46 +254,48 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
             ),
             _buildBottomBar(),
           ],
-        )
+        ),
       ),
     );
   }
-  
-  Widget _buildBottomBar(){
+
+  Widget _buildBottomBar() {
     final draftState = ref.watch(draftHabitProvider);
     bool canGoNext = true;
 
     // Regra da tela 1 do cadastro
-    if(_currentPage == 0 && draftState.category == null){
+    if (_currentPage == 0 && draftState.category == null) {
       canGoNext = false;
-
-    } else if(_currentPage == 1 && draftState.conclusionType == null){  // Regra da tela 2 do cadastro
+    } else if (_currentPage == 1 && draftState.conclusionType == null) {
+      // Regra da tela 2 do cadastro
       canGoNext = false;
-
-    } else if(_currentPage == 2){  // Regra de tela 3 do cadastro
+    } else if (_currentPage == 2) {
+      // Regra de tela 3 do cadastro
       if (draftState.name.trim().isEmpty || draftState.name.trim().length < 3) {
         canGoNext = false;
-      } else if (draftState.conclusionType == HabitConclusionType.goalQuantity) {
-        if (draftState.goalQuantity.trim().isEmpty || draftState.goalQuantity == '0') {
+      } else if (draftState.conclusionType ==
+          HabitConclusionType.goalQuantity) {
+        if (draftState.goalQuantity.trim().isEmpty ||
+            draftState.goalQuantity == '0') {
           canGoNext = false;
         }
       }
-      
-    } else if(_currentPage == 3 ){ // Regra da tela 4
-      if(draftState.frequencyType == null){
+    } else if (_currentPage == 3) {
+      // Regra da tela 4
+      if (draftState.frequencyType == null) {
         canGoNext = false;
-      } else if(draftState.frequencyType == HabitFrequencyType.weekly && draftState.weeklyDays.isEmpty){
+      } else if (draftState.frequencyType == HabitFrequencyType.weekly &&
+          draftState.weeklyDays.isEmpty) {
         canGoNext = false;
-      } else if(draftState.frequencyType == HabitFrequencyType.monthly && draftState.monthlyDays.isEmpty){
+      } else if (draftState.frequencyType == HabitFrequencyType.monthly &&
+          draftState.monthlyDays.isEmpty) {
         canGoNext = false;
       }
     }
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      decoration: const BoxDecoration(
-        color: AppColors.bottomAppBarcolor,
-      ),
+      decoration: const BoxDecoration(color: AppColors.bottomAppBarcolor),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -310,30 +304,27 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
             child: Text(
               _currentPage == 0 ? 'CANCELAR' : 'ANTERIOR',
               style: Theme.of(context).textTheme.labelMedium,
-            )
+            ),
           ),
           Row(
-            children: List.generate(
-              _totalPages,
-              (index) {
-                final isCompletedOrActive = index <= _currentPage;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isCompletedOrActive 
+            children: List.generate(_totalPages, (index) {
+              final isCompletedOrActive = index <= _currentPage;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isCompletedOrActive
                       ? AppColors.positiveActionDialogTextColor
                       : AppColors.darkBlue,
-                    border: Border.all(
-                      color: AppColors.positiveActionDialogTextColor
-                    )
+                  border: Border.all(
+                    color: AppColors.positiveActionDialogTextColor,
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            }),
           ),
           Visibility(
             visible: canGoNext,
@@ -341,6 +332,11 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
             maintainAnimation: true,
             maintainState: true,
             child: TextButton(
+              key: ValueKey(
+                _currentPage == _totalPages - 1
+                    ? 'finish_habit_creation'
+                    : 'next_habit_creation',
+              ),
               onPressed: _isSaving ? null : _nextPage,
               child: _isSaving
                   ? const SizedBox.square(
@@ -348,11 +344,11 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage>{
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : Text(
-                      _currentPage == _totalPages -1 ? 'FINALIZAR' : 'PRÓXIMA',
+                      _currentPage == _totalPages - 1 ? 'FINALIZAR' : 'PRÓXIMA',
                       style: Theme.of(context).textTheme.labelMedium,
                     ),
             ),
-          )
+          ),
         ],
       ),
     );

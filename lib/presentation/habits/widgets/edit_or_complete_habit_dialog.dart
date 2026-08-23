@@ -73,6 +73,7 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton(
+                  key: Key('edit_habit_text_button'),
                   onPressed: () async {
                     final repository = ref.read(
                       notificationConfigRepositoryProvider,

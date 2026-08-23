@@ -11,10 +11,9 @@ class ChooseHabitCategory extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ChooseHabitCategory> createState() => _ChooseHabitCategory();
-
 }
 
-class _ChooseHabitCategory extends ConsumerState<ChooseHabitCategory>{
+class _ChooseHabitCategory extends ConsumerState<ChooseHabitCategory> {
   final habitCategories = HabitIcon.values;
   @override
   Widget build(BuildContext context) {
@@ -23,7 +22,9 @@ class _ChooseHabitCategory extends ConsumerState<ChooseHabitCategory>{
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        CommonCreateHabitTitle(titleText: 'Selecione uma categoria para \n o seu hábito:'),
+        CommonCreateHabitTitle(
+          titleText: 'Selecione uma categoria para \n o seu hábito:',
+        ),
         Expanded(
           child: GridView.count(
             crossAxisCount: 2,
@@ -31,54 +32,54 @@ class _ChooseHabitCategory extends ConsumerState<ChooseHabitCategory>{
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
             padding: const EdgeInsets.all(16),
-            children: 
-              List.generate(habitCategories.length, (index){
-                final currentCategory = habitCategories[index];
-                final isSelected = currentCategory == selectedCategory;
-                return Card(
-                  color: isSelected
-                    ? AppColors.homePageIconColor 
+            children: List.generate(habitCategories.length, (index) {
+              final currentCategory = habitCategories[index];
+              final isSelected = currentCategory == selectedCategory;
+              return Card(
+                color: isSelected
+                    ? AppColors.homePageIconColor
                     : AppColors.cardBackgrounColor,
-                  elevation: 0,
-                  margin: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(6)),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(6),
-                    onTap: (){
-                      ref.read(draftHabitProvider.notifier).updateCategory(currentCategory);
-          
-                    }, 
-                    child: Padding(
-                      padding: const EdgeInsetsGeometry.symmetric(horizontal: 12),
-                      child: Row(
-                        children: [
-                          CommonIconContainer(
-                            habitIcon: currentCategory, 
-                            alpha: 0.4,
-                            size: 32,
-                            padding: 4,
+                elevation: 0,
+                margin: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadiusGeometry.circular(6),
+                ),
+                child: InkWell(
+                  key: ValueKey('habit_category_${currentCategory.name}'),
+                  borderRadius: BorderRadius.circular(6),
+                  onTap: () {
+                    ref
+                      .read(draftHabitProvider.notifier)
+                      .updateCategory(currentCategory);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsetsGeometry.symmetric(horizontal: 12),
+                    child: Row(
+                      children: [
+                        CommonIconContainer(
+                          habitIcon: currentCategory,
+                          alpha: 0.4,
+                          size: 32,
+                          padding: 4,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            currentCategory.iconLabel,
+                            style: Theme.of(context).textTheme.bodyMedium!
+                              .copyWith(fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              currentCategory.iconLabel,
-                                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                  fontWeight: FontWeight.bold
-                                ),
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          )
-                        ],
-                      ),
-                    )
-                  )
-                );
-              }
-            )
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
         ),
       ],
     );
   }
-
 }

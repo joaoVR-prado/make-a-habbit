@@ -10,101 +10,110 @@ class ChooseFrequencyType extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ChooseFrequencyType> createState() => _ChooseFrequencyType();
-
 }
 
-class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{ 
+class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType> {
   @override
   Widget build(BuildContext context) {
     final draftState = ref.watch(draftHabitProvider);
     final selectedFrequency = draftState.frequencyType;
-    
-    return Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      CommonCreateHabitTitle(titleText: 'Defina uma frequência para  \n seu hábito: '),
-      Expanded(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          children: HabitFrequencyType.values.map((type) {
-            final isSelected = selectedFrequency == type;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Column(
-                children: [
-                  InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () {
-                      //ref.read(draftFrequencyTypeProvider.notifier).state = type;
-                      ref.read(draftHabitProvider.notifier).updateFrequencyType(type);
 
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 26,
-                            height: 26,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isSelected ? AppColors.positiveActionDialogTextColor : Colors.transparent,
-                              border: Border.all(
-                                color: isSelected ? AppColors.positiveActionDialogTextColor : Colors.white,
-                                width: 2.8,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        CommonCreateHabitTitle(
+          titleText: 'Defina uma frequência para  \n seu hábito: ',
+        ),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            children: HabitFrequencyType.values.map((type) {
+              final isSelected = selectedFrequency == type;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  children: [
+                    InkWell(
+                      key: ValueKey('frequency_type_${type.name}'),
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        ref
+                          .read(draftHabitProvider.notifier)
+                          .updateFrequencyType(type);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 26,
+                              height: 26,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isSelected
+                                  ? AppColors.positiveActionDialogTextColor
+                                  : Colors.transparent,
+                                border: Border.all(
+                                  color: isSelected
+                                    ? AppColors.positiveActionDialogTextColor
+                                    : Colors.white,
+                                  width: 2.8,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  type.title, 
-                                  style: Theme.of(context).textTheme.bodyLarge
-                                ),
-                                const SizedBox(height: 4),
-                              ],
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    type.title,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge,
+                                  ),
+                                  const SizedBox(height: 4),
+                                ],
+                              ),
                             ),
-                          )
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  if(isSelected && type == HabitFrequencyType.weekly) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: _buildWeeklySelector(context, ref),
-                    )
+                    if (isSelected && type == HabitFrequencyType.weekly) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: _buildWeeklySelector(context, ref),
+                      ),
+                    ],
+                    if (isSelected && type == HabitFrequencyType.monthly) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: _buildMonthlySelector(context, ref),
+                      ),
+                    ],
                   ],
-                  if(isSelected && type == HabitFrequencyType.monthly) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: _buildMonthlySelector(context, ref),
-                    )
-                  ]
-                ],
-              ),
-            );
-          }).toList(),
+                ),
+              );
+            }).toList(),
+          ),
         ),
-      )
-    ],
+      ],
     );
   }
-
 
   Widget _buildWeeklyTypeDaysCard({
     required BuildContext context,
     required String text,
     required bool isSelected,
     required VoidCallback onTap,
-  }){
+  }) {
     return Card(
       margin: const EdgeInsets.all(4), //AppColors.cardBackgrounColor
       elevation: isSelected ? 4 : 0,
-      color: isSelected ? AppColors.positiveActionDialogTextColor : AppColors.cardBackgrounColor,
+      color: isSelected
+          ? AppColors.positiveActionDialogTextColor
+          : AppColors.cardBackgrounColor,
       clipBehavior: Clip.hardEdge,
       child: SizedBox(
         width: 112, // 56
@@ -124,14 +133,14 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
                         text,
                         style: Theme.of(context).textTheme.labelLarge!.copyWith(
                           color: isSelected ? Colors.white : Colors.black,
-                          fontSize: 22
+                          fontSize: 22,
                         ),
                       ),
                     ),
                   ),
                 ),
-              )
-            )
+              ),
+            ),
           ],
         ),
       ),
@@ -143,14 +152,15 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
     required String text,
     required bool isSelected,
     required VoidCallback onTap,
-  }){
-    
+  }) {
     final double cardWidth = text == 'Último' ? 68.0 : 38.0;
 
     return Card(
       margin: const EdgeInsets.all(4), //AppColors.cardBackgrounColor
       elevation: isSelected ? 4 : 0,
-      color: isSelected ? AppColors.positiveActionDialogTextColor : Colors.transparent,
+      color: isSelected
+          ? AppColors.positiveActionDialogTextColor
+          : Colors.transparent,
       clipBehavior: Clip.hardEdge,
       child: SizedBox(
         width: cardWidth,
@@ -168,48 +178,59 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
                     child: Center(
                       child: Text(
                         text,
-                        style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                          fontSize: 20
-                        )
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelMedium!.copyWith(fontSize: 20),
                       ),
                     ),
                   ),
                 ),
-              )
-            )
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-
-  Widget _buildWeeklySelector(
-    BuildContext context,
-    WidgetRef ref
-  ){
+  Widget _buildWeeklySelector(BuildContext context, WidgetRef ref) {
     final selectedDays = ref.watch(draftHabitProvider).weeklyDays;
-    final weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+    final weekDays = [
+      'Segunda',
+      'Terça',
+      'Quarta',
+      'Quinta',
+      'Sexta',
+      'Sábado',
+      'Domingo',
+    ];
 
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       alignment: WrapAlignment.center,
-      children: List.generate(weekDays.length, (index){
+      children: List.generate(weekDays.length, (index) {
         final dayIndex = index + 1;
         final isSelected = selectedDays.contains(dayIndex);
 
         return _buildWeeklyTypeDaysCard(
-          context: context, 
-          text: weekDays[index], 
-          isSelected: isSelected, 
-          onTap: (){
-            if(isSelected){
-              ref.read(draftHabitProvider.notifier).updateWeeklyDays( selectedDays.where((d) => d != dayIndex).toList());
-            } else{
-              ref.read(draftHabitProvider.notifier).updateWeeklyDays( [...selectedDays, dayIndex]);
+          context: context,
+          text: weekDays[index],
+          isSelected: isSelected,
+          onTap: () {
+            if (isSelected) {
+              ref
+                  .read(draftHabitProvider.notifier)
+                  .updateWeeklyDays(
+                    selectedDays.where((d) => d != dayIndex).toList(),
+                  );
+            } else {
+              ref.read(draftHabitProvider.notifier).updateWeeklyDays([
+                ...selectedDays,
+                dayIndex,
+              ]);
             }
-          }
+          },
         );
       }),
     );
@@ -223,28 +244,33 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType>{
       runSpacing: 2,
       alignment: WrapAlignment.center,
       children: List.generate(32, (index) {
-        
-        final dayValue = index + 1; 
-        
+        final dayValue = index + 1;
+
         // Se for o 32, o texto será "Último", senão será o próprio número
         final text = dayValue == 32 ? 'Último' : dayValue.toString();
-        
+
         final isSelected = selectedDays.contains(dayValue);
 
         return _buildMonthlyTypeDaysCard(
           context: context,
           text: text,
           isSelected: isSelected,
-          onTap: () {   
+          onTap: () {
             if (isSelected) {
-              ref.read(draftHabitProvider.notifier).updateMonthlyDays(selectedDays.where((d) => d != dayValue).toList());
+              ref
+                  .read(draftHabitProvider.notifier)
+                  .updateMonthlyDays(
+                    selectedDays.where((d) => d != dayValue).toList(),
+                  );
             } else {
-              ref.read(draftHabitProvider.notifier).updateMonthlyDays([...selectedDays, dayValue]);
+              ref.read(draftHabitProvider.notifier).updateMonthlyDays([
+                ...selectedDays,
+                dayValue,
+              ]);
             }
           },
         );
       }),
     );
   }
-
 }
