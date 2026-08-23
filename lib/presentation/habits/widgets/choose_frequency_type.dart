@@ -38,8 +38,8 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType> {
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
                         ref
-                          .read(draftHabitProvider.notifier)
-                          .updateFrequencyType(type);
+                            .read(draftHabitProvider.notifier)
+                            .updateFrequencyType(type);
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -51,12 +51,12 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: isSelected
-                                  ? AppColors.positiveActionDialogTextColor
-                                  : Colors.transparent,
+                                    ? AppColors.positiveActionDialogTextColor
+                                    : Colors.transparent,
                                 border: Border.all(
                                   color: isSelected
-                                    ? AppColors.positiveActionDialogTextColor
-                                    : Colors.white,
+                                      ? AppColors.positiveActionDialogTextColor
+                                      : Colors.white,
                                   width: 2.8,
                                 ),
                               ),
@@ -104,6 +104,7 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType> {
 
   Widget _buildWeeklyTypeDaysCard({
     required BuildContext context,
+    required int day,
     required String text,
     required bool isSelected,
     required VoidCallback onTap,
@@ -124,6 +125,7 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
+                  key: ValueKey('weekly_day_$day'),
                   onTap: onTap,
                   child: SizedBox(
                     width: 56,
@@ -149,6 +151,7 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType> {
 
   Widget _buildMonthlyTypeDaysCard({
     required BuildContext context,
+    required int day,
     required String text,
     required bool isSelected,
     required VoidCallback onTap,
@@ -171,6 +174,7 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
+                  key: ValueKey('monthly_day_$day'),
                   onTap: onTap,
                   child: SizedBox(
                     width: 38,
@@ -215,6 +219,7 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType> {
 
         return _buildWeeklyTypeDaysCard(
           context: context,
+          day: dayIndex,
           text: weekDays[index],
           isSelected: isSelected,
           onTap: () {
@@ -253,6 +258,7 @@ class _ChooseFrequencyType extends ConsumerState<ChooseFrequencyType> {
 
         return _buildMonthlyTypeDaysCard(
           context: context,
+          day: dayValue,
           text: text,
           isSelected: isSelected,
           onTap: () {
