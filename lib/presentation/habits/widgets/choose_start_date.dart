@@ -247,7 +247,6 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Card(
-              key: Key('start_date_card'),
               margin: const EdgeInsets.only(left: 18),
               elevation: isSelected ? 4 : 0,
               color: isSelected
