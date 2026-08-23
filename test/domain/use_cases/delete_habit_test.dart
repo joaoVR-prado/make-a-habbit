@@ -40,7 +40,7 @@ void main() {
 
   group('CASOS DE USO PARA EXCLUIR HÁBITO', () {
     test(
-      'Cancela a agenda antes de excluir o hábito e os dados relacionados',
+      'Cancela a agenda antes de excluir o hábito e os dados relacionados.',
       () async {
         when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
         when(() => conclusions.deleteByHabit(habitId)).thenAnswer((_) async {});
@@ -59,7 +59,7 @@ void main() {
       },
     );
 
-    test('Continua a limpeza e informa todas as falhas parciais', () async {
+    test('Continua a limpeza e informa as falhas auxiliares.', () async {
       when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
       when(() => conclusions.deleteByHabit(habitId)).thenThrow(Exception());
       when(() => configs.delete(habitId)).thenThrow(Exception());
@@ -74,11 +74,30 @@ void main() {
           HabitOperationFailure.notificationConfig,
         ]),
       );
+      expect(
+        result.failures,
+        isNot(contains(HabitOperationFailure.notificationSchedule)),
+      );
       verify(() => habits.delete(habitId)).called(1);
     });
 
     test(
-      'Permite repetir a exclusão sem alterar a sequência de limpeza',
+      'Não exclui o hábito quando a agenda não pode ser cancelada.',
+      () async {
+        when(
+          () => scheduler.cancelForHabit(habitId),
+        ).thenThrow(Exception('agendamento'));
+
+        await expectLater(deleteHabit(habitId), throwsException);
+
+        verifyNever(() => habits.delete(habitId));
+        verifyNever(() => conclusions.deleteByHabit(habitId));
+        verifyNever(() => configs.delete(habitId));
+      },
+    );
+
+    test(
+      'Permite repetir a exclusão sem alterar a sequência de limpeza.',
       () async {
         when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
         when(() => conclusions.deleteByHabit(habitId)).thenAnswer((_) async {});
@@ -95,7 +114,7 @@ void main() {
       },
     );
 
-    test('Propaga a falha quando o hábito não pode ser excluído', () async {
+    test('Propaga a falha quando o hábito não pode ser excluído.', () async {
       when(() => scheduler.cancelForHabit(habitId)).thenAnswer((_) async {});
       when(() => conclusions.deleteByHabit(habitId)).thenAnswer((_) async {});
       when(() => configs.delete(habitId)).thenAnswer((_) async {});
@@ -106,20 +125,5 @@ void main() {
       verifyNever(() => conclusions.deleteByHabit(habitId));
       verifyNever(() => configs.delete(habitId));
     });
-
-    test(
-      'Não exclui o hábito quando a agenda não pode ser cancelada',
-      () async {
-        when(
-          () => scheduler.cancelForHabit(habitId),
-        ).thenThrow(Exception('agendamento'));
-
-        await expectLater(deleteHabit(habitId), throwsException);
-
-        verifyNever(() => habits.delete(habitId));
-        verifyNever(() => conclusions.deleteByHabit(habitId));
-        verifyNever(() => configs.delete(habitId));
-      },
-    );
   });
 }

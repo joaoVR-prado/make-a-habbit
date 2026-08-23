@@ -115,8 +115,8 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
             );
             if (selectedDate != null) {
               ref
-                  .read(draftHabitProvider.notifier)
-                  .updateStartDate(selectedDate);
+                .read(draftHabitProvider.notifier)
+                .updateStartDate(selectedDate);
             }
           },
         ),
@@ -209,8 +209,8 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
             if (selectedTime != null) {
               //ref.read(draftReminderTimeNotificationProvider.notifier).state = selectedTime;
               ref
-                  .read(draftHabitProvider.notifier)
-                  .updateReminderTime(selectedTime);
+                .read(draftHabitProvider.notifier)
+                .updateReminderTime(selectedTime);
             }
           },
         ),
@@ -250,8 +250,8 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
               margin: const EdgeInsets.only(left: 18),
               elevation: isSelected ? 4 : 0,
               color: isSelected
-                  ? AppColors.positiveActionDialogTextColor
-                  : AppColors.cardBackgrounColor,
+                ? AppColors.positiveActionDialogTextColor
+                : AppColors.cardBackgrounColor,
               clipBehavior: Clip.hardEdge,
               child: SizedBox(
                 width: 112,
@@ -282,8 +282,8 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
                       color: AppColors.calendarMainColor,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.white, // Um cinza clarinho para não pesar
-                        width: 0.1, // Espessura da borda
+                        color: Colors.white,
+                        width: 0.1,
                       ),
                     ),
                     child: const Padding(
@@ -339,7 +339,6 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
               return; // Sai do onChanged sem salvar
             }
           }
-          //ref.read(draftEnableStreakProvider.notifier).state = newValue;
           ref.read(draftHabitProvider.notifier).toggleStreak(newValue);
         },
       ),

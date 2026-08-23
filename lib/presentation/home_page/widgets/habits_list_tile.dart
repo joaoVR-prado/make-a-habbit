@@ -20,6 +20,7 @@ class HabitsListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      key: Key('habit_card_${habit.id}'),
       color: Colors.transparent,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       elevation: 0,

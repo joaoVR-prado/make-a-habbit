@@ -42,44 +42,43 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       appBar: AppBar(
-        // TODO: Trocar icones/funcoes ao mudar de pagina
         leading: currentTab == 0
-            ? IconButton(
-                icon: const Icon(Icons.calendar_month, size: 38),
-                color: AppColors.homePageIconColor,
-                onPressed: () async {
-                  final currentDate = ref.read(selectedDateProvider);
+          ? IconButton(
+              icon: const Icon(Icons.calendar_month, size: 38),
+              color: AppColors.homePageIconColor,
+              onPressed: () async {
+                final currentDate = ref.read(selectedDateProvider);
 
-                  final DateTime? selectedDate = await showDatePicker(
-                    context: context,
-                    initialDate: currentDate,
-                    firstDate: DateTime(today.year - 1), // Ano passado
-                    lastDate: DateTime(today.year + 1), // Vai até ano que vem
+                final DateTime? selectedDate = await showDatePicker(
+                  context: context,
+                  initialDate: currentDate,
+                  firstDate: DateTime(today.year - 1), // Ano passado
+                  lastDate: DateTime(today.year + 1), // Vai até ano que vem
 
-                    builder: (context, child) {
-                      return Theme(
-                        data: Theme.of(context).copyWith(
-                          colorScheme: const ColorScheme.light(
-                            primary: AppColors.homePageIconColor,
-                            onPrimary: Colors.white,
-                            onSurface: Colors.black,
-                          ),
+                  builder: (context, child) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: const ColorScheme.light(
+                          primary: AppColors.homePageIconColor,
+                          onPrimary: Colors.white,
+                          onSurface: Colors.black,
                         ),
-                        child: child!,
-                      );
-                    },
-                  );
-                  if (selectedDate != null && selectedDate != currentDate) {
-                    ref.read(selectedDateProvider.notifier).state =
-                        selectedDate;
-                  }
-                },
-              )
-            : null,
+                      ),
+                      child: child!,
+                    );
+                  },
+                );
+                if (selectedDate != null && selectedDate != currentDate) {
+                  ref.read(selectedDateProvider.notifier).state =
+                    selectedDate;
+                }
+              },
+            )
+          : null,
         title: Text(
           currentTab == 0
-              ? '${_getDayName(selectedDate.weekday)} - ${_getMonthName(selectedDate.month)}. ${selectedDate.day} - ${selectedDate.year}'
-              : 'Relatórios',
+            ? '${_getDayName(selectedDate.weekday)} - ${_getMonthName(selectedDate.month)}. ${selectedDate.day} - ${selectedDate.year}'
+            : 'Relatórios',
           style: Theme.of(context).textTheme.labelMedium,
         ),
         actions: [
@@ -141,37 +140,37 @@ class _HomePageState extends ConsumerState<HomePage> {
         ],
       ),
       floatingActionButton: currentTab == 0
-          ? FloatingActionButton(
-              onPressed: () async {
-                await Navigator.of(context).push(HabitDraftRoute.create());
-              },
-              child: Icon(Icons.add, color: Colors.white),
-            )
-          : null,
+        ? FloatingActionButton(
+            key: const ValueKey('create_habit'),
+            onPressed: () async {
+              await Navigator.of(context).push(HabitDraftRoute.create());
+            },
+            child: Icon(Icons.add, color: Colors.white),
+          )
+        : null,
       body: currentTab == 0
-          ? displayHabits.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, _) => Center(
-                child: FilledButton(
-                  onPressed: () async {
-                    try {
-                      await Future.wait([
-                        ref.read(habitControllerProvider.notifier).retry(),
-                        ref
-                            .read(concludedHabitsControllerProvider.notifier)
-                            .retry(),
-                      ]);
-                    } catch (_) {
-                      // Os providers preservam o AsyncError para nova tentativa.
-                    }
-                  },
-                  child: const Text('Tentar novamente'),
-                ),
+        ? displayHabits.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, _) => Center(
+              child: FilledButton(
+                onPressed: () async {
+                  try {
+                    await Future.wait([
+                      ref.read(habitControllerProvider.notifier).retry(),
+                      ref
+                        .read(concludedHabitsControllerProvider.notifier)
+                        .retry(),
+                    ]);
+                  } catch (_) {
+                  }
+                },
+                child: const Text('Tentar novamente'),
               ),
-              data: (items) =>
-                  _buildHabits(isToday: isToday, displayHabits: items),
-            )
-          : const ReportsPage(),
+            ),
+            data: (items) =>
+                _buildHabits(isToday: isToday, displayHabits: items),
+          )
+        : const ReportsPage(),
       //: Center(child: Text('Tela de Relatórios em construção!')),
       bottomNavigationBar: BottomAppBar(
         height: 60,

@@ -11,10 +11,9 @@ class ChooseHabitName extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ChooseHabitName> createState() => _ChooseHabitName();
-
 }
 
-class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
+class _ChooseHabitName extends ConsumerState<ChooseHabitName> {
   late final TextEditingController _qtdController;
 
   @override
@@ -22,14 +21,12 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
     super.initState();
     final quantity = ref.read(draftHabitProvider).goalQuantity;
     _qtdController = TextEditingController(text: quantity);
-
   }
 
   @override
   void dispose() {
     super.dispose();
     _qtdController.dispose();
-
   }
 
   @override
@@ -50,33 +47,32 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
           },
           label: 'Ex: Treino de Musculação...',
           hint: 'Hábito', //Hábito
-          keyboardType: TextInputType.text
-
+          keyboardType: TextInputType.text,
         ),
 
-        if(selectedHabitType == HabitConclusionType.goalQuantity) ...[
+        if (selectedHabitType == HabitConclusionType.goalQuantity) ...[
           const SizedBox(height: 16),
           _buildQuantityInputCard(
             key: const ValueKey('input_quantity'),
             context: context,
             ref: ref,
-            label: 'Ex: Beber água 2x ao dia.', 
+            label: 'Ex: Beber água 2x ao dia.',
             hint: '0',
           ),
-          
         ],
         _buildTextInputCard(
           key: const ValueKey('input_description'),
           context: context,
           value: draftState.description,
           onChanged: (newDescription) {
-            ref.read(draftHabitProvider.notifier).updateDescription(newDescription);
-
+            ref
+                .read(draftHabitProvider.notifier)
+                .updateDescription(newDescription);
           },
-          label: 'Ex: Quero ler 10 páginas de um livro por dia pois...', //Descrição(opcional)
+          label:
+              'Ex: Quero ler 10 páginas de um livro por dia pois...', //Descrição(opcional)
           hint: 'Descrição(opcional)',
-          keyboardType: TextInputType.text
-
+          keyboardType: TextInputType.text,
         ),
       ],
     );
@@ -90,7 +86,7 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
     required String label,
     required String hint,
     required TextInputType keyboardType,
-  }){
+  }) {
     return Column(
       children: [
         SizedBox(
@@ -98,18 +94,21 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
           child: Card(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
             color: AppColors.cardBackgrounColor,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               child: TextFormField(
+                key: key,
                 initialValue: value,
                 keyboardType: keyboardType,
                 style: Theme.of(context).textTheme.bodyLarge,
                 decoration: InputDecoration(
                   hintText: hint,
                   hintStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Colors.black.withValues(alpha: 0.5)
+                    color: Colors.black.withValues(alpha: 0.5),
                   ),
                   border: InputBorder.none,
                 ),
@@ -122,14 +121,13 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
           padding: EdgeInsets.only(bottom: 4),
           child: Text(
             label,
-            style: Theme.of(context).textTheme.labelSmall!.copyWith(
-              fontSize: 10
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall!.copyWith(fontSize: 10),
           ),
         ),
       ],
     );
-
   }
 
   Widget _buildQuantityInputCard({
@@ -146,22 +144,23 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
           child: Card(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
             color: AppColors.cardBackgrounColor,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), 
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               child: TextFormField(
+                key: key,
                 controller: _qtdController,
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: InputDecoration(
                   hintText: hint,
                   hintStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Colors.black.withValues(alpha: 0.5)
+                    color: Colors.black.withValues(alpha: 0.5),
                   ),
                   border: InputBorder.none,
                   prefixIcon: IconButton(
@@ -170,31 +169,29 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
                       if (currentValue > 0) {
                         currentValue--;
                         _qtdController.text = currentValue.toString();
-                        ref.read(draftHabitProvider.notifier).updateGoalQuantity(currentValue.toString());
+                        ref
+                            .read(draftHabitProvider.notifier)
+                            .updateGoalQuantity(currentValue.toString());
                       }
-                    }, 
-                    icon: Icon(
-                      Icons.remove, 
-                      color: Colors.white,
-                      size: 32,
-                    )
+                    },
+                    icon: Icon(Icons.remove, color: Colors.white, size: 32),
                   ),
                   suffixIcon: IconButton(
                     onPressed: () {
                       int currentValue = int.tryParse(_qtdController.text) ?? 0;
                       currentValue++;
                       _qtdController.text = currentValue.toString();
-                      ref.read(draftHabitProvider.notifier).updateGoalQuantity(currentValue.toString());
-                    }, 
-                    icon: Icon(
-                      Icons.add,
-                      size: 32,
-                      color: Colors.white
-                    )
-                  )
+                      ref
+                          .read(draftHabitProvider.notifier)
+                          .updateGoalQuantity(currentValue.toString());
+                    },
+                    icon: Icon(Icons.add, size: 32, color: Colors.white),
+                  ),
                 ),
                 onChanged: (value) {
-                  ref.read(draftHabitProvider.notifier).updateGoalQuantity(value);
+                  ref
+                      .read(draftHabitProvider.notifier)
+                      .updateGoalQuantity(value);
                 },
               ),
             ),
@@ -204,11 +201,12 @@ class _ChooseHabitName extends ConsumerState<ChooseHabitName>{
           padding: const EdgeInsets.only(bottom: 12),
           child: Text(
             label,
-            style: Theme.of(context).textTheme.labelSmall!.copyWith(fontSize: 10),
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall!.copyWith(fontSize: 10),
           ),
         ),
       ],
     );
   }
-
 }

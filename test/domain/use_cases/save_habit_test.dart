@@ -34,7 +34,7 @@ void main() {
     scheduler = _MockNotificationScheduler();
     clock = _MockClock();
     habit = HabitModel(
-      id: 'habito-1',
+      id: 'habito',
       iconCode: 0,
       name: 'Beber água',
       conclusionType: HabitConclusionType.yesNo,
@@ -55,8 +55,8 @@ void main() {
     );
   });
 
-  group('CASO DE USO PARA SALVAR HÁBITO', () {
-    test('Salva o hábito antes da configuração e do agendamento', () async {
+  group('CASOS DE USO PARA SALVAR HÁBITO', () {
+    test('Salva o hábito antes da configuração e do agendamento.', () async {
       when(() => habits.getById(habit.id)).thenReturn(null);
       when(() => habits.add(habit)).thenAnswer((_) async {});
       when(() => configs.save(habit.id, notification)).thenAnswer((_) async {});
@@ -85,7 +85,7 @@ void main() {
       ]);
     });
 
-    test('Repete a operação como atualização quando o hábito já existe', () async {
+    test('Repete a operação como atualização quando o hábito já existe.', () async {
       var lookupCount = 0;
       when(() => habits.getById(habit.id)).thenAnswer((_) {
         lookupCount++;
@@ -110,7 +110,7 @@ void main() {
       verify(() => habits.update(habit)).called(1);
     });
 
-    test('Informa falhas parciais sem desfazer o hábito persistido', () async {
+    test('Informa as falhas sem desfazer o hábito.', () async {
       when(() => habits.getById(habit.id)).thenReturn(null);
       when(() => habits.add(habit)).thenAnswer((_) async {});
       when(() => configs.save(habit.id, notification)).thenThrow(Exception());
@@ -135,7 +135,7 @@ void main() {
       verify(() => habits.add(habit)).called(1);
     });
 
-    test('Interrompe a operação quando o hábito não pode ser persistido', () async {
+    test('Interrompe a operação quando o hábito não pode ser persistido.', () async {
       when(() => habits.getById(habit.id)).thenReturn(null);
       when(() => habits.add(habit)).thenThrow(Exception('armazenamento'));
 
