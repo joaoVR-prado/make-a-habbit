@@ -31,6 +31,7 @@ class _YesNoHabit extends ConsumerState<YesNoHabit> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ChoiceChip(
+              key: const Key('yes_no_incomplete_option'),
               label: Text(
                 'INCOMPLETO',
                 style: TextTheme.of(context).labelSmall,
@@ -43,6 +44,7 @@ class _YesNoHabit extends ConsumerState<YesNoHabit> {
               },
             ),
             ChoiceChip(
+              key: const Key('yes_no_complete_option'),
               label: Text(
                 'CONCLUÍDO',
                 style: TextTheme.of(context).labelSmall,
@@ -79,6 +81,7 @@ class _YesNoHabit extends ConsumerState<YesNoHabit> {
             CommonVerticalDivider(),
             // Concluir
             TextButton(
+              key: const Key('save_yes_no_conclusion_button'),
               onPressed: () async {
                 if (_isConcluded == null) {
                   return; 

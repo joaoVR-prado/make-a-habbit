@@ -80,6 +80,7 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 28),
           child: TextFormField(
+            key: const Key('quantity_conclusion_input'),
             controller: _qtdController,
             style: TextTheme.of(context).labelLarge!.copyWith(
               color: AppColors.qtdTextColor
@@ -167,6 +168,7 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
             CommonVerticalDivider(),
             // Concluir
             TextButton(
+              key: const Key('save_quantity_conclusion_button'),
               onPressed: () async {
                 final concludedQtd = int.tryParse(_qtdController.text) ?? 1;
                 setState(() => _isSaving = true);

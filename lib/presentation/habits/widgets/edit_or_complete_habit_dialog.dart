@@ -92,6 +92,7 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
                 ),
                 const CommonVerticalDivider(),
                 TextButton(
+                  key: const Key('complete_habit_text_button'),
                   onPressed: isFutureDate
                       ? null
                       : () {
@@ -115,6 +116,7 @@ class EditOrCompleteHabitDialog extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: TextButton(
+                key: const Key('delete_habit_text_button'),
                 onPressed: () {
                   showDialog<void>(
                     context: context,
@@ -247,6 +249,7 @@ class _DeleteHabitConfirmationDialogState
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             TextButton(
+              key: const Key('cancel_delete_habit_button'),
               onPressed: _isDeleting ? null : () => Navigator.pop(context),
               child: Text(
                 'Cancelar',
@@ -257,6 +260,7 @@ class _DeleteHabitConfirmationDialogState
             ),
             const CommonVerticalDivider(),
             TextButton(
+              key: const Key('confirm_delete_habit_button'),
               onPressed: _isDeleting ? null : _confirmDeletion,
               child: _isDeleting
                   ? const SizedBox.square(
