@@ -20,35 +20,37 @@ class CompleteHabit extends ConsumerWidget {
     final now = ref.watch(clockProvider).now();
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            trailing: CommonIconContainer(
-              habitIcon: HabitIcon.fromCode(habit.iconCode),
-              alpha: 0.5,
-            ),
-            title: Text(
-              habit.name,
-              style: TextTheme.of(context).titleMedium!.copyWith(
-                color: AppColors.dialogTextColor,
-                fontWeight: FontWeight.bold,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              trailing: CommonIconContainer(
+                habitIcon: HabitIcon.fromCode(habit.iconCode),
+                alpha: 0.5,
+              ),
+              title: Text(
+                habit.name,
+                style: TextTheme.of(context).titleMedium!.copyWith(
+                  color: AppColors.dialogTextColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(
+                _getDayFormat(now),
+                style: TextTheme.of(context).bodySmall!.copyWith(
+                  fontSize: 10,
+                  color: AppColors.dialogTextColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-            subtitle: Text(
-              _getDayFormat(now),
-              style: TextTheme.of(context).bodySmall!.copyWith(
-                fontSize: 10,
-                color: AppColors.dialogTextColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          CommonHorizontalDivider(),
-          habit.conclusionType == HabitConclusionType.goalQuantity
-              ? GoalQtdTextField(habit: habit)
-              : YesNoHabit(habit: habit),
-        ],
+            CommonHorizontalDivider(),
+            habit.conclusionType == HabitConclusionType.goalQuantity
+                ? GoalQtdTextField(habit: habit)
+                : YesNoHabit(habit: habit),
+          ],
+        ),
       ),
     );
   }
