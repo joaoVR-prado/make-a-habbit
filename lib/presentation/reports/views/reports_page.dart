@@ -37,6 +37,7 @@ class ReportsPage extends ConsumerWidget {
                     value: ReportsView.general,
                     label: Text(
                       'Geral',
+                      key: const Key('reports-general-segment'),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     icon: Icon(
@@ -48,6 +49,7 @@ class ReportsPage extends ConsumerWidget {
                     value: ReportsView.habits,
                     label: Text(
                       'Hábitos',
+                      key: const Key('reports-habits-segment'),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     icon: Icon(

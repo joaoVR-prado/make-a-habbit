@@ -42,21 +42,25 @@ class GeneralReportView extends ConsumerWidget {
               childAspectRatio: 0.85,
               children: [
                 _StatCard(
+                  key: const Key('general-success-rate'),
                   title: 'Taxa de sucesso',
                   value: '${value.generalSuccessRate.toStringAsFixed(1)}%',
                   icon: Icons.bolt,
                 ),
                 _StatCard(
+                  key: const Key('general-best-streak'),
                   title: 'Recorde de ofensiva',
                   value: '${value.bestStreakGeral} dias',
                   icon: Icons.local_fire_department,
                 ),
                 _StatCard(
+                  key: const Key('general-total-habits'),
                   title: 'Total de hábitos',
                   value: '${value.totalHabits}',
                   icon: Icons.assignment,
                 ),
                 _StatCard(
+                  key: const Key('general-completed-today'),
                   title: 'Concluídos hoje',
                   value: '${value.completedToday}',
                   icon: Icons.check_circle,
@@ -72,6 +76,7 @@ class GeneralReportView extends ConsumerWidget {
 
 class _StatCard extends StatelessWidget {
   const _StatCard({
+    super.key,
     required this.title,
     required this.value,
     required this.icon,

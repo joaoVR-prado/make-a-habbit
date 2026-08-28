@@ -54,6 +54,7 @@ class HabitSearch extends SearchDelegate<HabitModel?> {
         return Padding(
           padding: EdgeInsetsGeometry.symmetric(vertical: 2, horizontal: 12),
           child: ListTile(
+            key: ValueKey('habit-search-result-${habit.id}'),
             title: Text(
               habit.name,
               style: Theme.of(context).textTheme.bodyLarge,
