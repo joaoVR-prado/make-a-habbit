@@ -17,6 +17,7 @@ class HabitDetailReportPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+          key: const Key('habit-detail-back-button'),
           tooltip: 'Voltar',
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(

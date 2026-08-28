@@ -185,6 +185,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
+                  key: const Key('home-habits-tab'),
                   onTap: () {
                     ref.read(homeTabProvider.notifier).state = 0;
                   },
@@ -208,6 +209,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
+                  key: const Key('home-reports-tab'),
                   onTap: () {
                     ref.read(homeTabProvider.notifier).state = 1;
                   },
