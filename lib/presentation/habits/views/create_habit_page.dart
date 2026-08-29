@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:make_a_habbit/app/providers/controller_providers.dart';
+import 'package:make_a_habbit/controllers/habits/draft_habit_mapper.dart';
 import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
 import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
-import 'package:make_a_habbit/domain/entities/habits/habit_frequency.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_type.dart';
 import 'package:make_a_habbit/domain/entities/notifications/notification_config_model.dart';
-import 'package:make_a_habbit/domain/services/notification_schedule_planner.dart';
 import 'package:make_a_habbit/domain/use_cases/habit_operation_result.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_conclusion_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_frequency_type.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_habit_category.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_habit_name.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/choose_start_date.dart';
-import 'package:uuid/uuid.dart';
 
 class CreateHabitPage extends ConsumerStatefulWidget {
   const CreateHabitPage({super.key, this.saveHabit});
@@ -82,103 +80,31 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage> {
 
   Future<void> _saveDraft() async {
     final draftState = ref.read(draftHabitProvider);
-    final category = draftState.category;
-    final conclusionType = draftState.conclusionType;
-    final frequencyType = draftState.frequencyType;
-    final startDate = draftState.startDate;
-    if (category == null ||
-        conclusionType == null ||
-        frequencyType == null ||
-        startDate == null) {
-      _showValidationError('Preencha todos os campos obrigatórios.');
-      return;
-    }
-
-    // Verifica se é edição de hábito
-    var uuid = Uuid();
-    final existingId = draftState.existingId;
-
-    // OPERAÇÔES DO HIVE //
-    // Ve o tipo de frequencia para salavr os dias escolhidos
-    List<int>? selectedDays;
-    if (frequencyType == HabitFrequencyType.weekly) {
-      selectedDays = draftState.weeklyDays;
-    } else if (frequencyType == HabitFrequencyType.monthly) {
-      selectedDays = draftState.monthlyDays;
-    }
-
-    late final HabitFrequency habitFrequency;
+    late final MappedHabitDraft mappedDraft;
     try {
-      habitFrequency = HabitFrequency.fromType(
-        type: frequencyType,
-        selectedDays: selectedDays,
+      mappedDraft = const DraftHabitMapper()(
+        draftState,
+        now: ref.read(clockProvider).now(),
       );
-    } on ArgumentError catch (error) {
-      _showValidationError(error.message?.toString() ?? 'Frequência inválida.');
+    } on DraftHabitValidationException catch (error) {
+      _showValidationError(error.message);
       return;
     }
-
-    int? goalQuantity;
-    if (conclusionType == HabitConclusionType.goalQuantity) {
-      goalQuantity = int.tryParse(draftState.goalQuantity);
-    }
-
-    DateTime? notificationDateTime;
-    if (draftState.reminderTime != null) {
-      final reminderTime = draftState.reminderTime!;
-      final now = ref.read(clockProvider).now();
-      notificationDateTime = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        reminderTime.hour,
-        reminderTime.minute,
-      );
-    }
-
-    final id = existingId ?? uuid.v4();
-    final notificationId = const NotificationSchedulePlanner().baseIdForHabit(
-      id,
-    );
-
-    late final HabitModel newHabit;
-    try {
-      newHabit = HabitModel(
-        id: id,
-        iconCode: category.code,
-        name: draftState.name,
-        description: draftState.description,
-        conclusionType: conclusionType,
-        goalQuantity: goalQuantity,
-        frequency: habitFrequency,
-        startDate: startDate,
-        endDate: draftState.endDate,
-        notificationId: notificationId,
-        notificationTime: notificationDateTime,
-      );
-    } on ArgumentError catch (error) {
-      _showValidationError(error.message?.toString() ?? 'Hábito inválido.');
-      return;
-    }
-
-    final newNotification = NotificationConfigModel(
-      isReminderEnabled: draftState.reminderTime != null,
-      isStreakEnabled: draftState.isStreakEnabled,
-      customTimeNotification: notificationDateTime != null
-          ? [notificationDateTime]
-          : [],
-    );
 
     final saveHabit = widget.saveHabit;
     final result = saveHabit != null
-        ? await saveHabit(newHabit, newNotification, existingId != null)
-        : existingId == null
+        ? await saveHabit(
+            mappedDraft.habit,
+            mappedDraft.notification,
+            mappedDraft.isEditing,
+          )
+        : !mappedDraft.isEditing
         ? await ref
               .read(habitControllerProvider.notifier)
-              .addHabit(newHabit, newNotification)
+              .addHabit(mappedDraft.habit, mappedDraft.notification)
         : await ref
               .read(habitControllerProvider.notifier)
-              .updateHabit(newHabit, newNotification);
+              .updateHabit(mappedDraft.habit, mappedDraft.notification);
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -186,7 +112,7 @@ class _CreateHabitPageStage extends ConsumerState<CreateHabitPage> {
           content: Text(
             result.hasPartialFailures
                 ? _partialFailureMessage(result)
-                : existingId == null
+                : !mappedDraft.isEditing
                 ? 'Hábito criado com sucesso!'
                 : 'Hábito atualizado com sucesso!',
             style: Theme.of(context).textTheme.labelMedium,

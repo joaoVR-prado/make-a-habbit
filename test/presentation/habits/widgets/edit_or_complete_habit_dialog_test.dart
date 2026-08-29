@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_frequency.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/app/providers/controller_providers.dart';
 import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';

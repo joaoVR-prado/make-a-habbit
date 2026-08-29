@@ -119,7 +119,6 @@ void main() {
 
         expect(nameField.initialValue, 'Beber Oito Copos');
         expect(quantityField.controller?.text, '8');
-        
       },
     );
   });
@@ -133,7 +132,6 @@ Future<void> _pumpApp(WidgetTester tester, Clock clock) async {
     ),
   );
   await tester.pumpAndSettle();
-
 }
 
 final class _FixedClock implements Clock {
@@ -143,21 +141,18 @@ final class _FixedClock implements Clock {
 
   @override
   DateTime now() => value;
-
 }
 
 void _expectStartDateIsToday() {
   final startDateTile = find.ancestor(
     of: find.text('Data de início'),
     matching: find.byType(ListTile),
-
   );
 
   expect(startDateTile, findsOneWidget);
   expect(
     find.descendant(of: startDateTile, matching: find.text('Hoje')),
     findsOneWidget,
-
   );
 }
 
@@ -165,5 +160,4 @@ void _expectSameDate(DateTime actual, DateTime expected) {
   expect(actual.year, expected.year);
   expect(actual.month, expected.month);
   expect(actual.day, expected.day);
-
 }

@@ -13,9 +13,13 @@ import 'package:make_a_habbit/domain/use_cases/save_habit.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockHabitRepository extends Mock implements HabitRepository {}
+
 class _MockNotificationConfigRepository extends Mock
     implements NotificationConfigRepository {}
-class _MockNotificationScheduler extends Mock implements NotificationScheduler {}
+
+class _MockNotificationScheduler extends Mock
+    implements NotificationScheduler {}
+
 class _MockClock extends Mock implements Clock {}
 
 void main() {
@@ -85,30 +89,35 @@ void main() {
       ]);
     });
 
-    test('Repete a operação como atualização quando o hábito já existe.', () async {
-      var lookupCount = 0;
-      when(() => habits.getById(habit.id)).thenAnswer((_) {
-        lookupCount++;
-        return lookupCount == 1 ? null : habit;
-      });
-      when(() => habits.add(habit)).thenAnswer((_) async {});
-      when(() => habits.update(habit)).thenAnswer((_) async {});
-      when(() => configs.save(habit.id, notification)).thenAnswer((_) async {});
-      when(
-        () => scheduler.replaceSchedules(
-          habit: habit,
-          reminderEnabled: true,
-          streakEnabled: false,
-          now: now,
-        ),
-      ).thenAnswer((_) async {});
+    test(
+      'Repete a operação como atualização quando o hábito já existe.',
+      () async {
+        var lookupCount = 0;
+        when(() => habits.getById(habit.id)).thenAnswer((_) {
+          lookupCount++;
+          return lookupCount == 1 ? null : habit;
+        });
+        when(() => habits.add(habit)).thenAnswer((_) async {});
+        when(() => habits.update(habit)).thenAnswer((_) async {});
+        when(
+          () => configs.save(habit.id, notification),
+        ).thenAnswer((_) async {});
+        when(
+          () => scheduler.replaceSchedules(
+            habit: habit,
+            reminderEnabled: true,
+            streakEnabled: false,
+            now: now,
+          ),
+        ).thenAnswer((_) async {});
 
-      await saveHabit(habit: habit, notification: notification);
-      await saveHabit(habit: habit, notification: notification);
+        await saveHabit(habit: habit, notification: notification);
+        await saveHabit(habit: habit, notification: notification);
 
-      verify(() => habits.add(habit)).called(1);
-      verify(() => habits.update(habit)).called(1);
-    });
+        verify(() => habits.add(habit)).called(1);
+        verify(() => habits.update(habit)).called(1);
+      },
+    );
 
     test('Informa as falhas sem desfazer o hábito.', () async {
       when(() => habits.getById(habit.id)).thenReturn(null);
@@ -135,24 +144,27 @@ void main() {
       verify(() => habits.add(habit)).called(1);
     });
 
-    test('Interrompe a operação quando o hábito não pode ser persistido.', () async {
-      when(() => habits.getById(habit.id)).thenReturn(null);
-      when(() => habits.add(habit)).thenThrow(Exception('armazenamento'));
+    test(
+      'Interrompe a operação quando o hábito não pode ser persistido.',
+      () async {
+        when(() => habits.getById(habit.id)).thenReturn(null);
+        when(() => habits.add(habit)).thenThrow(Exception('armazenamento'));
 
-      await expectLater(
-        saveHabit(habit: habit, notification: notification),
-        throwsException,
-      );
+        await expectLater(
+          saveHabit(habit: habit, notification: notification),
+          throwsException,
+        );
 
-      verifyNever(() => configs.save(habit.id, notification));
-      verifyNever(
-        () => scheduler.replaceSchedules(
-          habit: habit,
-          reminderEnabled: true,
-          streakEnabled: false,
-          now: now,
-        ),
-      );
-    });
+        verifyNever(() => configs.save(habit.id, notification));
+        verifyNever(
+          () => scheduler.replaceSchedules(
+            habit: habit,
+            reminderEnabled: true,
+            streakEnabled: false,
+            now: now,
+          ),
+        );
+      },
+    );
   });
 }

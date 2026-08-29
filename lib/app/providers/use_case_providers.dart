@@ -1,15 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:make_a_habbit/app/providers/dependency_providers.dart';
 import 'package:make_a_habbit/core/providers/clock_provider.dart';
-import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
-import 'package:make_a_habbit/data/providers/habit_repository_provider.dart';
-import 'package:make_a_habbit/data/providers/notification_config_repository_provider.dart';
-import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
 import 'package:make_a_habbit/domain/use_cases/clear_habit_data.dart';
 import 'package:make_a_habbit/domain/use_cases/delete_habit.dart';
 import 'package:make_a_habbit/domain/use_cases/ensure_notification_permission.dart';
-import 'package:make_a_habbit/domain/use_cases/save_habit.dart';
+import 'package:make_a_habbit/domain/use_cases/get_notification_config.dart';
 import 'package:make_a_habbit/domain/use_cases/record_habit_conclusion.dart';
 import 'package:make_a_habbit/domain/use_cases/reconcile_habit_notifications.dart';
+import 'package:make_a_habbit/domain/use_cases/save_habit.dart';
 
 final saveHabitProvider = Provider<SaveHabit>((ref) {
   return SaveHabit(
@@ -44,6 +42,10 @@ final recordHabitConclusionProvider = Provider<RecordHabitConclusion>((ref) {
     conclusions: ref.watch(concludedHabitsRepositoryProvider),
     clock: ref.watch(clockProvider),
   );
+});
+
+final getNotificationConfigProvider = Provider<GetNotificationConfig>((ref) {
+  return GetNotificationConfig(ref.watch(notificationConfigRepositoryProvider));
 });
 
 final ensureNotificationPermissionProvider =

@@ -16,9 +16,10 @@ import 'package:make_a_habbit/data/repositories/notification_config_repository.d
 import 'package:mocktail/mocktail.dart';
 
 class _MockHabitBox extends Mock implements Box<HabitDto> {}
+
 class _MockConclusionBox extends Mock implements Box<ConclusionDto> {}
-class _MockNotificationBox extends Mock
-    implements Box<NotificationConfigDto> {}
+
+class _MockNotificationBox extends Mock implements Box<NotificationConfigDto> {}
 
 void main() {
   final habit = HabitModel(
@@ -69,7 +70,12 @@ void main() {
 
       final savedDtos = verify(() => box.put(habit.id, captureAny())).captured;
       expect(savedDtos, hasLength(2));
-      expect(savedDtos.cast<HabitDto>().every((dto) => dto.toDomain().id == habit.id), isTrue);
+      expect(
+        savedDtos.cast<HabitDto>().every(
+          (dto) => dto.toDomain().id == habit.id,
+        ),
+        isTrue,
+      );
       verify(() => box.delete(habit.id)).called(1);
       verify(() => box.clear()).called(1);
     });
@@ -89,9 +95,13 @@ void main() {
       await repository.delete(habit.id);
       await repository.clear();
 
-      final savedDto = verify(() => box.put(habit.id, captureAny())).captured.single
-          as NotificationConfigDto;
-      expect(savedDto.toDomain().customTimeNotification, notification.customTimeNotification);
+      final savedDto =
+          verify(() => box.put(habit.id, captureAny())).captured.single
+              as NotificationConfigDto;
+      expect(
+        savedDto.toDomain().customTimeNotification,
+        notification.customTimeNotification,
+      );
       verify(() => box.delete(habit.id)).called(1);
       verify(() => box.clear()).called(1);
     });
@@ -120,7 +130,9 @@ void main() {
 
       await repository.deleteByHabit(habit.id);
 
-      final deletedKeys = verify(() => box.deleteAll(captureAny())).captured.single;
+      final deletedKeys = verify(
+        () => box.deleteAll(captureAny()),
+      ).captured.single;
       expect(deletedKeys, ['target']);
     });
 
@@ -131,16 +143,14 @@ void main() {
         conclusionDate: DateTime(2026, 8, 8, 19, 30),
         conclusionValue: const YesNoCompletionValue(true),
       );
-      when(
-        () => box.put('habito_2026-8-8', any()),
-      ).thenAnswer((_) async {});
+      when(() => box.put('habito_2026-8-8', any())).thenAnswer((_) async {});
       final repository = HiveConclusionRepository(box);
 
       await repository.save(conclusion);
 
-      final savedDto = verify(
-        () => box.put('habito_2026-8-8', captureAny()),
-      ).captured.single as ConclusionDto;
+      final savedDto =
+          verify(() => box.put('habito_2026-8-8', captureAny())).captured.single
+              as ConclusionDto;
       expect(savedDto.toDomain().habitId, conclusion.habitId);
     });
   });

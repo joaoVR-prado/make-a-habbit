@@ -10,14 +10,14 @@
 
 | Área | Tecnologias |
 |------|-------------|
-| **Framework** | [Flutter](https://flutter.dev/) (Dart SDK `^3.10.4`) |
+| **Framework** | [Flutter](https://flutter.dev/) `3.44.4` (Dart SDK `^3.10.4`) |
 | **Estado** | [Riverpod](https://riverpod.dev/) (`flutter_riverpod`) |
 | **Persistência** | [Hive CE](https://github.com/hive-ce/hive_ce) (`hive_ce`, `hive_ce_flutter`) + adapters gerados |
 | **Identificadores** | `uuid` |
 | **UI** | Material Design, `google_fonts`, `smooth_page_indicator` |
 | **Notificações locais** | `awesome_notifications` |
 | **Internacionalização** | `flutter_localizations` (locale **pt-BR**) |
-| **Testes** | `flutter_test`, `mocktail` |
+| **Testes** | `flutter_test`, `integration_test`, `mocktail` |
 | **Qualidade** | `flutter_lints` |
 | **Persistência** | DTOs Hive com adapters explícitos na infraestrutura |
 
@@ -63,8 +63,10 @@ flutter run
 |----------|---------|
 | Instalar dependências | `flutter pub get` |
 | Executar em desenvolvimento | `flutter run` |
+| Verificar formatação | `dart format --output=none --set-exit-if-changed lib test integration_test` |
 | Análise estática / lints | `flutter analyze` |
-| Testes automatizados | `flutter test` |
+| Testes unitários e de widget | `flutter test --coverage` |
+| Testes de integração | `flutter test integration_test/` |
 | Build APK (release) | `flutter build apk` |
 | Build App Bundle (Play Store) | `flutter build appbundle` |
 | Build iOS | `flutter build ios` (macOS) |
@@ -76,18 +78,19 @@ flutter run
 ```
 lib/
 ├── main.dart                 # Entrada: Hive, notificações, MaterialApp, locale pt-BR
-├── core/                     # Tema, cores, enums compartilhados
-├── controllers/              # Controllers Riverpod (hábitos, conclusões, notificações)
+├── app/providers/            # Composition root e injeção de dependências Riverpod
+├── core/                     # Tema, relógio e utilitários compartilhados
+├── controllers/              # Controllers e estado de aplicação
 ├── data/
 │   ├── dtos/                 # DTOs e adapters exclusivos da persistência Hive
-│   ├── providers/            # Providers dos repositórios
 │   └── repositories/         # Acesso às boxes Hive
 ├── domain/
 │   ├── entities/             # Entidades e regras de negócio sem Flutter ou Hive
 │   ├── repositories/         # Contratos de persistência
 │   └── use_cases/            # Coordenação das operações de domínio
 └── presentation/             # Telas e widgets (home, criação/edição de hábitos, comuns)
-test/                         # Testes (ex.: repositório de hábitos)
+test/                         # Testes unitários e de widget
+integration_test/             # Fluxos críticos executados em dispositivo Android
 ```
 
 ---
@@ -106,7 +109,7 @@ Visão geral do que já existe no código e do que ainda está planejado ou inco
 - [x] Notificações locais para lembretes (`awesome_notifications`)
 - [ ] **RF-01 / §4.3** — Tela de **relatórios de hábitos**: listagem, filtros, métricas por hábito, calendário mensal e estados vazios (RN-01 / RN-02)
 - [ ] Ícone dedicado para o canal de notificações Android 
-- [ ] Cobertura de testes e builds de release documentados em CI
+- [x] Cobertura de testes e validação do App Bundle de release em CI
 
 ---
 

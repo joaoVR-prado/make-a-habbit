@@ -6,6 +6,7 @@ import 'package:make_a_habbit/domain/entities/habits/habit_frequency_type.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_type.dart';
 import 'package:make_a_habbit/domain/entities/notifications/notification_config_model.dart';
+
 class DraftHabitState {
   final String name;
   final String description;
@@ -18,8 +19,8 @@ class DraftHabitState {
   final DateTime? endDate;
   final TimeOfDay? reminderTime;
   final bool isStreakEnabled;
-  final String? existingId; 
-  final HabitIcon? category; 
+  final String? existingId;
+  final HabitIcon? category;
 
   DraftHabitState({
     this.name = '',
@@ -34,7 +35,7 @@ class DraftHabitState {
     this.reminderTime,
     this.isStreakEnabled = false,
     this.existingId,
-    this.category, 
+    this.category,
   });
 
   factory DraftHabitState.forEdit(
@@ -79,7 +80,7 @@ class DraftHabitState {
     String? existingId,
     HabitIcon? category,
     bool clearEndDate = false,
-    bool clearReminderTime = false 
+    bool clearReminderTime = false,
   }) {
     return DraftHabitState(
       name: name ?? this.name,
@@ -91,7 +92,9 @@ class DraftHabitState {
       monthlyDays: monthlyDays ?? this.monthlyDays,
       startDate: startDate ?? this.startDate,
       endDate: clearEndDate ? null : (endDate ?? this.endDate),
-      reminderTime: clearReminderTime ? null : (reminderTime ?? this.reminderTime),
+      reminderTime: clearReminderTime
+          ? null
+          : (reminderTime ?? this.reminderTime),
       isStreakEnabled: isStreakEnabled ?? this.isStreakEnabled,
       existingId: existingId ?? this.existingId,
       category: category ?? this.category,
@@ -108,83 +111,67 @@ class DraftHabitNotifier extends Notifier<DraftHabitState> {
 
   void updateId(String id) {
     state = state.copyWith(existingId: id);
-
   }
 
   void updateCategory(HabitIcon category) {
     state = state.copyWith(category: category);
-
   }
 
   void updateName(String name) {
     state = state.copyWith(name: name);
-
   }
-  
+
   void updateDescription(String description) {
     state = state.copyWith(description: description);
-
   }
 
   void updateConclusionType(HabitConclusionType type) {
     state = state.copyWith(conclusionType: type);
-
   }
-  
+
   void updateGoalQuantity(String quantity) {
     state = state.copyWith(goalQuantity: quantity);
-
   }
 
   void updateFrequencyType(HabitFrequencyType type) {
     state = state.copyWith(frequencyType: type);
-
   }
-  
+
   void updateWeeklyDays(List<int> days) {
     state = state.copyWith(weeklyDays: days);
-
   }
 
   void updateMonthlyDays(List<int> days) {
     state = state.copyWith(monthlyDays: days);
-
   }
-  
+
   void updateStartDate(DateTime date) {
     state = state.copyWith(startDate: date);
-
   }
 
   void updateEndDate(DateTime? date) {
     state = state.copyWith(endDate: date);
-
   }
 
   void updateReminderTime(TimeOfDay? time) {
     state = state.copyWith(reminderTime: time);
-
   }
 
   void toggleStreak(bool value) {
     state = state.copyWith(isStreakEnabled: value);
-
   }
-  
+
   void clearEndDate() {
     state = state.copyWith(clearEndDate: true);
-    
   }
 
   void clearReminderTime() {
     state = state.copyWith(clearReminderTime: true);
-
   }
 
   // Limpador de drafts
   void clear() {
     state = DraftHabitState(startDate: ref.read(clockProvider).now());
-
   }
 }
 

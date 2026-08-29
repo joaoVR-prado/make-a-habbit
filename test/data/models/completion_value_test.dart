@@ -16,10 +16,7 @@ void main() {
     });
 
     test('Rejeita uma quantidade negativa.', () {
-      expect(
-        () => QuantityCompletionValue(-1),
-        throwsA(isA<ArgumentError>()),
-      );
+      expect(() => QuantityCompletionValue(-1), throwsA(isA<ArgumentError>()));
     });
   });
 }

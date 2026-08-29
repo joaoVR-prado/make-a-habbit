@@ -54,7 +54,10 @@ void main() {
       source.add(DateTime.sunday);
 
       expect(frequency.selectedDays, [DateTime.monday, DateTime.friday]);
-      expect(() => frequency.selectedDays.add(DateTime.sunday), throwsUnsupportedError);
+      expect(
+        () => frequency.selectedDays.add(DateTime.sunday),
+        throwsUnsupportedError,
+      );
     });
   });
 

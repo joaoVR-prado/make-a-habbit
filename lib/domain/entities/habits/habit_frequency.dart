@@ -9,7 +9,9 @@ sealed class HabitFrequency {
   }) => switch (type) {
     HabitFrequencyType.daily => const DailyHabitFrequency(),
     HabitFrequencyType.weekly => WeeklyHabitFrequency(selectedDays ?? const []),
-    HabitFrequencyType.monthly => MonthlyHabitFrequency(selectedDays ?? const []),
+    HabitFrequencyType.monthly => MonthlyHabitFrequency(
+      selectedDays ?? const [],
+    ),
   };
 
   HabitFrequencyType get type;
@@ -68,7 +70,9 @@ List<int> _validateDays(
   required String label,
 }) {
   final days = values.toSet().toList()..sort();
-  if (days.isEmpty) throw ArgumentError('A frequência deve possuir dias $label.');
+  if (days.isEmpty) {
+    throw ArgumentError('A frequência deve possuir dias $label.');
+  }
   if (days.any((day) => day < min || day > max)) {
     throw ArgumentError.value(values, 'days', 'Existem dias $label inválidos.');
   }

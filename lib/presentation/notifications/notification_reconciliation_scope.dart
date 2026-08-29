@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:make_a_habbit/data/providers/habit_use_case_providers.dart';
+import 'package:make_a_habbit/app/providers/use_case_providers.dart';
 
 class NotificationReconciliationScope extends ConsumerStatefulWidget {
   const NotificationReconciliationScope({super.key, required this.child});

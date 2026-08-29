@@ -41,28 +41,27 @@ void main() {
       },
     );
 
-    testWidgets(
-      'Exibe uma mensagem quando a persistência falha.',
-      (tester) async {
-        await _openCreateHabitPage(
-          tester,
-          saveHabit: (habit, notification, isEditing) async {
-            throw Exception('Falha no armazenamento local');
-          },
-        );
-        await _advanceToLastPage(tester);
+    testWidgets('Exibe uma mensagem quando a persistência falha.', (
+      tester,
+    ) async {
+      await _openCreateHabitPage(
+        tester,
+        saveHabit: (habit, notification, isEditing) async {
+          throw Exception('Falha no armazenamento local');
+        },
+      );
+      await _advanceToLastPage(tester);
 
-        await tester.tap(find.text('FINALIZAR'));
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('FINALIZAR'));
+      await tester.pumpAndSettle();
 
-        expect(find.byKey(const Key('save_habit_error')), findsOneWidget);
-        expect(
-          find.text('Não foi possível salvar o hábito. Tente novamente.'),
-          findsOneWidget,
-        );
-        expect(find.text('FINALIZAR'), findsOneWidget);
-      },
-    );
+      expect(find.byKey(const Key('save_habit_error')), findsOneWidget);
+      expect(
+        find.text('Não foi possível salvar o hábito. Tente novamente.'),
+        findsOneWidget,
+      );
+      expect(find.text('FINALIZAR'), findsOneWidget);
+    });
   });
 }
 
@@ -72,7 +71,8 @@ Future<void> _openCreateHabitPage(
     HabitModel habit,
     NotificationConfigModel notification,
     bool isEditing,
-  ) saveHabit,
+  )
+  saveHabit,
 }) async {
   final draft = DraftHabitState(
     name: 'Beber água',
@@ -84,12 +84,8 @@ Future<void> _openCreateHabitPage(
 
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        draftHabitInitialStateProvider.overrideWithValue(draft),
-      ],
-      child: MaterialApp(
-        home: CreateHabitPage(saveHabit: saveHabit),
-      ),
+      overrides: [draftHabitInitialStateProvider.overrideWithValue(draft)],
+      child: MaterialApp(home: CreateHabitPage(saveHabit: saveHabit)),
     ),
   );
   await tester.pumpAndSettle();

@@ -10,8 +10,6 @@ class HabitStatsModel {
     required this.completedToday,
     required this.generalSuccessRate,
     required this.bestStreakGeral,
-    required this.weeklyCompletionHistory
-
+    required this.weeklyCompletionHistory,
   });
-
 }

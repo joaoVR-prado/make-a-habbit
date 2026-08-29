@@ -9,7 +9,13 @@ final class YesNoCompletionValue extends CompletionValue {
 
 final class QuantityCompletionValue extends CompletionValue {
   QuantityCompletionValue(this.value) {
-    if (value < 0) throw ArgumentError.value(value, 'value', 'A quantidade não pode ser negativa.');
+    if (value < 0) {
+      throw ArgumentError.value(
+        value,
+        'value',
+        'A quantidade não pode ser negativa.',
+      );
+    }
   }
   final int value;
 }

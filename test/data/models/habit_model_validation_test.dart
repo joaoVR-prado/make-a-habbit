@@ -44,9 +44,7 @@ void main() {
   group('Tipo de conclusão e meta', () {
     test('Exige meta positiva para hábito quantitativo.', () {
       expect(
-        () => criarHabito(
-          conclusionType: HabitConclusionType.goalQuantity,
-        ),
+        () => criarHabito(conclusionType: HabitConclusionType.goalQuantity),
         throwsA(isA<ArgumentError>()),
       );
       expect(
@@ -68,10 +66,7 @@ void main() {
     });
 
     test('Rejeita meta em hábito do tipo sim ou não.', () {
-      expect(
-        () => criarHabito(goalQuantity: 1),
-        throwsA(isA<ArgumentError>()),
-      );
+      expect(() => criarHabito(goalQuantity: 1), throwsA(isA<ArgumentError>()));
     });
   });
 

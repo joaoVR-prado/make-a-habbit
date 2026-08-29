@@ -87,8 +87,7 @@ class AwesomeNotificationScheduler implements NotificationScheduler {
       _notifications.cancelSchedulesByGroupKey(habitId);
 
   @override
-  Future<bool> isPermissionGranted() =>
-      _notifications.isNotificationAllowed();
+  Future<bool> isPermissionGranted() => _notifications.isNotificationAllowed();
 
   @override
   Future<bool> requestPermission() =>

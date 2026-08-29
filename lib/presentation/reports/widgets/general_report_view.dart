@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/app/providers/controller_providers.dart';
+import 'package:make_a_habbit/app/providers/report_providers.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
-import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
-import 'package:make_a_habbit/data/providers/habit_stats_provider.dart';
 import 'package:make_a_habbit/presentation/reports/widgets/weekly_graphic_card.dart';
 
 class GeneralReportView extends ConsumerWidget {
