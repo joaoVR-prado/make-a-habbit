@@ -86,6 +86,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
         ),
         // Data de Inicio
         _buildListTile(
+          actionKey: const Key('start_date_option'),
           context: context,
           leadingIcon: Icons.calendar_month,
           tileTitle: 'Data de início',
@@ -122,6 +123,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
         ),
         // Data de Fim
         _buildListTile(
+          actionKey: const Key('end_date_option'),
           context: context,
           leadingIcon: Icons.calendar_today,
           tileTitle: 'Data alvo',
@@ -159,6 +161,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
         ),
         // Horário de Lembrte
         _buildListTile(
+          actionKey: const Key('reminder_time_option'),
           context: context,
           leadingIcon: Icons.notification_add,
           tileTitle: 'Horário do lembrete',
@@ -226,6 +229,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
   }
 
   Widget _buildListTile({
+    required Key actionKey,
     required BuildContext context,
     required IconData leadingIcon,
     required String tileTitle,
@@ -257,6 +261,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
                 width: 112,
                 height: 36,
                 child: InkWell(
+                  key: actionKey,
                   onTap: onTap,
                   child: Center(
                     child: Text(
@@ -308,6 +313,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
     return Padding(
       padding: EdgeInsetsGeometry.symmetric(vertical: 8, horizontal: 8),
       child: SwitchListTile(
+        key: const Key('streak_notification_switch'),
         activeThumbColor: Colors.white,
         activeTrackColor: AppColors.positiveActionDialogTextColor,
         inactiveThumbColor: Colors.black87,
