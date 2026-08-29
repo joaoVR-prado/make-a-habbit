@@ -5,7 +5,12 @@ enum HabitIcon {
   outdoorsIcon(1, Icons.landscape, Color(0xFF2DB32D), 'Ar Livre'),
   artIcon(2, Icons.brush, Color(0xFF9933CC), 'Arte'),
   homeIcon(3, Icons.house, Color(0xFFD96236), 'Casa'),
-  entertainmentIcon(4, Icons.movie_creation, Color(0xFFF249B3), 'Entretenimento'),
+  entertainmentIcon(
+    4,
+    Icons.movie_creation,
+    Color(0xFFF249B3),
+    'Entretenimento',
+  ),
   sportsIcon(5, Icons.fitness_center, Color(0xFFFF8C33), 'Esportes'),
   studiesIcon(6, Icons.book, Color(0xFF4080FF), 'Estudos'),
   financiesIcon(7, Icons.attach_money, Color(0xFF1C8B4D), 'Finanças'),
@@ -23,12 +28,10 @@ enum HabitIcon {
 
   const HabitIcon(this.code, this.iconData, this.color, this.iconLabel);
 
-  static HabitIcon fromCode(int code){
+  static HabitIcon fromCode(int code) {
     return HabitIcon.values.firstWhere(
       (e) => e.code == code,
       orElse: () => HabitIcon.othersIcon,
     );
-
   }
-
 }

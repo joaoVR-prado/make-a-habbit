@@ -14,9 +14,8 @@ class HabitsListTile extends StatelessWidget {
     super.key,
     required this.habit,
     required this.habitStatus,
-
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -24,44 +23,43 @@ class HabitsListTile extends StatelessWidget {
       color: Colors.transparent,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.circular(16),
+      ),
       child: InkWell(
         onTap: () {
           showDialog(
-            context: context, 
-            builder: (BuildContext dialogContext){
+            context: context,
+            builder: (BuildContext dialogContext) {
               return EditOrCompleteHabitDialog(habit: habit);
-
-            }
+            },
           );
         },
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
           // Parte dos icones dos habitos
           leading: CommonIconContainer(
-            habitIcon: HabitIcon.fromCode(habit.iconCode), 
-            alpha: 0.4
+            habitIcon: HabitIcon.fromCode(habit.iconCode),
+            alpha: 0.4,
           ),
           // Parte do nome e descricao do habito
-          title: Text(
-            habit.name,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
+          title: Text(habit.name, style: Theme.of(context).textTheme.bodyLarge),
           subtitle: Text(
             habit.description == null ? '' : habit.description!,
             style: Theme.of(context).textTheme.bodySmall,
-        
           ),
-        
+
           trailing: _buildStatusIcon(),
         ),
       ),
     );
-
   }
 
-  Widget _buildStatusIcon(){
-    switch (habitStatus){
+  Widget _buildStatusIcon() {
+    switch (habitStatus) {
       case HabitStatus.done:
         return const Icon(
           Icons.check_circle,
@@ -84,11 +82,7 @@ class HabitsListTile extends StatelessWidget {
           color: AppColors.pendingStatusIconColor,
           size: 32,
           key: ValueKey('pending'),
-
         );
-        
     }
-
   }
-
 }

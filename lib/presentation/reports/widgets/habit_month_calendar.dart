@@ -58,10 +58,7 @@ class _HabitMonthCalendarState extends ConsumerState<HabitMonthCalendar> {
                 IconButton(
                   key: const Key('previous-report-month'),
                   onPressed: () => _changeMonth(-1),
-                  icon: const Icon(
-                    Icons.chevron_left,
-                    color: Colors.white,
-                  ),
+                  icon: const Icon(Icons.chevron_left, color: Colors.white),
                 ),
                 Expanded(
                   child: Text(
@@ -74,10 +71,7 @@ class _HabitMonthCalendarState extends ConsumerState<HabitMonthCalendar> {
                 IconButton(
                   key: const Key('next-report-month'),
                   onPressed: () => _changeMonth(1),
-                  icon: const Icon(
-                    Icons.chevron_right,
-                    color: Colors.white,
-                  ),
+                  icon: const Icon(Icons.chevron_right, color: Colors.white),
                 ),
               ],
             ),

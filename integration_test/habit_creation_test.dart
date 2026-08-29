@@ -178,7 +178,6 @@ void main() {
 
       // Verifica card da data de inicio
       _expectStartDateIsToday();
-      
     });
   });
 }
@@ -190,28 +189,24 @@ final class _FixedClock implements Clock {
 
   @override
   DateTime now() => value;
-
 }
 
 void _expectStartDateIsToday() {
   final startDateTile = find.ancestor(
     of: find.text('Data de início'),
     matching: find.byType(ListTile),
-
   );
 
   expect(
     startDateTile,
     findsOneWidget,
     reason: 'A opção de data inicial deveria estar visível.',
-    
   );
 
   expect(
     find.descendant(of: startDateTile, matching: find.text('Hoje')),
     findsOneWidget,
     reason: 'A data inicial deveria estar preenchida com o dia atual.',
-
   );
 }
 
@@ -219,5 +214,4 @@ void _expectSameDate(DateTime actual, DateTime expected) {
   expect(actual.year, expected.year);
   expect(actual.month, expected.month);
   expect(actual.day, expected.day);
-
 }

@@ -49,8 +49,8 @@ class _ChooseHabitCategory extends ConsumerState<ChooseHabitCategory> {
                   borderRadius: BorderRadius.circular(6),
                   onTap: () {
                     ref
-                      .read(draftHabitProvider.notifier)
-                      .updateCategory(currentCategory);
+                        .read(draftHabitProvider.notifier)
+                        .updateCategory(currentCategory);
                   },
                   child: Padding(
                     padding: const EdgeInsetsGeometry.symmetric(horizontal: 12),
@@ -67,7 +67,7 @@ class _ChooseHabitCategory extends ConsumerState<ChooseHabitCategory> {
                           child: Text(
                             currentCategory.iconLabel,
                             style: Theme.of(context).textTheme.bodyMedium!
-                              .copyWith(fontWeight: FontWeight.bold),
+                                .copyWith(fontWeight: FontWeight.bold),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),

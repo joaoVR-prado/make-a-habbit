@@ -15,26 +15,44 @@ class HabitModel {
     this.notificationId,
     this.notificationTime,
   }) : name = name.trim() {
-    if (id.trim().isEmpty) throw ArgumentError.value(id, 'id', 'O identificador é obrigatório.');
+    if (id.trim().isEmpty) {
+      throw ArgumentError.value(id, 'id', 'O identificador é obrigatório.');
+    }
     if (this.name.length < 3) {
-      throw ArgumentError.value(name, 'name', 'O nome deve possuir ao menos 3 caracteres.');
+      throw ArgumentError.value(
+        name,
+        'name',
+        'O nome deve possuir ao menos 3 caracteres.',
+      );
     }
     if (endDate != null) {
       final startDay = DateTime(startDate.year, startDate.month, startDate.day);
       final endDay = DateTime(endDate!.year, endDate!.month, endDate!.day);
       if (endDay.isBefore(startDay)) {
-        throw ArgumentError.value(endDate, 'endDate', 'A data final não pode anteceder a inicial.');
+        throw ArgumentError.value(
+          endDate,
+          'endDate',
+          'A data final não pode anteceder a inicial.',
+        );
       }
     }
     switch (conclusionType) {
       case HabitConclusionType.goalQuantity:
         if (goalQuantity == null || goalQuantity! <= 0) {
-          throw ArgumentError.value(goalQuantity, 'goalQuantity', 'Uma meta positiva é obrigatória para hábitos quantitativos.');
+          throw ArgumentError.value(
+            goalQuantity,
+            'goalQuantity',
+            'Uma meta positiva é obrigatória para hábitos quantitativos.',
+          );
         }
         break;
       case HabitConclusionType.yesNo:
         if (goalQuantity != null) {
-          throw ArgumentError.value(goalQuantity, 'goalQuantity', 'Hábitos do tipo sim ou não não podem possuir meta quantitativa.');
+          throw ArgumentError.value(
+            goalQuantity,
+            'goalQuantity',
+            'Hábitos do tipo sim ou não não podem possuir meta quantitativa.',
+          );
         }
         break;
     }

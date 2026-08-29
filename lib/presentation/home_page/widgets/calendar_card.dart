@@ -12,20 +12,21 @@ class CalendarCard extends StatelessWidget {
     required this.dayName,
     required this.dayNumber,
     required this.isSelected,
-    required this.onTap
-
+    required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(top: 4, bottom: 4, left: 1, right: 1),
       elevation: isSelected ? 4 : 0,
-      color: isSelected ? AppColors.calendarMainColor : AppColors.cardBackgrounColor,
+      color: isSelected
+          ? AppColors.calendarMainColor
+          : AppColors.cardBackgrounColor,
       clipBehavior: Clip.hardEdge,
       child: Stack(
         children: [
-          if(isSelected)
+          if (isSelected)
             Positioned(
               bottom: 0,
               left: 0,
@@ -36,44 +37,44 @@ class CalendarCard extends StatelessWidget {
                   color: AppColors.calendarSecondaryColor,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(6),
-                    topRight: Radius.circular(6)
-                  )
+                    topRight: Radius.circular(6),
+                  ),
                 ),
               ),
             ),
-            Positioned.fill(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: onTap,
-                  child: SizedBox(
-                    width: 62,
-                    height: 82,
-                    child: Padding(
-                      padding: const EdgeInsetsGeometry.symmetric(vertical: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: isSelected ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            dayName, 
-                            style: Theme.of(context).textTheme.labelSmall,
-                          ),
-                          Text(
-                            dayNumber,
-                            style: Theme.of(context).textTheme.labelLarge,
-                          )
-                        ],
-                      )
+          Positioned.fill(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                child: SizedBox(
+                  width: 62,
+                  height: 82,
+                  child: Padding(
+                    padding: const EdgeInsetsGeometry.symmetric(vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: isSelected
+                          ? MainAxisAlignment.spaceBetween
+                          : MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          dayName,
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                        Text(
+                          dayNumber,
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
+                      ],
                     ),
-                    
                   ),
                 ),
-              )
-            )
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-
 }

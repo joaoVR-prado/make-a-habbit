@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
-import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
-import 'package:make_a_habbit/data/providers/habit_stats_provider.dart';
+import 'package:make_a_habbit/app/providers/controller_providers.dart';
+import 'package:make_a_habbit/app/providers/report_providers.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 import 'package:make_a_habbit/presentation/reports/widgets/habit_month_calendar.dart';
 
@@ -40,8 +40,8 @@ class HabitDetailReportPage extends ConsumerWidget {
             onPressed: () async {
               try {
                 await ref
-                  .read(concludedHabitsControllerProvider.notifier)
-                  .retry();
+                    .read(concludedHabitsControllerProvider.notifier)
+                    .retry();
               } catch (_) {
                 // O provider mantém o estado de erro para outra tentativa.
               }

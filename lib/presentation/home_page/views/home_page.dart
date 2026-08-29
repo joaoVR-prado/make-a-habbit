@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/app/providers/controller_providers.dart';
 import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
-import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/presentation/habits/routes/habit_draft_route.dart';
 import 'package:make_a_habbit/presentation/habits/widgets/edit_or_complete_habit_dialog.dart';
 import 'package:make_a_habbit/presentation/home_page/widgets/habit_search.dart';
@@ -43,42 +42,42 @@ class _HomePageState extends ConsumerState<HomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       appBar: AppBar(
         leading: currentTab == 0
-          ? IconButton(
-              icon: const Icon(Icons.calendar_month, size: 38),
-              color: AppColors.homePageIconColor,
-              onPressed: () async {
-                final currentDate = ref.read(selectedDateProvider);
+            ? IconButton(
+                icon: const Icon(Icons.calendar_month, size: 38),
+                color: AppColors.homePageIconColor,
+                onPressed: () async {
+                  final currentDate = ref.read(selectedDateProvider);
 
-                final DateTime? selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate: currentDate,
-                  firstDate: DateTime(today.year - 1), // Ano passado
-                  lastDate: DateTime(today.year + 1), // Vai até ano que vem
+                  final DateTime? selectedDate = await showDatePicker(
+                    context: context,
+                    initialDate: currentDate,
+                    firstDate: DateTime(today.year - 1), // Ano passado
+                    lastDate: DateTime(today.year + 1), // Vai até ano que vem
 
-                  builder: (context, child) {
-                    return Theme(
-                      data: Theme.of(context).copyWith(
-                        colorScheme: const ColorScheme.light(
-                          primary: AppColors.homePageIconColor,
-                          onPrimary: Colors.white,
-                          onSurface: Colors.black,
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: const ColorScheme.light(
+                            primary: AppColors.homePageIconColor,
+                            onPrimary: Colors.white,
+                            onSurface: Colors.black,
+                          ),
                         ),
-                      ),
-                      child: child!,
-                    );
-                  },
-                );
-                if (selectedDate != null && selectedDate != currentDate) {
-                  ref.read(selectedDateProvider.notifier).state =
-                    selectedDate;
-                }
-              },
-            )
-          : null,
+                        child: child!,
+                      );
+                    },
+                  );
+                  if (selectedDate != null && selectedDate != currentDate) {
+                    ref.read(selectedDateProvider.notifier).state =
+                        selectedDate;
+                  }
+                },
+              )
+            : null,
         title: Text(
           currentTab == 0
-            ? '${_getDayName(selectedDate.weekday)} - ${_getMonthName(selectedDate.month)}. ${selectedDate.day} - ${selectedDate.year}'
-            : 'Relatórios',
+              ? '${_getDayName(selectedDate.weekday)} - ${_getMonthName(selectedDate.month)}. ${selectedDate.day} - ${selectedDate.year}'
+              : 'Relatórios',
           style: Theme.of(context).textTheme.labelMedium,
         ),
         actions: [
@@ -140,37 +139,36 @@ class _HomePageState extends ConsumerState<HomePage> {
         ],
       ),
       floatingActionButton: currentTab == 0
-        ? FloatingActionButton(
-            key: const ValueKey('create_habit'),
-            onPressed: () async {
-              await Navigator.of(context).push(HabitDraftRoute.create());
-            },
-            child: Icon(Icons.add, color: Colors.white),
-          )
-        : null,
+          ? FloatingActionButton(
+              key: const ValueKey('create_habit'),
+              onPressed: () async {
+                await Navigator.of(context).push(HabitDraftRoute.create());
+              },
+              child: Icon(Icons.add, color: Colors.white),
+            )
+          : null,
       body: currentTab == 0
-        ? displayHabits.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, _) => Center(
-              child: FilledButton(
-                onPressed: () async {
-                  try {
-                    await Future.wait([
-                      ref.read(habitControllerProvider.notifier).retry(),
-                      ref
-                        .read(concludedHabitsControllerProvider.notifier)
-                        .retry(),
-                    ]);
-                  } catch (_) {
-                  }
-                },
-                child: const Text('Tentar novamente'),
+          ? displayHabits.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, _) => Center(
+                child: FilledButton(
+                  onPressed: () async {
+                    try {
+                      await Future.wait([
+                        ref.read(habitControllerProvider.notifier).retry(),
+                        ref
+                            .read(concludedHabitsControllerProvider.notifier)
+                            .retry(),
+                      ]);
+                    } catch (_) {}
+                  },
+                  child: const Text('Tentar novamente'),
+                ),
               ),
-            ),
-            data: (items) =>
-                _buildHabits(isToday: isToday, displayHabits: items),
-          )
-        : const ReportsPage(),
+              data: (items) =>
+                  _buildHabits(isToday: isToday, displayHabits: items),
+            )
+          : const ReportsPage(),
       //: Center(child: Text('Tela de Relatórios em construção!')),
       bottomNavigationBar: BottomAppBar(
         height: 60,

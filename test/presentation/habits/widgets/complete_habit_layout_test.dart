@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:make_a_habbit/controllers/habits/concluded_habits_controller.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/app/providers/controller_providers.dart';
+import 'package:make_a_habbit/app/providers/dependency_providers.dart';
+import 'package:make_a_habbit/app/providers/use_case_providers.dart';
 import 'package:make_a_habbit/core/providers/clock_provider.dart';
-import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/concluded_habits_model.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_frequency.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
@@ -18,6 +18,12 @@ final class _FixedClock implements Clock {
 }
 
 final class _EmptyConcludedHabitsController extends ConcludedHabitsController {
+  _EmptyConcludedHabitsController()
+    : super(
+        conclusions: concludedHabitsRepositoryProvider,
+        recordConclusion: recordHabitConclusionProvider,
+      );
+
   @override
   Future<List<ConcludedHabitsModel>> build() async => const [];
 }

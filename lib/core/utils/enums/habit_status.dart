@@ -1,7 +1,1 @@
-
-enum HabitStatus {
-  pending,
-  done,
-  incomplete
-
-}
+enum HabitStatus { pending, done, incomplete }

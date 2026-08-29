@@ -7,7 +7,7 @@ import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/data/dtos/conclusion_dto.dart';
 import 'package:make_a_habbit/data/dtos/habit_dto.dart';
 import 'package:make_a_habbit/data/dtos/notification_config_dto.dart';
-import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
+import 'package:make_a_habbit/app/providers/dependency_providers.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
 import 'package:make_a_habbit/domain/services/clock.dart';
 import 'package:make_a_habbit/domain/services/notification_scheduler.dart';

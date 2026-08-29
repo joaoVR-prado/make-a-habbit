@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class CommonCreateHabitTitle extends StatelessWidget {
   final String titleText;
 
-  const CommonCreateHabitTitle({
-    super.key,
-    required this.titleText
-  });
+  const CommonCreateHabitTitle({super.key, required this.titleText});
 
   @override
   Widget build(BuildContext context) {
@@ -22,5 +19,4 @@ class CommonCreateHabitTitle extends StatelessWidget {
       ),
     );
   }
-
 }

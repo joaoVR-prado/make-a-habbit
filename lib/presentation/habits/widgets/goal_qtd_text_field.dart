@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:make_a_habbit/controllers/habits/habit_controller.dart';
+import 'package:make_a_habbit/app/providers/controller_providers.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/completion_value.dart';
 import 'package:make_a_habbit/domain/entities/habits/habit_model.dart';
-import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_horizontal_divider.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_vertical_divider.dart';
 
 class GoalQtdTextField extends ConsumerStatefulWidget {
   final HabitModel habit;
-  const GoalQtdTextField({
-    super.key,
-    required this.habit
-  });
-  
+  const GoalQtdTextField({super.key, required this.habit});
 
   @override
   ConsumerState<GoalQtdTextField> createState() => _GoalQtdTextFieldState();
@@ -26,34 +21,36 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
   late TextEditingController _qtdController;
   bool _isSaving = false;
   @override
-  void initState(){
+  void initState() {
     super.initState();
 
     final selectedDate = ref.read(selectedDateProvider);
-    final getAllConclusions = ref.read(concludedHabitsControllerProvider).value ?? const [];
+    final getAllConclusions =
+        ref.read(concludedHabitsControllerProvider).value ?? const [];
 
-    final dailyHabitConclusion = getAllConclusions.where((i) => 
-      i.habitId == widget.habit.id &&
-      i.conclusionDate.year == selectedDate.year &&
-      i.conclusionDate.month == selectedDate.month &&
-      i.conclusionDate.day == selectedDate.day
-    ).firstOrNull;
+    final dailyHabitConclusion = getAllConclusions
+        .where(
+          (i) =>
+              i.habitId == widget.habit.id &&
+              i.conclusionDate.year == selectedDate.year &&
+              i.conclusionDate.month == selectedDate.month &&
+              i.conclusionDate.day == selectedDate.day,
+        )
+        .firstOrNull;
 
     final doneQuantity = switch (dailyHabitConclusion?.conclusionValue) {
       QuantityCompletionValue(:final value) => value,
       _ => 0,
     };
     _qtdController = TextEditingController(text: doneQuantity.toString());
-
   }
 
   @override
   void dispose() {
     _qtdController.dispose();
     super.dispose();
-    
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final selectedDate = ref.watch(selectedDateProvider);
@@ -61,12 +58,15 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
     final getAllConlusions = conclusions.value ?? const [];
 
     // Busca a conclusao do habito
-    final dailyHabitConclusion = getAllConlusions.where((i) => 
-      i.habitId == widget.habit.id &&
-      i.conclusionDate.year == selectedDate.year &&
-      i.conclusionDate.month == selectedDate.month &&
-      i.conclusionDate.day == selectedDate.day
-    ).firstOrNull;
+    final dailyHabitConclusion = getAllConlusions
+        .where(
+          (i) =>
+              i.habitId == widget.habit.id &&
+              i.conclusionDate.year == selectedDate.year &&
+              i.conclusionDate.month == selectedDate.month &&
+              i.conclusionDate.day == selectedDate.day,
+        )
+        .firstOrNull;
 
     // Pega a quantidade ja feita
     final doneQuantity = switch (dailyHabitConclusion?.conclusionValue) {
@@ -82,55 +82,45 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
           child: TextFormField(
             key: const Key('quantity_conclusion_input'),
             controller: _qtdController,
-            style: TextTheme.of(context).labelLarge!.copyWith(
-              color: AppColors.qtdTextColor
-            ),
+            style: TextTheme.of(
+              context,
+            ).labelLarge!.copyWith(color: AppColors.qtdTextColor),
             textAlign: TextAlign.center,
             keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly
-            ],
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 11),
               filled: true,
               fillColor: AppColors.dialogTextColor,
-              
+
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12)
+                borderRadius: BorderRadius.circular(12),
               ),
               // Diminuir quantidade
               prefixIcon: IconButton(
-                onPressed: (){
+                onPressed: () {
                   int currentValue = int.tryParse(_qtdController.text) ?? 0;
                   _updateQuantity(currentValue - 1);
-          
-                }, 
-                icon: Icon(
-                  Icons.remove,
-                  color: AppColors.iconQtdColor,
-                )
+                },
+                icon: Icon(Icons.remove, color: AppColors.iconQtdColor),
               ),
               // Aumentar Quantidade
-                suffixIcon: IconButton(
-                onPressed: (){
+              suffixIcon: IconButton(
+                onPressed: () {
                   int currentValue = int.tryParse(_qtdController.text) ?? 0;
                   _updateQuantity(currentValue + 1);
-          
-                }, 
-                icon: Icon(
-                  Icons.add,
-                  color: AppColors.iconQtdColor,
-                )
-              )
+                },
+                icon: Icon(Icons.add, color: AppColors.iconQtdColor),
+              ),
             ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 28),
           child: TextFormField(
-            style: TextTheme.of(context).labelSmall!.copyWith(
-              color: AppColors.qtdTextColor
-            ),
+            style: TextTheme.of(
+              context,
+            ).labelSmall!.copyWith(color: AppColors.qtdTextColor),
             readOnly: true,
             maxLines: 2,
             initialValue: 'Hoje \n $doneQuantity/${widget.habit.goalQuantity}',
@@ -141,7 +131,7 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
               fillColor: AppColors.dialogTextColor,
               enabled: false,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12)
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
@@ -152,54 +142,54 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-            // Cancelar
-            TextButton(
-              onPressed: _isSaving ? null : () async {
-                Navigator.pop(context);
-              },
-              child: Text(
-                'CANCELAR',
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  color: AppColors.dialogTextColor,
-                  fontWeight: FontWeight.bold
+              // Cancelar
+              TextButton(
+                onPressed: _isSaving
+                    ? null
+                    : () async {
+                        Navigator.pop(context);
+                      },
+                child: Text(
+                  'CANCELAR',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: AppColors.dialogTextColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-            CommonVerticalDivider(),
-            // Concluir
-            TextButton(
-              key: const Key('save_quantity_conclusion_button'),
-              onPressed: () async {
-                final concludedQtd = int.tryParse(_qtdController.text) ?? 1;
-                setState(() => _isSaving = true);
-                try {
-                  await ref
-                    .read(concludedHabitsControllerProvider.notifier)
-                    .saveQuantityConclusion(
-                      habitId: widget.habit.id,
-                      date: selectedDate,
-                      quantity: concludedQtd,
-                    );
-                } catch (_) {
-                  if (mounted) setState(() => _isSaving = false);
-                  return;
-                }
+              CommonVerticalDivider(),
+              // Concluir
+              TextButton(
+                key: const Key('save_quantity_conclusion_button'),
+                onPressed: () async {
+                  final concludedQtd = int.tryParse(_qtdController.text) ?? 1;
+                  setState(() => _isSaving = true);
+                  try {
+                    await ref
+                        .read(concludedHabitsControllerProvider.notifier)
+                        .saveQuantityConclusion(
+                          habitId: widget.habit.id,
+                          date: selectedDate,
+                          quantity: concludedQtd,
+                        );
+                  } catch (_) {
+                    if (mounted) setState(() => _isSaving = false);
+                    return;
+                  }
 
-                if (context.mounted){
-                  Navigator.pop(context);// Sai da modal de conclusao
-                  Navigator.pop(context); // sai da modal de edicao
-
-                }
-              
-              },
-              child: Text(
-                'ACEITAR',
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  color: AppColors.positiveActionDialogTextColor,
-                  fontWeight: FontWeight.bold
+                  if (context.mounted) {
+                    Navigator.pop(context); // Sai da modal de conclusao
+                    Navigator.pop(context); // sai da modal de edicao
+                  }
+                },
+                child: Text(
+                  'ACEITAR',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: AppColors.positiveActionDialogTextColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
             ],
           ),
         ),
@@ -207,13 +197,12 @@ class _GoalQtdTextFieldState extends ConsumerState<GoalQtdTextField> {
     );
   }
 
-  void _updateQuantity(int newValue){
-    if(newValue >=0){
+  void _updateQuantity(int newValue) {
+    if (newValue >= 0) {
       _qtdController.text = newValue.toString();
 
       _qtdController.selection = TextSelection.fromPosition(
         TextPosition(offset: _qtdController.text.length),
-
       );
     }
   }

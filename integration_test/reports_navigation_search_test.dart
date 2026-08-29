@@ -6,7 +6,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/data/dtos/conclusion_dto.dart';
 import 'package:make_a_habbit/data/dtos/habit_dto.dart';
-import 'package:make_a_habbit/data/providers/notification_scheduler_provider.dart';
+import 'package:make_a_habbit/app/providers/dependency_providers.dart';
 import 'package:make_a_habbit/data/repositories/concluded_habits_repository.dart';
 import 'package:make_a_habbit/data/repositories/habit_repository.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/completion_value.dart';

@@ -3,17 +3,26 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/completion_value.dart';
 import 'package:make_a_habbit/domain/entities/conclusions/concluded_habits_model.dart';
-import 'package:make_a_habbit/data/providers/concluded_habits_repository_provider.dart';
-import 'package:make_a_habbit/data/providers/habit_use_case_providers.dart';
+import 'package:make_a_habbit/domain/repositories/conclusion_repository.dart';
+import 'package:make_a_habbit/domain/use_cases/record_habit_conclusion.dart';
 
 class ConcludedHabitsController
     extends AsyncNotifier<List<ConcludedHabitsModel>> {
+  ConcludedHabitsController({
+    required Provider<ConclusionRepository> conclusions,
+    required Provider<RecordHabitConclusion> recordConclusion,
+  }) : _conclusions = conclusions,
+       _recordConclusion = recordConclusion;
+
+  final Provider<ConclusionRepository> _conclusions;
+  final Provider<RecordHabitConclusion> _recordConclusion;
+
   bool _isOperating = false;
   List<ConcludedHabitsModel>? _lastSuccessfulData;
 
   @override
   Future<List<ConcludedHabitsModel>> build() async {
-    final conclusions = ref.read(concludedHabitsRepositoryProvider).getAll();
+    final conclusions = ref.read(_conclusions).getAll();
     _lastSuccessfulData = conclusions;
     return conclusions;
   }
@@ -21,7 +30,7 @@ class ConcludedHabitsController
   Future<void> retry() async {
     state = const AsyncLoading();
     final result = await AsyncValue.guard(
-      () async => ref.read(concludedHabitsRepositoryProvider).getAll(),
+      () async => ref.read(_conclusions).getAll(),
     );
     if (result case AsyncData(:final value)) {
       _lastSuccessfulData = value;
@@ -55,7 +64,7 @@ class ConcludedHabitsController
     required CompletionValue value,
   }) async {
     await _runExclusive((current) async {
-      final conclusion = await ref.read(recordHabitConclusionProvider)(
+      final conclusion = await ref.read(_recordConclusion)(
         habitId: habitId,
         date: date,
         value: value,
@@ -77,9 +86,7 @@ class ConcludedHabitsController
   Future<void> removeConclusion(String habitId, DateTime date) async {
     await _runExclusive((current) async {
       final formattedDate = DateTime(date.year, date.month, date.day);
-      await ref
-          .read(concludedHabitsRepositoryProvider)
-          .delete(habitId, formattedDate);
+      await ref.read(_conclusions).delete(habitId, formattedDate);
       return current
           .where(
             (item) =>

@@ -11,9 +11,7 @@ class _MockAwesomeNotifications extends Mock implements AwesomeNotifications {}
 
 void main() {
   setUpAll(() {
-    registerFallbackValue(
-      NotificationContent(id: 0, channelKey: 'teste'),
-    );
+    registerFallbackValue(NotificationContent(id: 0, channelKey: 'teste'));
     registerFallbackValue(NotificationCalendar(second: 0));
   });
 

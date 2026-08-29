@@ -45,41 +45,47 @@ void main() {
     );
   }
 
-  group('TESTES BÁSICOS SOBRE OS RELATÓRIOS DE HÁBITOS', (){
+  group('TESTES BÁSICOS SOBRE OS RELATÓRIOS DE HÁBITOS', () {
     test('Retorna com as conquistas zeradas quando não tenho um hábito', () {
-      final stats = calculator.calculate(habits: [], conclusions: [], now: today);
+      final stats = calculator.calculate(
+        habits: [],
+        conclusions: [],
+        now: today,
+      );
 
       expect(stats.totalHabits, 0);
       expect(stats.completedToday, 0);
       expect(stats.generalSuccessRate, 0);
       expect(stats.bestStreakGeral, 0);
       expect(stats.weeklyCompletionHistory.length, 7);
-
     });
 
-    test('Conta as conclusões de hábitos do tipo booleano (sim/não) e de quantidade ', () {
-      final habits = [
-        habit(id: 'boolean'),
-        habit(
-          id: 'quantity',
-          type: HabitConclusionType.goalQuantity,
-          goal: 3,
-        ),
-      ];
-      final conclusions = [
-        conclusion('boolean', today, true),
-        conclusion('quantity', today, 3),
-      ];
+    test(
+      'Conta as conclusões de hábitos do tipo booleano (sim/não) e de quantidade ',
+      () {
+        final habits = [
+          habit(id: 'boolean'),
+          habit(
+            id: 'quantity',
+            type: HabitConclusionType.goalQuantity,
+            goal: 3,
+          ),
+        ];
+        final conclusions = [
+          conclusion('boolean', today, true),
+          conclusion('quantity', today, 3),
+        ];
 
-      final stats = calculator.calculate(
-        habits: habits,
-        conclusions: conclusions,
-        now: today,
-      );
+        final stats = calculator.calculate(
+          habits: habits,
+          conclusions: conclusions,
+          now: today,
+        );
 
-      expect(stats.completedToday, 2);
-      expect(stats.weeklyCompletionHistory[today], 2);
-    });
+        expect(stats.completedToday, 2);
+        expect(stats.weeklyCompletionHistory[today], 2);
+      },
+    );
 
     test('Calcula a taxa de sucesso de habitos diarios', () {
       final start = today.subtract(const Duration(days: 1));
@@ -93,21 +99,24 @@ void main() {
       expect(stats.generalSuccessRate, 50);
     });
 
-    test('Testa se segue a regra de não calcular conclusões em datas que o hábito não ocorre está correta', () {
-      final futureHabit = habit(
-        id: 'future',
-        startDate: today.add(const Duration(days: 1)),
-      );
-      final stats = calculator.calculate(
-        habits: [futureHabit],
-        conclusions: [conclusion('future', today, true)],
-        now: today,
-      );
+    test(
+      'Testa se segue a regra de não calcular conclusões em datas que o hábito não ocorre está correta',
+      () {
+        final futureHabit = habit(
+          id: 'future',
+          startDate: today.add(const Duration(days: 1)),
+        );
+        final stats = calculator.calculate(
+          habits: [futureHabit],
+          conclusions: [conclusion('future', today, true)],
+          now: today,
+        );
 
-      expect(stats.totalHabits, 0);
-      expect(stats.completedToday, 0);
-      expect(stats.generalSuccessRate, 0);
-    });
+        expect(stats.totalHabits, 0);
+        expect(stats.completedToday, 0);
+        expect(stats.generalSuccessRate, 0);
+      },
+    );
 
     test('Mantem a sequência em dias que o hábito não está agendado', () {
       final monday = DateTime(2026, 8, 3);
@@ -143,10 +152,6 @@ void main() {
       );
 
       expect(stats.bestStreakGeral, 1);
-
     });
-
   });
-
-  
 }

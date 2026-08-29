@@ -28,8 +28,9 @@ class ReportsPage extends ConsumerWidget {
               width: double.infinity,
               child: SegmentedButton<ReportsView>(
                 style: SegmentedButton.styleFrom(
-                  selectedBackgroundColor: AppColors.positiveActionDialogTextColor,
-                  selectedForegroundColor: Colors.white
+                  selectedBackgroundColor:
+                      AppColors.positiveActionDialogTextColor,
+                  selectedForegroundColor: Colors.white,
                 ),
                 key: const Key('reports-segmented-control'),
                 segments: [
@@ -40,10 +41,7 @@ class ReportsPage extends ConsumerWidget {
                       key: const Key('reports-general-segment'),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    icon: Icon(
-                      Icons.dashboard_outlined,
-                      color: Colors.white,
-                    ),
+                    icon: Icon(Icons.dashboard_outlined, color: Colors.white),
                   ),
                   ButtonSegment(
                     value: ReportsView.habits,
@@ -52,10 +50,7 @@ class ReportsPage extends ConsumerWidget {
                       key: const Key('reports-habits-segment'),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    icon: Icon(
-                      Icons.checklist,
-                      color: Colors.white,
-                    ),
+                    icon: Icon(Icons.checklist, color: Colors.white),
                   ),
                 ],
                 selected: {selectedView},

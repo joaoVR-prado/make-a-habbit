@@ -19,18 +19,14 @@ void main() {
   group('ESCOPO DO RASCUNHO POR ROTA', () {
     test('Uma nova criação começa limpa após outro escopo ser descartado.', () {
       final firstRoute = ProviderContainer(
-        overrides: [
-          draftHabitInitialStateProvider.overrideWithValue(null),
-        ],
+        overrides: [draftHabitInitialStateProvider.overrideWithValue(null)],
       );
       firstRoute.read(draftHabitProvider.notifier).updateName('Temporário');
       expect(firstRoute.read(draftHabitProvider).name, 'Temporário');
       firstRoute.dispose();
 
       final secondRoute = ProviderContainer(
-        overrides: [
-          draftHabitInitialStateProvider.overrideWithValue(null),
-        ],
+        overrides: [draftHabitInitialStateProvider.overrideWithValue(null)],
       );
       addTearDown(secondRoute.dispose);
 
@@ -67,9 +63,7 @@ void main() {
 
     test('O mesmo escopo preserva o rascunho durante a navegação interna.', () {
       final routeScope = ProviderContainer(
-        overrides: [
-          draftHabitInitialStateProvider.overrideWithValue(null),
-        ],
+        overrides: [draftHabitInitialStateProvider.overrideWithValue(null)],
       );
       addTearDown(routeScope.dispose);
 

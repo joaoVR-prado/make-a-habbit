@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/controllers/habits/draft_habit_notifier.dart';
 import 'package:make_a_habbit/core/providers/clock_provider.dart';
 import 'package:make_a_habbit/core/theme/app_colors.dart';
-import 'package:make_a_habbit/data/providers/habit_use_case_providers.dart';
+import 'package:make_a_habbit/app/providers/use_case_providers.dart';
 import 'package:make_a_habbit/presentation/common/widgets/common_create_habit_title.dart';
 
 class ChooseStartDate extends ConsumerStatefulWidget {
@@ -116,8 +116,8 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
             );
             if (selectedDate != null) {
               ref
-                .read(draftHabitProvider.notifier)
-                .updateStartDate(selectedDate);
+                  .read(draftHabitProvider.notifier)
+                  .updateStartDate(selectedDate);
             }
           },
         ),
@@ -212,8 +212,8 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
             if (selectedTime != null) {
               //ref.read(draftReminderTimeNotificationProvider.notifier).state = selectedTime;
               ref
-                .read(draftHabitProvider.notifier)
-                .updateReminderTime(selectedTime);
+                  .read(draftHabitProvider.notifier)
+                  .updateReminderTime(selectedTime);
             }
           },
         ),
@@ -254,8 +254,8 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
               margin: const EdgeInsets.only(left: 18),
               elevation: isSelected ? 4 : 0,
               color: isSelected
-                ? AppColors.positiveActionDialogTextColor
-                : AppColors.cardBackgrounColor,
+                  ? AppColors.positiveActionDialogTextColor
+                  : AppColors.cardBackgrounColor,
               clipBehavior: Clip.hardEdge,
               child: SizedBox(
                 width: 112,
@@ -286,10 +286,7 @@ class _ChooseStartDate extends ConsumerState<ChooseStartDate> {
                     decoration: BoxDecoration(
                       color: AppColors.calendarMainColor,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 0.1,
-                      ),
+                      border: Border.all(color: Colors.white, width: 0.1),
                     ),
                     child: const Padding(
                       padding: EdgeInsetsGeometry.all(6),
