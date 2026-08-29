@@ -7,7 +7,7 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  quality:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +40,7 @@ jobs:
           retention-days: 14
 
   release-validation:
-    needs: quality
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
