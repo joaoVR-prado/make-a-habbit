@@ -100,6 +100,9 @@ class _HorizontalCalendarState extends ConsumerState<HorizontalCalendar> {
           return Padding(
             padding: EdgeInsetsGeometry.symmetric(horizontal: _padding / 2),
             child: CalendarCard(
+              key: ValueKey(
+                'home-calendar-${date.year}-${date.month}-${date.day}',
+              ),
               dayName: _getDayName(date.weekday),
               dayNumber: date.day.toString(),
               isSelected: isSelected,
