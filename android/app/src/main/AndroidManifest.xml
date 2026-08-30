@@ -1,12 +1,14 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:label="Make a Habbit"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <service
+            android:name="me.carda.awesome_notifications.core.services.ForegroundService"
+            tools:node="remove" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
