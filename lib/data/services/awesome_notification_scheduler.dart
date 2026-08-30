@@ -10,7 +10,7 @@ class AwesomeNotificationScheduler implements NotificationScheduler {
   }) : _notifications = notifications ?? AwesomeNotifications(),
        _planner = planner;
 
-  static const channelKey = 'habit_reminders_v2';
+  static const channelKey = 'habit_reminders_v3';
 
   final AwesomeNotifications _notifications;
   final NotificationSchedulePlanner _planner;
@@ -44,7 +44,7 @@ class AwesomeNotificationScheduler implements NotificationScheduler {
           category: plan.category == PlannedNotificationCategory.reminder
               ? NotificationCategory.Reminder
               : NotificationCategory.Status,
-          wakeUpScreen: true,
+          wakeUpScreen: false,
         ),
         schedule: _toAwesomeSchedule(plan.schedule, timeZone),
       );
@@ -64,7 +64,7 @@ class AwesomeNotificationScheduler implements NotificationScheduler {
         minute: schedule.minute,
         second: 0,
         repeats: true,
-        preciseAlarm: true,
+        preciseAlarm: false,
         allowWhileIdle: true,
       ),
       ExactDateSchedule() => NotificationCalendar(
@@ -76,7 +76,7 @@ class AwesomeNotificationScheduler implements NotificationScheduler {
         minute: schedule.date.minute,
         second: 0,
         repeats: false,
-        preciseAlarm: true,
+        preciseAlarm: false,
         allowWhileIdle: true,
       ),
     };
