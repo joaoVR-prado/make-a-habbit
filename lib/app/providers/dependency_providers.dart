@@ -7,21 +7,24 @@ import 'package:make_a_habbit/data/repositories/concluded_habits_repository.dart
 import 'package:make_a_habbit/data/repositories/habit_repository.dart';
 import 'package:make_a_habbit/data/repositories/notification_config_repository.dart';
 import 'package:make_a_habbit/data/services/awesome_notification_scheduler.dart';
+import 'package:make_a_habbit/data/storage/hive_local_storage.dart';
 import 'package:make_a_habbit/domain/repositories/notification_config_repository.dart';
 import 'package:make_a_habbit/domain/services/notification_scheduler.dart';
 
 final habitRepositoryProvider = Provider<HabitRepository>((ref) {
-  return HiveHabitRepository(Hive.box<HabitDto>('habits'));
+  return HiveHabitRepository(Hive.box<HabitDto>(HiveBoxNames.habits));
 });
 
 final concludedHabitsRepositoryProvider = Provider<ConclusionRepository>((ref) {
-  return HiveConclusionRepository(Hive.box<ConclusionDto>('conclusions'));
+  return HiveConclusionRepository(
+    Hive.box<ConclusionDto>(HiveBoxNames.conclusions),
+  );
 });
 
 final notificationConfigRepositoryProvider =
     Provider<NotificationConfigRepository>((ref) {
       return HiveNotificationConfigRepository(
-        Hive.box<NotificationConfigDto>('notifications'),
+        Hive.box<NotificationConfigDto>(HiveBoxNames.notifications),
       );
     });
 

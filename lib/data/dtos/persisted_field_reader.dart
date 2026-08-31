@@ -23,10 +23,10 @@ int readRequiredIntField(
   String fieldName,
 ) {
   final value = fields[index];
-  if (value is num) return value.toInt();
+  if (value is int) return value;
   throw FormatException(
     'Campo obrigatório "$fieldName" ausente ou inválido. '
-    'Esperado: num; recebido: ${value.runtimeType}.',
+    'Esperado: int; recebido: ${value.runtimeType}.',
   );
 }
 
@@ -37,10 +37,10 @@ int? readOptionalIntField(
 ) {
   final value = fields[index];
   if (value == null) return null;
-  if (value is num) return value.toInt();
+  if (value is int) return value;
   throw FormatException(
     'Campo opcional "$fieldName" inválido. '
-    'Esperado: num; recebido: ${value.runtimeType}.',
+    'Esperado: int; recebido: ${value.runtimeType}.',
   );
 }
 

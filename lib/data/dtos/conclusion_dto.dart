@@ -34,13 +34,16 @@ final class ConclusionDto {
 
   ConcludedHabitsModel toDomain() {
     final conclusionValue = switch ((isYesNo, yesNoValue, quantityValue)) {
-      (true, final bool value, _) => YesNoCompletionValue(value),
-      (false, _, final int value) => QuantityCompletionValue(value),
+      (true, final bool value, null) => YesNoCompletionValue(value),
+      (false, null, final int value) => QuantityCompletionValue(value),
       (true, null, _) => throw const FormatException(
         'Conclusão do tipo sim ou não sem valor persistido.',
       ),
       (false, _, null) => throw const FormatException(
         'Conclusão quantitativa sem valor persistido.',
+      ),
+      _ => throw const FormatException(
+        'Conclusão persistida possui valores incompatíveis com o seu tipo.',
       ),
     };
 
