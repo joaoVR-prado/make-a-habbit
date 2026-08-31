@@ -66,5 +66,71 @@ void main() {
         );
       },
     );
+
+    test('Apaga o armazenamento antes de cancelar as notificações.', () async {
+      final calls = <String>[];
+      final bootstrap = AppBootstrap(
+        initializeStorage: () async {},
+        initializeNotifications: () async {},
+        resetLocalStorage: () async => calls.add('armazenamento'),
+        cancelNotifications: () async => calls.add('notificações'),
+      );
+
+      await bootstrap.resetLocalData();
+
+      expect(calls, ['armazenamento', 'notificações']);
+    });
+
+    test('Informa a etapa quando os dados não podem ser apagados.', () async {
+      var canceledNotifications = false;
+      final bootstrap = AppBootstrap(
+        initializeStorage: () async {},
+        initializeNotifications: () async {},
+        resetLocalStorage: () async => throw Exception('arquivo bloqueado'),
+        cancelNotifications: () async {
+          canceledNotifications = true;
+        },
+      );
+
+      await expectLater(
+        bootstrap.resetLocalData(),
+        throwsA(
+          isA<AppBootstrapException>()
+              .having((error) => error.stage, 'etapa', AppBootstrapStage.reset)
+              .having(
+                (error) => error.cause.toString(),
+                'causa',
+                contains('arquivo bloqueado'),
+              ),
+        ),
+      );
+      expect(canceledNotifications, isFalse);
+    });
+
+    test(
+      'Mantém a recuperação concluída quando o cancelamento falha.',
+      () async {
+        final reportedErrors = <Object>[];
+        final bootstrap = AppBootstrap(
+          initializeStorage: () async {},
+          initializeNotifications: () async {},
+          resetLocalStorage: () async {},
+          cancelNotifications: () async {
+            throw Exception('plugin indisponível');
+          },
+          reportNonFatalError: (error, stackTrace) {
+            reportedErrors.add(error);
+          },
+        );
+
+        await bootstrap.resetLocalData();
+
+        expect(reportedErrors, hasLength(1));
+        expect(
+          reportedErrors.single.toString(),
+          contains('plugin indisponível'),
+        );
+      },
+    );
   });
 }

@@ -47,5 +47,16 @@ void main() {
         throwsA(isA<FormatException>()),
       );
     });
+
+    test('Rejeita número decimal em um campo inteiro.', () {
+      expect(
+        () => readRequiredIntField(const {0: 1.5}, 0, 'habit.iconCode'),
+        throwsA(isA<FormatException>()),
+      );
+      expect(
+        () => readOptionalIntField(const {0: 2.5}, 0, 'habit.goalQuantity'),
+        throwsA(isA<FormatException>()),
+      );
+    });
   });
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup disableIfNoEncryptionCapabilities="true">
+        <include domain="root" path="app_flutter/habits.hive" />
+        <include domain="root" path="app_flutter/conclusions.hive" />
+        <include domain="root" path="app_flutter/notifications.hive" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="root" path="app_flutter/habits.hive" />
+        <include domain="root" path="app_flutter/conclusions.hive" />
+        <include domain="root" path="app_flutter/notifications.hive" />
+    </device-transfer>
+</data-extraction-rules>

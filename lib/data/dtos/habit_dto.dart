@@ -153,8 +153,8 @@ String _readEnumName<T extends Enum>(
   String fieldName,
 ) {
   if (persistedValue is String) return persistedValue;
-  if (persistedValue is num) {
-    final legacyIndex = persistedValue.toInt();
+  if (persistedValue is int) {
+    final legacyIndex = persistedValue;
     if (legacyIndex >= 0 && legacyIndex < values.length) {
       return values[legacyIndex].name;
     }

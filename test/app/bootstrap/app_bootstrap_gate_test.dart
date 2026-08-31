@@ -59,5 +59,96 @@ void main() {
       expect(attempts, 2);
       expect(find.text('Aplicativo disponível'), findsOneWidget);
     });
+
+    testWidgets('Só apaga os dados locais depois da confirmação.', (
+      tester,
+    ) async {
+      var initializationAttempts = 0;
+      var resetAttempts = 0;
+      final bootstrap = AppBootstrap(
+        initializeStorage: () async {
+          initializationAttempts++;
+          if (initializationAttempts == 1) throw Exception('Dados inválidos');
+        },
+        initializeNotifications: () async {},
+        resetLocalStorage: () async => resetAttempts++,
+        cancelNotifications: () async {},
+      );
+
+      await tester.pumpWidget(
+        AppBootstrapGate(
+          bootstrap: bootstrap,
+          child: const MaterialApp(home: Text('Aplicativo disponível')),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('reset_local_data')));
+      await tester.pumpAndSettle();
+      expect(find.text('Apagar dados locais?'), findsOneWidget);
+      expect(resetAttempts, 0);
+
+      await tester.tap(find.byKey(const Key('confirm_local_data_reset')));
+      await tester.pumpAndSettle();
+
+      expect(resetAttempts, 1);
+      expect(initializationAttempts, 2);
+      expect(find.text('Aplicativo disponível'), findsOneWidget);
+    });
+
+    testWidgets('Preserva os dados quando a recuperação é cancelada.', (
+      tester,
+    ) async {
+      var resetAttempts = 0;
+      final bootstrap = AppBootstrap(
+        initializeStorage: () async => throw Exception('Dados inválidos'),
+        initializeNotifications: () async {},
+        resetLocalStorage: () async => resetAttempts++,
+        cancelNotifications: () async {},
+      );
+
+      await tester.pumpWidget(
+        AppBootstrapGate(
+          bootstrap: bootstrap,
+          child: const MaterialApp(home: Text('Aplicativo disponível')),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('reset_local_data')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('cancel_local_data_reset')));
+      await tester.pumpAndSettle();
+
+      expect(resetAttempts, 0);
+      expect(find.text('Não foi possível abrir seus dados'), findsOneWidget);
+    });
+
+    testWidgets('Exibe erro quando os dados locais não podem ser apagados.', (
+      tester,
+    ) async {
+      final bootstrap = AppBootstrap(
+        initializeStorage: () async => throw Exception('Dados inválidos'),
+        initializeNotifications: () async {},
+        resetLocalStorage: () async => throw Exception('Arquivo bloqueado'),
+        cancelNotifications: () async {},
+      );
+
+      await tester.pumpWidget(
+        AppBootstrapGate(
+          bootstrap: bootstrap,
+          child: const MaterialApp(home: Text('Aplicativo disponível')),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('reset_local_data')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('confirm_local_data_reset')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('local_data_reset_error')), findsOneWidget);
+      expect(find.byKey(const Key('reset_local_data')), findsOneWidget);
+    });
   });
 }

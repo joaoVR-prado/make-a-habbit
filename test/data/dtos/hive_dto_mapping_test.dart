@@ -164,6 +164,19 @@ void main() {
 
       expect(dto.toDomain, throwsA(isA<FormatException>()));
     });
+
+    test('Rejeita valores simultâneos de tipos de conclusão distintos.', () {
+      final dto = ConclusionDto(
+        habitId: 'habito',
+        conclusionDate: DateTime(2026, 8, 16),
+        isYesNo: true,
+        yesNoValue: true,
+        quantityValue: 1,
+        note: null,
+      );
+
+      expect(dto.toDomain, throwsA(isA<FormatException>()));
+    });
   });
 
   group('MAPEAMENTO ENTRE NOTIFICAÇÃO E DTO DO HIVE', () {
