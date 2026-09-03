@@ -14,7 +14,7 @@
 | **Estado** | [Riverpod](https://riverpod.dev/) (`flutter_riverpod`) |
 | **Persistência** | [Hive CE](https://github.com/hive-ce/hive_ce) (`hive_ce`, `hive_ce_flutter`) + adapters gerados |
 | **Identificadores** | `uuid` |
-| **UI** | Material Design, `google_fonts`, `smooth_page_indicator` |
+| **UI** | Material Design, fonte local Konkhmer Sleokchher, `smooth_page_indicator` |
 | **Notificações locais** | `awesome_notifications` |
 | **Internacionalização** | `flutter_localizations` (locale **pt-BR**) |
 | **Testes** | `flutter_test`, `integration_test`, `mocktail` |
@@ -56,6 +56,25 @@ flutter run
 ```
 
 ---
+
+## Tipografia offline
+
+A fonte Konkhmer Sleokchher Regular é distribuída dentro do aplicativo via
+`flutter.fonts` no `pubspec.yaml`. Não há download de fontes em execução nem
+dependência de cache de uma instalação anterior. Os estilos base usam essa fonte;
+os estilos sobrescritos do tema mantêm a fonte padrão, tamanhos, pesos e cores
+anteriores. Este lote não uniformiza a tipografia do aplicativo.
+
+O TTF é o mesmo utilizado pelo `google_fonts` 8.2.1, com SHA-256
+`00b63640c4ee464aba1bd1e509a62372b1c8371fbf31ee8efcefaa3e6c8ef173`, obtido do
+[servidor oficial de fontes](https://fonts.gstatic.com/s/a/00b63640c4ee464aba1bd1e509a62372b1c8371fbf31ee8efcefaa3e6c8ef173.ttf).
+A [licença SIL OFL 1.1](assets/fonts/OFL.txt) acompanha o bundle e é registrada
+no `LicenseRegistry` do Flutter. A origem está no
+[repositório oficial do Google Fonts](https://github.com/google/fonts/tree/main/ofl/konkhmersleokchher).
+
+Validação manual antes do lançamento: instalar o app em um emulador limpo,
+desligar a rede antes da primeira abertura e navegar por Hábitos, criação e
+Relatórios. A tipografia deve estar disponível sem uma execução anterior online.
 
 ## Scripts e comandos úteis
 
