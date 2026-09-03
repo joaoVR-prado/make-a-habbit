@@ -87,8 +87,12 @@ Relatórios. A tipografia deve estar disponível sem uma execução anterior onl
 | Testes unitários e de widget | `flutter test --coverage` |
 | Testes de integração | `flutter test integration_test/` |
 | Build APK (release) | `flutter build apk` |
-| Build App Bundle (Play Store) | `flutter build appbundle` |
+| Build App Bundle (validação local) | `flutter build appbundle` |
 | Build iOS | `flutter build ios` (macOS) |
+
+Para gerar o AAB assinado e ofuscado destinado à Play Store, siga o
+[guia de release](docs/release.md). O bundle local sem `key.properties` é
+intencionalmente gerado sem assinatura e não deve ser enviado para produção.
 
 ---
 

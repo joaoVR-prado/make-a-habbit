@@ -1,4 +1,4 @@
-package com.example.make_a_habbit
+package com.joaovrprado.makeahabbit
 
 import io.flutter.embedding.android.FlutterActivity
 
