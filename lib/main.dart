@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:make_a_habbit/app/bootstrap/app_bootstrap.dart';
 import 'package:make_a_habbit/app/bootstrap/app_bootstrap_gate.dart';
 import 'package:make_a_habbit/app/errors/app_error_handler.dart';
+import 'package:make_a_habbit/core/theme/app_fonts.dart';
 import 'package:make_a_habbit/core/theme/app_theme.dart';
 import 'package:make_a_habbit/presentation/home_page/views/home_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -11,6 +12,7 @@ import 'package:make_a_habbit/presentation/notifications/notification_reconcilia
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   AppErrorHandler.install();
+  AppFonts.registerLicense();
   runApp(
     AppBootstrapGate(
       bootstrap: AppBootstrap(),
