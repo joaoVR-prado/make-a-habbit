@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -5,8 +7,36 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use(keystoreProperties::load)
+}
+
+fun releaseSigningValue(environmentName: String, propertyName: String): String? =
+    System.getenv(environmentName)?.takeIf(String::isNotBlank)
+        ?: keystoreProperties.getProperty(propertyName)?.takeIf(String::isNotBlank)
+
+val releaseStoreFile = releaseSigningValue("PLAY_UPLOAD_STORE_FILE", "storeFile")
+val releaseStorePassword = releaseSigningValue("PLAY_UPLOAD_STORE_PASSWORD", "storePassword")
+val releaseKeyAlias = releaseSigningValue("PLAY_UPLOAD_KEY_ALIAS", "keyAlias")
+val releaseKeyPassword = releaseSigningValue("PLAY_UPLOAD_KEY_PASSWORD", "keyPassword")
+val releaseSigningValues = listOf(
+    releaseStoreFile,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword,
+)
+val hasReleaseSigning = releaseSigningValues.all { it != null }
+if (!hasReleaseSigning && releaseSigningValues.any { it != null }) {
+    throw GradleException(
+        "A assinatura de release está incompleta. Informe storeFile, " +
+            "storePassword, keyAlias e keyPassword.",
+    )
+}
+
 android {
-    namespace = "com.example.make_a_habbit"
+    namespace = "com.joaovrprado.makeahabbit"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,8 +50,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.make_a_habbit"
+        applicationId = "com.joaovrprado.makeahabbit"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -30,11 +59,20 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 }
